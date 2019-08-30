@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "composite": true,
+        "declaration": true,
+        "declarationMap": true,
+        "downlevelIteration": true,
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "keyofStringsOnly": false,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": false,
+        "noEmitOnError": true,
+        "removeComments": true,
+        "sourceMap": true,
+        "strict": true,
+        "stripInternal": true,
+        "moduleResolution": "node",
+        "module": "commonjs",
+        "target": "esnext",
+        "lib": ["esnext"]
+    }
+}

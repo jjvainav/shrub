@@ -1,0 +1,14 @@
+# builds
+dist
+
+# ide
+/.vscode
+
+# npm
+node_modules
+
+# typescript
+*.tsbuildinfo
+
+# yarn
+yarn-error.log
