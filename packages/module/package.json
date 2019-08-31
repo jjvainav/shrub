@@ -1,6 +1,6 @@
 {
     "name": "@shrub/module",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -17,6 +17,6 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/service-collection": "0.1.1"
+        "@shrub/service-collection": "0.1.2"
     }
 }
