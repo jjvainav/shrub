@@ -20,7 +20,7 @@ module.exports = {
         "^.+\\.(js|ts)$": "ts-jest"
     },
     transformIgnorePatterns: [
-        "node_modules/?!(@tool)"
+        "node_modules/?!(@shrub)"
     ],
     testRegex: "((\\.|/)(test))\\.ts$",
     moduleFileExtensions: ["js", "ts"],

@@ -1,4 +1,4 @@
-import { createOptions, createService, IOptionsService, IServiceRegistration } from "@tool/service-collection";
+import { createOptions, createService, IOptionsService, IServiceRegistration } from "@shrub/service-collection";
 import { combineExtensions, createConfigType, createHostBuilder, IModule, IModuleConfigurator, IModuleInitializer, loadModules } from "../src/module";
 
 describe("module loader", () => {

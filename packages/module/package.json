@@ -1,5 +1,5 @@
 {
-    "name": "@tool/module",
+    "name": "@shrub/module",
     "version": "0.1.1",
     "license": "MIT",
     "repository": {
@@ -17,6 +17,6 @@
         "test": "jest"
     },
     "dependencies": {
-        "@tool/service-collection": "0.1.1"
+        "@shrub/service-collection": "0.1.1"
     }
 }
