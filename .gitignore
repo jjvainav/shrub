@@ -4,6 +4,9 @@ dist
 # ide
 /.vscode
 
+# lerna
+lerna-debug.log
+
 # npm
 node_modules
 

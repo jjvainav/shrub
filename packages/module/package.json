@@ -1,6 +1,6 @@
 {
     "name": "@tool/module",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -8,12 +8,15 @@
     },
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
+    "publishConfig": {
+        "access": "public"
+    },
     "scripts": {
         "build": "tsc -b .",
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
         "test": "jest"
     },
-    "peerDependencies": {
-        "@tool/service-collection": "1.0.0"
+    "dependencies": {
+        "@tool/service-collection": "0.1.0"
     }
 }
