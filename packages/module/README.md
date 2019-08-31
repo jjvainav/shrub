@@ -1,1 +1,1 @@
-Defines a simple API for building modular server-side applications or front-end components.
+An API for modular server-side applications and front-end components.

@@ -1,12 +1,12 @@
 {
     "private": true,
-    "homepage": "https://github.com/jjvainav/tool",
-    "bugs": "https://github.com/jjvainav/tool/issues",
+    "homepage": "https://github.com/jjvainav/shrub",
+    "bugs": "https://github.com/jjvainav/shrub/issues",
     "license": "MIT",
     "author": "Jeremy Vainavicz <jjvainav@gmail.com>",
     "repository": {
         "type": "git",
-        "url": "https://github.com/jjvainav/tool.git"
+        "url": "https://github.com/jjvainav/shrub.git"
     },
     "workspaces": [
         "packages/*"

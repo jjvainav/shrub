@@ -1,10 +1,11 @@
 {
     "name": "@shrub/service-collection",
+    "description": "Dependency injection container with constructor injection support.",
     "version": "0.1.2",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/jjvainav/tool.git"
+        "url": "https://github.com/jjvainav/shrub.git"
     },
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
