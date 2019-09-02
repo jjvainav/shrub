@@ -1,0 +1,27 @@
+/* content container */
+$contentContainerShadowLight:
+    rgba(#000000, .08) 0px 2px 2px 0px inset, 
+    rgba(#000000, .08) 2px 0px 2px 0px inset;
+
+/* sidebar */
+$sidebarBackgroundLight: #020101;
+$sidebarLogoShadowLight: 
+    rgba(#000000, .08) 0px 1px, 
+    rgba(#000000, .08) 1px 0px;
+$sidebarZIndex: 101;
+
+/* sidebar item */
+$sidebarItemActiveBackgroundLight: rgba(#000000, .08);
+$sidebarItemActionWidth: 40px; // icon-width + padding that gets applied to list tile
+$sidebarItemGroupBackgroundLight: #dcdcdc;
+$sidebarItemIndicatorActiveBackground: #2979FF;
+$sidebarItemIndicatorBackgroundLight: #b0b0b0;
+$sidebarItemIndicatorWidth: 3px;
+
+/* toolbar */
+$toolbarBackgroundLight: #ffffff;
+// note: the toolbar height is also set programmatically in the toolbar.vue file
+// this variable is actually used by the sidebar
+$toolbarHeight: 54px; 
+$toolbarIconButtonWidth: 50px;
+$toolbarToggleBorderLight: rgba(#000000, .08);

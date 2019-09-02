@@ -3,7 +3,7 @@ import Router, { RawLocation, Route, RouteConfig } from "vue-router";
 import { EventEmitter, IEvent } from "@shrub/event-emitter";
 import { createService, Singleton } from "@shrub/service-collection";
 import { IComponent } from "@shrub/vue-core";
-import { ModuleExampleComponent, NotFoundComponent } from "./components";
+import { ModuleExampleComponent } from "./components";
 
 Vue.use(Router);
 
@@ -12,6 +12,7 @@ export const IWorkbenchService = createService<IWorkbenchService>("workbench-ser
 export interface IWorkbenchService {
     readonly onRouteChanged: IEvent;
     readonly currentRoute: IWorkbenchRoute;
+    readonly router: Router;
     getExample(name: string): IWorkbenchExample | undefined;
     getExamples(): Iterable<IWorkbenchExample>;
     navigateTo(link: IWorkbenchLink): void;
@@ -97,13 +98,6 @@ export class WorkbenchBrowserService implements IWorkbenchService {
 
     navigateTo(link: IWorkbenchLink): void {
         this.router.push(this.asRawLocation(link));
-    }
-
-    register404(): void {
-        // there seems to be an issue with vue-router and the '*' path - in order for it to 
-        // work properly it must be registered last even though the docs say otherwise
-        this.registerRoute({ path: "/404", component: { id: "404", ctor: NotFoundComponent } });
-        this.registerRoute({ path: "*", redirect: "/404" });
     }
 
     registerExample(example: IWorkbenchExample): void {

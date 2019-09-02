@@ -1,0 +1,6 @@
+@import "./variables.scss";
+
+html {
+    /* by default Vuetify sets this to 'scroll' so a vertical scrollbar is always visible */
+    overflow-y: visible;
+}

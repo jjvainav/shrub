@@ -1,6 +1,6 @@
 {
     "name": "@shrub/vue-core",
-    "description": "Abstract core module for vue component support and modules should not depend on this directly but instead depend on one of the platform specific modules (e.g. vue-browser, vue-server).",
+    "description": "Abstract core module for vue component support.",
     "version": "0.1.4",
     "license": "MIT",
     "repository": {
