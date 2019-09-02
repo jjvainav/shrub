@@ -29,7 +29,7 @@ const services = new ServiceMap();
 services.registerTransient(IFooService, FooService);
 ```
 
-### 3. Get Service
+### 3. Get Service Instance
 
 ```typescript
 services.get(IFooService);
@@ -37,7 +37,7 @@ services.get(IFooService);
 
 ## Constructor Injection
 
-The service object created by createService is a decorator and also used for constructor injection.
+The service instance created by createService is a decorator that can be used for constructor injection.
 
 ```typescript
 export class FooBar {
