@@ -1,7 +1,7 @@
 {
     "name": "@shrub/event-emitter-dom",
     "description": "Event emitter class extensions for DOM events.",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -17,6 +17,6 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/event-emitter": "0.1.3"
+        "@shrub/event-emitter": "0.1.4"
     }
 }
