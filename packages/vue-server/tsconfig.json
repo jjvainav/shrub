@@ -1,0 +1,15 @@
+{
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src",
+        "strictPropertyInitialization": true
+    },
+    "include": ["src"],
+    "references": [
+        { "path": "../module" },
+        { "path": "../serialization" },
+        { "path": "../service-collection" },
+        { "path": "../vue-core" }
+    ]
+  }

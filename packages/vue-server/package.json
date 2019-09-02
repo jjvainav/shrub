@@ -1,0 +1,34 @@
+{
+    "name": "@shrub/vue-server",
+    "description": "Module for server side rendered vue components.",
+    "version": "0.1.3",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "typings": "dist/index.d.ts",
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.0.0"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "watch": "tsc -b . -w"
+    },
+    "dependencies": {
+        "vue": "^2.6.10",
+        "vue-server-renderer": "^2.6.10"
+    },
+    "devDependencies": {
+        "@shrub/module": "0.1.3",
+        "@shrub/serialization": "0.1.3",
+        "@shrub/service-collection": "0.1.3",
+        "@shrub/vue-core": "0.1.3",
+        "@types/node": "^12.7.3"
+    }
+}
