@@ -822,6 +822,25 @@
     universal-user-agent "^3.0.0"
     url-template "^2.0.8"
 
+"@shrub/event-emitter-dom@^0.1.4":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@shrub/event-emitter-dom/-/event-emitter-dom-0.1.5.tgz#9b34ecafd946d906ac0db3cf36a4e1abac9d2a82"
+  integrity sha512-wdIfE3qpjSnnRYlZAbkcYpB3vaZ8NBL4v5asXcxhkJN+v0up8Pzwn69g2MlaXaObjdyI/COM8PNT5PLBRNbmOg==
+  dependencies:
+    "@shrub/event-emitter" "0.1.5"
+
+"@shrub/event-emitter@0.1.5", "@shrub/event-emitter@^0.1.4":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@shrub/event-emitter/-/event-emitter-0.1.5.tgz#369d4c9c46fb55db313464974980b8da533e90cc"
+  integrity sha512-pXuaFGxJaLOZAvwR3YqAF4PRRk9RIVMENDdd3TLKKqE56zFEWzK5AqXVMcZs0nk1bXyt/PfyhZgXKcqAeeEmjg==
+
+"@shrub/module@0.1.5", "@shrub/module@^0.1.4":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@shrub/module/-/module-0.1.5.tgz#3222328e06ff39d1f5a74c20622fd211bf777c1c"
+  integrity sha512-Vf6PKxYhLqIQZD6HVRVSaaqLRtmZ2rC0cvyIJfXyMYiQkoBSDXHqYafRBC+rdixiIkO4X4PR12XRE0FtbpAa5Q==
+  dependencies:
+    "@shrub/service-collection" "0.1.5"
+
 "@shrub/module@^0.1.3":
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/@shrub/module/-/module-0.1.3.tgz#d9528fe397f5339afea61af28e64d41d3ef67c8d"
@@ -829,10 +848,32 @@
   dependencies:
     "@shrub/service-collection" "0.1.3"
 
+"@shrub/serialization@0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@shrub/serialization/-/serialization-0.1.5.tgz#90acfcefefe7b892d0c67313c62ec758bcad1dd5"
+  integrity sha512-aO+2iU89h4Ok0b8oNY4aUBKX4RmCGZ0WLNMFdPbDhaEA9dCvPNdpYuUCiEAxZ2Itv4duWq9jofm0uubYA4St6g==
+  dependencies:
+    "@shrub/event-emitter" "0.1.5"
+
 "@shrub/service-collection@0.1.3", "@shrub/service-collection@^0.1.3":
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/@shrub/service-collection/-/service-collection-0.1.3.tgz#f018aed2451cd8037ed10040d0ca8238e7c776d0"
   integrity sha512-0dUbHq7J7zOaHxJQFOw56DzyNugsVXRq2nVNueMnPA6TJoev6KhSBWr5tcEojs6hcxoWNfr+4ul55cx1UFzdiQ==
+
+"@shrub/service-collection@0.1.5", "@shrub/service-collection@^0.1.4":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@shrub/service-collection/-/service-collection-0.1.5.tgz#92254e177b049c91a87f34cc394f693b51de2b1b"
+  integrity sha512-2IoILHsUiJnIgn45N3PbPHcy+lJZSwxP9lVF99f+IeqHJDEc2/uQmyf7d8sQy9CGkjbMD3HHAUH8HdxM/Ubt+A==
+
+"@shrub/vue-core@^0.1.4":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-core/-/vue-core-0.1.5.tgz#af61a21204be92d7cc14c69574d83d4d41065fc2"
+  integrity sha512-Gz8I5QMtKYVP46dTJUNgkaUuBiXF6L53olcN5YKOQu1VJjq3Bbdk34CZ57W7dA3CVZzWvr+DKQP2sTu4QIoRNg==
+  dependencies:
+    "@shrub/module" "0.1.5"
+    "@shrub/serialization" "0.1.5"
+    "@shrub/service-collection" "0.1.5"
+    vue "^2.6.10"
 
 "@types/body-parser@*":
   version "1.17.1"
@@ -4131,6 +4172,11 @@ map-visit@^1.0.0:
   integrity sha1-7Nyo8TFE5mDxtb1B8S80edmN+48=
   dependencies:
     object-visit "^1.0.0"
+
+material-design-icons-iconfont@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/material-design-icons-iconfont/-/material-design-icons-iconfont-5.0.1.tgz#371875ed7fe9c8c520bc7123c3231feeab731c31"
+  integrity sha512-Xg6rIdGrfySTqiTZ6d+nQbcFepS6R4uKbJP0oAqyeZXJY/bX6mZDnOmmUJusqLXfhIwirs0c++a6JpqVa8RFvA==
 
 md5.js@^1.3.4:
   version "1.3.5"

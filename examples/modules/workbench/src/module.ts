@@ -4,7 +4,7 @@ import { IModule, IModuleConfigurator } from "@shrub/module";
 import { IServiceRegistration } from "@shrub/service-collection";
 import { IVueConfiguration, VueCoreModule } from "@shrub/vue-core";
 import { NotFoundComponent, WorkbenchComponent } from "./components";
-import { IWorkbenchService, WorkbenchBrowserService } from "./service";
+import { DisplayService, IDisplayService, IWorkbenchService, WorkbenchBrowserService } from "./services";
 
 // import icons for Vuetify: https://vuetifyjs.com/en/framework/icons
 import "material-design-icons-iconfont/dist/material-design-icons.css";
@@ -18,6 +18,7 @@ export class WorkbenchModule implements IModule {
     readonly dependencies = [VueCoreModule];
 
     configureServices(registration: IServiceRegistration): void {
+        registration.register(IDisplayService, DisplayService);
         registration.register(IWorkbenchService, WorkbenchBrowserService);
     }
 

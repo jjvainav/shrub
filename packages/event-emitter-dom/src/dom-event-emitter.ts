@@ -4,7 +4,7 @@ import { EventEmitter } from "@shrub/event-emitter";
  * An event emitter that listens for and forwards DOM events to registered callbacks.
  * This is optimized to only listen for DOM events if a callback has been registered with the emitter.
  */
-export class DOMEventEmitter<TArgs> extends EventEmitter<TArgs> {
+export class DOMEventEmitter<TArgs = void> extends EventEmitter<TArgs> {
     private readonly listener: any;
     private target?: EventTarget;
 

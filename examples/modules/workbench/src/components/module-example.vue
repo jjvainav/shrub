@@ -1,13 +1,13 @@
 <template>
-    <div id="module-app">
+    <div id="module-example">
         <router-view></router-view>
     </div>
 </template>
 
-<script lang="ts" src="./module-app"></script>
+<script lang="ts" src="./module-example"></script>
 
 <style>
-    #module-app {
+    #module-example {
         height: 100%;
     }
 </style>

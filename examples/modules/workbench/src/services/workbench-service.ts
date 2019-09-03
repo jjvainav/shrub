@@ -3,7 +3,7 @@ import Router, { RawLocation, Route, RouteConfig } from "vue-router";
 import { EventEmitter, IEvent } from "@shrub/event-emitter";
 import { createService, Singleton } from "@shrub/service-collection";
 import { IComponent } from "@shrub/vue-core";
-import { ModuleExampleComponent } from "./components";
+import { ModuleExampleComponent } from "../components";
 
 Vue.use(Router);
 
