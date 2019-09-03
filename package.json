@@ -15,7 +15,7 @@
         "bootstrap": "./node_modules/.bin/lerna bootstrap",
         "build": "./node_modules/.bin/lerna run build --stream",
         "clean": "./node_modules/.bin/lerna run clean --stream --parallel",
-        "publish": "yarn run build && ./node_modules/.bin/lerna publish --force-publish --exact -m \"chore(release): publish %s\"",
+        "publish": "yarn run build && ./node_modules/.bin/lerna publish --contents dist --force-publish --exact -m \"chore(release): publish %s\"",
         "test": "./node_modules/.bin/jest --silent"
     },
     "devDependencies": {
