@@ -1,7 +1,7 @@
 {
     "name": "@shrub/module",
     "description": "An API for modular server-side applications and front-end components.",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -21,6 +21,6 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/service-collection": "0.1.6"
+        "@shrub/service-collection": "0.1.7"
     }
 }

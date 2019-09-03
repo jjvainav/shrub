@@ -1,7 +1,7 @@
 {
     "name": "@shrub/event-emitter",
     "description": "Simple event emitter for typed events.",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -11,7 +11,7 @@
     "typings": "dist/index.d.ts",
     "files": [
         "dist"
-    ],    
+    ],
     "publishConfig": {
         "access": "public"
     },
