@@ -1,7 +1,7 @@
 {
     "name": "@shrub/vue-browser",
     "description": "Module for client-side vue apps hosted in a browser.",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -18,10 +18,10 @@
         "watch": "tsc -b . -w"
     },
     "dependencies": {
-        "@shrub/module": "0.1.5",
-        "@shrub/serialization": "0.1.5",
-        "@shrub/service-collection": "0.1.5",
-        "@shrub/vue-core": "0.1.5",
+        "@shrub/module": "0.1.6",
+        "@shrub/serialization": "0.1.6",
+        "@shrub/service-collection": "0.1.6",
+        "@shrub/vue-core": "0.1.6",
         "vue": "^2.6.10",
         "vue-class-component": "^7.1.0"
     }
