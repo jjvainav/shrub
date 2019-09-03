@@ -1,0 +1,10 @@
+{
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "outDir": "dist",
+        "rootDir": "src",
+        "typeRoots": ["types"]
+    },
+    "include": ["src", "types"]
+  }

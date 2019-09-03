@@ -9,8 +9,7 @@
         "url": "https://github.com/jjvainav/shrub.git"
     },
     "workspaces": [
-        "modules/*",
-        "web"
+        "packages/*"
     ],
     "scripts": {
         "bootstrap": "./node_modules/.bin/lerna bootstrap",

@@ -4,8 +4,6 @@
     </div>
 </template>
 
-<script lang="ts" src="./module-example"></script>
-
 <style>
     #module-example {
         height: 100%;

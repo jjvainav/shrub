@@ -1,10 +1,11 @@
 import Vue from "vue";
 import Vuetify from "vuetify";
-import { IModule, IModuleConfigurator } from "@shrub/module";
+import { createConfigType, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/module";
 import { IServiceRegistration } from "@shrub/service-collection";
 import { IVueConfiguration, VueCoreModule } from "@shrub/vue-core";
 import { NotFoundComponent, WorkbenchComponent } from "./components";
-import { DisplayService, IDisplayService, IWorkbenchService, WorkbenchBrowserService } from "./services";
+import { DisplayService, IDisplayService, IWorkbenchExample, IWorkbenchRouteConfig, IWorkbenchService, WorkbenchBrowserService } from "./services";
+import * as utils from "./utils";
 
 // import icons for Vuetify: https://vuetifyjs.com/en/framework/icons
 import "material-design-icons-iconfont/dist/material-design-icons.css";
@@ -13,9 +14,33 @@ import "./styles/index.scss";
 
 Vue.use(Vuetify);
 
+export const IWorkbenchConfiguration = createConfigType<IWorkbenchConfiguration>("workbench");
+export interface IWorkbenchConfiguration {
+    registerExample(example: IWorkbenchExample): void;
+    registerRoute(route: IWorkbenchRouteConfig): void;
+}
+
+export interface IWorkbenchModuleSettings {
+    readonly defaultExample?: string;
+}
+
 export class WorkbenchModule implements IModule {
     readonly name = "workbench";
     readonly dependencies = [VueCoreModule];
+
+    initialize(init: IModuleInitializer): void {
+        init.config(IWorkbenchConfiguration).register(({ services, settings }: IModuleConfigurator) => ({
+            registerExample: example => { 
+                const service = services.get(IWorkbenchService);
+
+                service.registerExample(example);
+                if (example.name === settings.defaultExample) {
+                    service.registerRoute({ path: "/", redirect: "/" + utils.toKebabCase(example.name) });
+                }
+            },
+            registerRoute: route => services.get(IWorkbenchService).registerRoute(route)
+        }));
+    }
 
     configureServices(registration: IServiceRegistration): void {
         registration.register(IDisplayService, DisplayService);

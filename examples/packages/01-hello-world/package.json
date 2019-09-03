@@ -1,0 +1,17 @@
+{
+    "name": "@examples/hello-world",
+    "version": "1.0.0",
+    "private": true,
+    "main": "dist/index.js",
+    "typings": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
+    },
+    "dependencies": {
+        "@shrub/module": "^0.1.7",
+        "@shrub/service-collection": "^0.1.7",
+        "@shrub/vue-core": "^0.1.7",
+        "vue": "^2.6.10"
+    }
+}

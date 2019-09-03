@@ -1,7 +1,7 @@
 <template>
     <div class="logo-container">
-        <span class="logo-icon">♫</span>
-        <span class="logo-text">Logo</span>
+        <span class="logo-icon">🌲</span>
+        <span class="logo-text">Examples</span>
     </div>
 </template>
 

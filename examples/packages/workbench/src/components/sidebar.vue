@@ -2,7 +2,6 @@
     <!-- note: floating removes the border-right from the sidebar -->
     <v-navigation-drawer 
         class="workbench-sidebar"
-        :dark="model.isDarkTheme"
         :permanent="model.isSidebarOpen" 
         :value="model.isSidebarOpen" 
         width="250" 
@@ -15,7 +14,7 @@
                 <logo></logo>
             </router-link>
             <v-list>
-                <sidebar-item v-for="item of menuItems" :key="$key(item)" :model="model" :item="item" />
+                <sidebar-item v-for="menu of menuItems" :key="menu.link" :model="model" :item="menu.item" :link="menu.link" />
             </v-list>
         </div>
     </v-navigation-drawer>

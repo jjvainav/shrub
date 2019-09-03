@@ -4,6 +4,7 @@ import { EventEmitter, IEvent } from "@shrub/event-emitter";
 import { createService, Singleton } from "@shrub/service-collection";
 import { IComponent } from "@shrub/vue-core";
 import { ModuleExampleComponent } from "../components";
+import * as utils from "../utils";
 
 Vue.use(Router);
 
@@ -41,7 +42,7 @@ export interface IWorkbenchRoute {
 
 export interface IWorkbenchRouteConfig {
     readonly name?: string;
-    readonly path: string;
+    readonly path?: string;
     readonly component?: IComponent | (() => Promise<IComponent | IEsModuleComponent>);
     readonly children?: IWorkbenchRouteConfig[];
     readonly redirect?: string;
@@ -50,13 +51,12 @@ export interface IWorkbenchRouteConfig {
 
 export interface IWorkbenchExample {
     readonly name: string;
-    readonly routes: IWorkbenchRouteConfig[];
-    readonly menu?: IWorkbenchMenuItem[];
+    readonly component: () => Promise<IComponent | IEsModuleComponent>;
+    readonly menu: IWorkbenchMenuItem;
 }
 
 export interface IWorkbenchMenuItem {
     readonly title: string;
-    readonly link: IWorkbenchLink;
     readonly order?: number;
 }
 
@@ -101,13 +101,21 @@ export class WorkbenchBrowserService implements IWorkbenchService {
     }
 
     registerExample(example: IWorkbenchExample): void {
+        example = {
+            ...example,
+            name: utils.toKebabCase(example.name)
+        };
+
         if (this.examples.has(example.name)) {
             throw new Error(`Duplicate example (${example.name})`);
         }
 
         this.registerRoute({
-            path: "/" + example.name.toKebabCase(),
-            children: example.routes
+            path: "/" + example.name,
+            children: [{
+                name: example.name,
+                component: example.component
+            }]
         });
 
         this.examples.set(example.name, example);
@@ -130,7 +138,7 @@ export class WorkbenchBrowserService implements IWorkbenchService {
 
         return {
             name: route.name,
-            path: route.path,
+            path: route.path || "",
             redirect: route.redirect,
             meta: { key: this.key++ },
             children: route.children && route.children.map(child => this.getRouteConfig(child)),
