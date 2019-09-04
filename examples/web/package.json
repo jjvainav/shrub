@@ -14,11 +14,11 @@
     "dependencies": {
         "@examples/01-hello-world": "1.0.0",
         "@examples/workbench": "1.0.0",
-        "@shrub/express-core": "^0.1.10",
-        "@shrub/express-session": "^0.1.10",
-        "@shrub/module": "^0.1.10",
-        "@shrub/service-collection": "^0.1.10",
-        "@shrub/vue-browser": "^0.1.10",
+        "@shrub/express-core": "^0.1.11",
+        "@shrub/express-session": "^0.1.11",
+        "@shrub/module": "^0.1.11",
+        "@shrub/service-collection": "^0.1.11",
+        "@shrub/vue-browser": "^0.1.11",
         "express": "^4.16.4"
     },
     "devDependencies": {

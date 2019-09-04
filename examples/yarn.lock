@@ -819,88 +819,88 @@
     once "^1.4.0"
     universal-user-agent "^3.0.0"
 
-"@shrub/event-emitter-dom@^0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@shrub/event-emitter-dom/-/event-emitter-dom-0.1.10.tgz#4f01452b24dcf315f0071f04380abf3e905849d2"
-  integrity sha512-UeahGVek1eJgnn8LeAidkMKpspYLw5mp5S1KxsEKDGH3+AZKXYvBc+n8oszhdvSlaDZQVHd0dg8S/toZ35zhvg==
+"@shrub/event-emitter-dom@^0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@shrub/event-emitter-dom/-/event-emitter-dom-0.1.11.tgz#fba523d070440dfda23575272bf6a8e75a9a0d69"
+  integrity sha512-MGrQ4DxaOmYWtyY/s0VQmbF1k57E8IJWnOFt0Or5zcUxNO12AeTNEq52isRVsND0/Y6g6F4vbs6/lB5HR0k7dQ==
   dependencies:
-    "@shrub/event-emitter" "0.1.10"
+    "@shrub/event-emitter" "0.1.11"
 
-"@shrub/event-emitter@0.1.10", "@shrub/event-emitter@^0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@shrub/event-emitter/-/event-emitter-0.1.10.tgz#6e2e63748a848a65a5178328c9112d0f9f76c167"
-  integrity sha512-VVfh7cSa7ppq8GNXjNYkCZk3z8MX1Whnhcej2tTCkobWUL4Q3gqudeLU4YHdbeHcC448uXifa+4gxfpbDdWIQw==
+"@shrub/event-emitter@0.1.11", "@shrub/event-emitter@^0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@shrub/event-emitter/-/event-emitter-0.1.11.tgz#ad89847435cd99753b1a47b6fb1b3481eae63dd5"
+  integrity sha512-6CsWxccBZZ+mlJg8hPTb+gcM+eP3RLYaHZ+cW1i5QKMePbq1U/zlW78ddUbJHgXmYiWJfx3qipAzz90qdnC2SQ==
 
-"@shrub/express-cookies@0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@shrub/express-cookies/-/express-cookies-0.1.10.tgz#9fab590721ba4c8b65bc7723d1a3f264f6bfafe6"
-  integrity sha512-NhOGYs+XL2ET4IMSkIAV1ct4lQO05ha+fPlqcK3OYE3ditFk3If8LE8Piwc3YagsACPPPzWizVmPJnpHsCkFXg==
+"@shrub/express-cookies@0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@shrub/express-cookies/-/express-cookies-0.1.11.tgz#56bb7abf178ea546b2056aaa7159f926b938a029"
+  integrity sha512-yNPyWXyvHCFq6BL7JbUvnCFN+rzhXhTK6Uj38qBon9RjvToXKfOrObj2S6qAOPo8nq70q2Oo82FmNuXZ19kWww==
   dependencies:
-    "@shrub/express-core" "0.1.10"
-    "@shrub/module" "0.1.10"
-    "@shrub/service-collection" "0.1.10"
+    "@shrub/express-core" "0.1.11"
+    "@shrub/module" "0.1.11"
+    "@shrub/service-collection" "0.1.11"
     cookies "^0.7.3"
     express "^4.17.1"
 
-"@shrub/express-core@0.1.10", "@shrub/express-core@^0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@shrub/express-core/-/express-core-0.1.10.tgz#18a53ef806db90046268de6b1c781a79ecd9ccf0"
-  integrity sha512-0/oz86uMHqV2DP+1LsGeRtSqnv34qPi9tTDJXLrfOxbX66tE0a8KO44VYAURkvJe1q1sFpRM/6YBC6IZ/RTxlg==
+"@shrub/express-core@0.1.11", "@shrub/express-core@^0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@shrub/express-core/-/express-core-0.1.11.tgz#f75d4792f3bd07d5967acef002b60521f578e8bb"
+  integrity sha512-PRskrz5xVwVGmWAn6VM2dm7Z1T8Zho9zHd81jqKF7GslhLLuK6TK56UtAG5bKRExGtYLARhqCAasOHIa7W0PNA==
   dependencies:
-    "@shrub/module" "0.1.10"
-    "@shrub/service-collection" "0.1.10"
+    "@shrub/module" "0.1.11"
+    "@shrub/service-collection" "0.1.11"
     express "^4.17.1"
 
-"@shrub/express-session@^0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@shrub/express-session/-/express-session-0.1.10.tgz#ff4ae1a892e083e4ad6402b3f6fc4485ad1ab094"
-  integrity sha512-hTyemq4v3lEcQxe6pmiSjVerg2h0lEmh+Z4uGrZzy39hSlQM38/5fYR5K9X50EF6yhLAsb+A0OY7eFwxqWlxww==
+"@shrub/express-session@^0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@shrub/express-session/-/express-session-0.1.11.tgz#38b0cb85b3608e31f71892e4d42722a14ef73194"
+  integrity sha512-yF9mLvYBCSRrO5LZH76gbaVj96+YFNBXUawMW8GnBjiPdW3mgbOX6qw0mR2UwjE54Gmm2FlYOdf8U1Jt1MgTCw==
   dependencies:
-    "@shrub/express-cookies" "0.1.10"
-    "@shrub/express-core" "0.1.10"
-    "@shrub/module" "0.1.10"
-    "@shrub/service-collection" "0.1.10"
+    "@shrub/express-cookies" "0.1.11"
+    "@shrub/express-core" "0.1.11"
+    "@shrub/module" "0.1.11"
+    "@shrub/service-collection" "0.1.11"
     express "^4.17.1"
 
-"@shrub/module@0.1.10", "@shrub/module@^0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@shrub/module/-/module-0.1.10.tgz#5280b1804dc4e1479b4fac293de45735d2f04cb0"
-  integrity sha512-Vm4xTcVspQsUOguHvMHywPo6DHG49f94c5OZGWXVROtYxaFnPXt3cOU8YjRQUjMyWUOwe+UXgK6P3Nr23xf9hw==
+"@shrub/module@0.1.11", "@shrub/module@^0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@shrub/module/-/module-0.1.11.tgz#5e59a037658e0ac59d9388a987d85f426d423286"
+  integrity sha512-uPqJjskyJq1EoF46sb4ffLg4vQ+aAtjyXUJtmHgS2zG/NkkbcPw17GyWh2KA+6oZBMWRI+kDyJ40ygmKCwhXwg==
   dependencies:
-    "@shrub/service-collection" "0.1.10"
+    "@shrub/service-collection" "0.1.11"
 
-"@shrub/serialization@0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@shrub/serialization/-/serialization-0.1.10.tgz#f60636854755c14834ef27ecf7fd8f04bd4098d5"
-  integrity sha512-/sf0q7G8r/FuEI4wn7/qQDITxtCqkfD30I6535tfVyVE0O2cGosh1YnifcrVCCc0gp3EwMxP4uC5qRsiBL2jMA==
+"@shrub/serialization@0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@shrub/serialization/-/serialization-0.1.11.tgz#bde26833e69dc56a78937a8c0652a2c3880527ca"
+  integrity sha512-OeY8/hatITkyvRkguUz3svx3pVsgD6sfDCGooXMZzQzLrqtcq5/ktQus9uFVOiSJ3/nggTGaMcAgSNQkdm1Gnw==
   dependencies:
-    "@shrub/event-emitter" "0.1.10"
+    "@shrub/event-emitter" "0.1.11"
 
-"@shrub/service-collection@0.1.10", "@shrub/service-collection@^0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@shrub/service-collection/-/service-collection-0.1.10.tgz#b2369c3eb5e0b8e0c825620b52fa599ea487ff09"
-  integrity sha512-todrgZN6LuAiQwAQUbsIENoKKEWb3J26EQJS+Ki198yHG8KueqpHdBpCZ5rlK0Ml3EBzjQdfFIVk3KIBmXoRiA==
+"@shrub/service-collection@0.1.11", "@shrub/service-collection@^0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@shrub/service-collection/-/service-collection-0.1.11.tgz#0026b96caab7869a72e876f97b91fb8579b5815e"
+  integrity sha512-7Hicfc+12coo2ua0c8i5izMLSZKbLumbnatbp6fi/qPkCjJlzdvj9VWMRl2EKEq4LBfqoxcUx7y2g0gmcxowCg==
 
-"@shrub/vue-browser@^0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@shrub/vue-browser/-/vue-browser-0.1.10.tgz#f664d5a359971a6f39c68c5e4697ce269c5daa76"
-  integrity sha512-yKPtZX0X6dXyk+pOjYvGF1Z6ScT9Pt/DEh1LOywRFcWD72ugN3FOT+i3dnttWG2/7Wh/ODKMZHKkPOyLLfYbMg==
+"@shrub/vue-browser@^0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-browser/-/vue-browser-0.1.11.tgz#7f2e5f3a6bd410848752a7f10ca5dfa4b23e13db"
+  integrity sha512-5eN1s51eUKSbBfz1wlIXM8RAwdLrO55luUq/BY2hxHnEKZfl3uuKXfH1DwE8X+HxOB2NL5wPiz64u6wOMhuxXA==
   dependencies:
-    "@shrub/module" "0.1.10"
-    "@shrub/serialization" "0.1.10"
-    "@shrub/service-collection" "0.1.10"
-    "@shrub/vue-core" "0.1.10"
+    "@shrub/module" "0.1.11"
+    "@shrub/serialization" "0.1.11"
+    "@shrub/service-collection" "0.1.11"
+    "@shrub/vue-core" "0.1.11"
     vue "^2.6.10"
     vue-class-component "^7.1.0"
 
-"@shrub/vue-core@0.1.10", "@shrub/vue-core@^0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@shrub/vue-core/-/vue-core-0.1.10.tgz#09ff1a65e9c5a3d367769e0e87e26b9304f576e4"
-  integrity sha512-fNT7P4geDbKSOPKks4b2IZHc09V3w42E+5fBj4YHWxbypTvwh9Xip5qBx3juB35XwAclXeY/U6osC5YJL9vASA==
+"@shrub/vue-core@0.1.11", "@shrub/vue-core@^0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-core/-/vue-core-0.1.11.tgz#caca2979720e9c894c33ab7e64d6ab43050a341b"
+  integrity sha512-dxSNW3kVC+hNDp69o0s2MrzdrpwHfJ4e7NjeB24qsOj9bOTPG52ftie53QNqhMwlNhl6YKtuDKGHSmOAJ44Uvw==
   dependencies:
-    "@shrub/module" "0.1.10"
-    "@shrub/serialization" "0.1.10"
-    "@shrub/service-collection" "0.1.10"
+    "@shrub/module" "0.1.11"
+    "@shrub/serialization" "0.1.11"
+    "@shrub/service-collection" "0.1.11"
     vue "^2.6.10"
 
 "@types/body-parser@*":
