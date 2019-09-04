@@ -5,20 +5,26 @@
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "scripts": {
-        "build": "tsc",
-        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
+        "build": "concurrently \"tsc\" \"yarn run copy-styles\" \"yarn run copy-vue\"",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "copy-styles": "copyfiles -u 1 ./src/styles/**/*.scss dist",
+        "copy-vue": "copyfiles -u 1 ./src/components/**/*.vue dist"
     },
     "dependencies": {
-        "@shrub/event-emitter": "^0.1.7",
-        "@shrub/event-emitter-dom": "^0.1.7",
-        "@shrub/module": "^0.1.7",
-        "@shrub/service-collection": "^0.1.7",
-        "@shrub/vue-core": "^0.1.7",
+        "@shrub/event-emitter": "^0.1.9",
+        "@shrub/event-emitter-dom": "^0.1.9",
+        "@shrub/module": "^0.1.9",
+        "@shrub/service-collection": "^0.1.9",
+        "@shrub/vue-core": "^0.1.9",
         "material-design-icons-iconfont": "^5.0.1",
         "vue": "^2.6.10",
         "vue-class-component": "^7.1.0",
         "vue-property-decorator": "^8.2.2",
         "vue-router": "^3.1.3",
         "vuetify": "^1.5.18"
+    },
+    "devDependencies": {
+        "copyfiles": "^2.1.1",
+        "concurrently": "^4.1.2"
     }
 }

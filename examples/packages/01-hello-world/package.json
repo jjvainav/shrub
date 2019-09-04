@@ -1,17 +1,22 @@
 {
-    "name": "@examples/hello-world",
+    "name": "@examples/01-hello-world",
     "version": "1.0.0",
     "private": true,
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "scripts": {
-        "build": "tsc",
-        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
+        "build": "concurrently \"tsc\" \"yarn run copy-vue\"",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "copy-vue": "copyfiles -u 1 ./src/components/**/*.vue dist"
     },
     "dependencies": {
-        "@shrub/module": "^0.1.7",
-        "@shrub/service-collection": "^0.1.7",
-        "@shrub/vue-core": "^0.1.7",
+        "@shrub/module": "^0.1.9",
+        "@shrub/service-collection": "^0.1.9",
+        "@shrub/vue-core": "^0.1.9",
         "vue": "^2.6.10"
+    },
+    "devDependencies": {
+        "copyfiles": "^2.1.1",
+        "concurrently": "^4.1.2"
     }
 }

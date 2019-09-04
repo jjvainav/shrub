@@ -37,14 +37,6 @@
         display: block;
         height: $toolbarHeight;
         text-decoration: none;
-    }    
-
-    .workbench-sidebar.theme--dark {
-        background-color: $sidebarBackgroundDark !important;
-
-        .workbench-sidebar-logo {
-            box-shadow: $sidebarLogoShadowDark;
-        }          
     }
 
     .workbench-sidebar.theme--light {
