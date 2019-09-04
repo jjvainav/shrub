@@ -1,7 +1,7 @@
 {
     "name": "@shrub/vue-core",
     "description": "Abstract core module for vue component support.",
-    "version": "0.1.10",
+    "version": "0.1.11",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -21,9 +21,9 @@
         "watch": "tsc -b . -w"
     },
     "dependencies": {
-        "@shrub/module": "0.1.10",
-        "@shrub/serialization": "0.1.10",
-        "@shrub/service-collection": "0.1.10",
+        "@shrub/module": "0.1.11",
+        "@shrub/serialization": "0.1.11",
+        "@shrub/service-collection": "0.1.11",
         "vue": "^2.6.10"
     }
 }
