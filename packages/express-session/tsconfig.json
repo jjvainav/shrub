@@ -1,0 +1,14 @@
+{
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "dist",
+        "rootDir": "src"
+    },
+    "include": ["src"],
+    "references": [
+        { "path": "../express-cookies" },
+        { "path": "../express-core" },
+        { "path": "../module" },
+        { "path": "../service-collection" }
+    ]
+}

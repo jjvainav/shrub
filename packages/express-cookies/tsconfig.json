@@ -1,0 +1,14 @@
+{
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "outDir": "dist",
+        "rootDir": "src"
+    },
+    "include": ["src"],
+    "references": [
+        { "path": "../express-core" },
+        { "path": "../module" },
+        { "path": "../service-collection" }
+    ]
+}

@@ -1,0 +1,34 @@
+{
+    "name": "@shrub/express-core",
+    "description": "Core module and host for express based apps.",
+    "version": "0.1.7",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.0.0"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "test": "jest"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.1"
+    },    
+    "dependencies": {
+        "@shrub/module": "0.1.7",
+        "@shrub/service-collection": "0.1.7",
+        "express": "^4.17.1"
+    }
+}
