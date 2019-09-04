@@ -44,7 +44,7 @@ export interface IModule {
 }
 
 export interface IModuleConfigurationType<T> {
-    readonly key: Symbol;
+    readonly key: string;
 }
 
 export interface IModuleConfiguration {
@@ -104,8 +104,8 @@ export function combineExtensions(...extensions: IModuleHostExtension[]): IModul
 }
 
 /** Creates a module configuration type used to configure a module. */
-export function createConfigType<T>(key?: string): IModuleConfigurationType<T> {
-    return { key: Symbol(key) };
+export function createConfigType<T>(key: string): IModuleConfigurationType<T> {
+    return { key };
 }
 
 /** Create a new host builder. */
@@ -190,7 +190,7 @@ function createHost(services: ServiceMap, coreModules: IModule[], settingsCollec
             const discoveredModules = expandAndSortModules(this, coreModules);
 
             // initialize discovered modules
-            const configs = new Map<Symbol, ConfigurationEntry>();
+            const configs = new Map<string, ConfigurationEntry>();
             discoveredModules.forEach(module => {
                 if (module.initialize) {
                     module.initialize({
