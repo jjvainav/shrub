@@ -1,7 +1,7 @@
 {
     "name": "@shrub/serialization",
     "description": "Provides support for class based JSON serialization/deserialization.",
-    "version": "0.1.12",
+    "version": "0.1.13",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -21,6 +21,6 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/event-emitter": "0.1.12"
+        "@shrub/event-emitter": "0.1.13"
     }
 }
