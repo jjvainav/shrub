@@ -52,13 +52,15 @@ export class WorkbenchModule implements IModule {
         config.get(IVueConfiguration).mount(WorkbenchComponent, {
             options: {
                 created: function (this: Vue) {
-                    // update the breakpoints to match the values used by Vuetify
-                    this.$services.get(IDisplayService).setBreakpoints({
-                        extraSmall: this.$vuetify.breakpoint.thresholds.xs,
-                        small: this.$vuetify.breakpoint.thresholds.sm,
-                        medium: this.$vuetify.breakpoint.thresholds.md - this.$vuetify.breakpoint.scrollbarWidth,
-                        large: this.$vuetify.breakpoint.thresholds.lg - this.$vuetify.breakpoint.scrollbarWidth
-                    });
+                    if (this.$vuetify) {
+                        // update the breakpoints to match the values used by Vuetify
+                        this.$services.get(IDisplayService).setBreakpoints({
+                            extraSmall: this.$vuetify.breakpoint.thresholds.xs,
+                            small: this.$vuetify.breakpoint.thresholds.sm,
+                            medium: this.$vuetify.breakpoint.thresholds.md - this.$vuetify.breakpoint.scrollbarWidth,
+                            large: this.$vuetify.breakpoint.thresholds.lg - this.$vuetify.breakpoint.scrollbarWidth
+                        });
+                    }
                 },
                 router: workbenchService.router
             }

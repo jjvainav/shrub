@@ -19,6 +19,7 @@
         "@shrub/module": "^0.1.11",
         "@shrub/service-collection": "^0.1.11",
         "@shrub/vue-browser": "^0.1.11",
+        "@shrub/vue-server": "^0.1.11",
         "express": "^4.16.4"
     },
     "devDependencies": {
@@ -36,6 +37,7 @@
         "vue-server-renderer": "^2.6.10",
         "vue-style-loader": "^4.1.2",
         "vue-template-compiler": "^2.6.10",
+        "vuetify": "^1.5.18",
         "webpack": "^4.28.4",
         "webpack-cli": "^3.2.1",
         "webpack-merge": "^4.2.1",

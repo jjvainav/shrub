@@ -44,8 +44,11 @@ export class DisplayService implements IDisplayService {
             large: 1200
         };
 
-        this.resize.bindTarget(window);
-        this.resize.event.debounce(200)(() => this.updateBreakpoint());
+        if (typeof window !== "undefined") {
+            // window is undefined when rendering server-side
+            this.resize.bindTarget(window);
+            this.resize.event.debounce(200)(() => this.updateBreakpoint());
+        }
 
         this.updateBreakpoint();
     }

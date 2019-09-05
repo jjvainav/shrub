@@ -903,6 +903,14 @@
     "@shrub/service-collection" "0.1.11"
     vue "^2.6.10"
 
+"@shrub/vue-server@^0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-server/-/vue-server-0.1.11.tgz#13fb9b434bcfe97a07dcd3e546e11f4a42047960"
+  integrity sha512-9Hpz5jgq4NLa9rZ30cB5GnBjQxfn0T0putp7WFlS87sva60XKIfYgwHXYka29SpkQQXeUFakFzzGsPMWTLgz4Q==
+  dependencies:
+    vue "^2.6.10"
+    vue-server-renderer "^2.6.10"
+
 "@types/body-parser@*":
   version "1.17.1"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.17.1.tgz#18fcf61768fb5c30ccc508c21d6fd2e8b3bf7897"

@@ -5,7 +5,6 @@
         "esModuleInterop": true,
         "outDir": "dist",
         "rootDir": "src",
-        "typeRoots": ["types"],
         "lib": [
             "dom",
             "esnext"

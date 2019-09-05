@@ -4,8 +4,7 @@
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "outDir": "dist",
-        "rootDir": "src",
-        "typeRoots": ["types"]
+        "rootDir": "src"
     },
     "include": ["src", "types"]
   }

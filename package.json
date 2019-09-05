@@ -12,7 +12,7 @@
         "packages/*"
     ],
     "scripts": {
-        "bootstrap": "./node_modules/.bin/lerna bootstrap",
+        "bootstrap": "yarn install",
         "build": "./node_modules/.bin/lerna run build --stream",
         "clean": "./node_modules/.bin/lerna run clean --stream --parallel",
         "publish": "yarn run build && ./node_modules/.bin/lerna publish --force-publish --exact -m \"chore(release): publish %s\"",

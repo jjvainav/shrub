@@ -1,4 +1,5 @@
 ﻿import Vue, { ComponentOptions, VNodeData } from "vue";
+import Router from "vue-router";
 import { IModule, IModuleConfigurator, IModuleInitializer, loadModules } from "@shrub/module";
 import { IServiceCollection, IServiceRegistration } from "@shrub/service-collection";
 import { IModelService, IVueConfiguration, IVueMountOptions, VueCoreModule } from "@shrub/vue-core";
@@ -29,22 +30,29 @@ export interface IVueSSRRenderHandlerBuilder {
     (context: IVueSSRContext, app: Vue): Promise<Vue>;
 }
 
+/** The result when creating a Vue app for SSR rendering. */
+export interface IVueSSRCreateResult {
+    readonly app: Vue;
+    readonly router?: Router;
+}
+
 /** 
  * Loads the specified modules (along with the VueServerModule) and returns a Vue SSR render handler. 
  * Example usage in the server entry file:
  * 
  * export default bootstrap([modules]);
+ * 
+ * Note: modules will be loaded/created for each request so it's important that module instances passed
+ * into the bootstrap function not maintain state.
  */
 export function bootstrap(modules: IModule[], builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler {
     if (!modules.find(m => m.name === "vue-server")) {
         modules = [...modules, VueServerModule];
     }
 
-    // start loading the modules now and await for them to finish inside the SSR render handler
-    const loading = loadModules(modules);
     return async context => {
         // modules are loaded asynchronously so wait for them to finish loading and grab an instance of the host
-        const host = await loading;
+        const host = await loadModules(modules);
 
         if (context.beginRender) {
             // this allows server components the ability to configure the service collection before rendering it server-side
@@ -53,7 +61,12 @@ export function bootstrap(modules: IModule[], builder?: IVueSSRRenderHandlerBuil
         }
 
         const instance = host.getInstance(VueServerModule);
-        return instance.createApp().then(async app => {
+        return instance.createApp().then(async ({ app, router }) => {
+            if (router) {
+                // internally vue will set the request url and if a router is being used use the url to set the router location
+                router.push(context.url);
+            }
+
             context.rendered = () => {
                 // if model state has been captured during SSR set it as the context so it can be loaded client side
                 const modelService = <ServerModelService>app.$services.get(IModelService);
@@ -62,7 +75,23 @@ export function bootstrap(modules: IModule[], builder?: IVueSSRRenderHandlerBuil
                 }
             };
             
-            return builder ? await builder(context, app) : app;
+            // if a 'builder' is provided invoke it now to allow extending the Vue app instance
+            app = builder ? await builder(context, app) : app;
+
+            if (router) {
+                // wait until the router has resolved
+                return new Promise<Vue>((resolve, reject) => router.onReady(() => {
+                    if (!router.getMatchedComponents().length) {
+                        // no routes matched the request url so reject with a 404
+                        return reject({ code: 404 });
+                    }
+
+                    resolve(app);
+                },
+                reject));
+            }
+
+            return app;
         });
     };
 }
@@ -94,17 +123,20 @@ export class VueServerModule implements IModule {
         registration.register(IModelService, ServerModelService);
     }
 
-    createApp(): Promise<Vue> {
+    createApp(): Promise<IVueSSRCreateResult> {
         return new Promise((resolve, reject) => {
             if (!this.component) {
                 reject(new Error("Vue component has not been mounted."));
             }
             else {
-                resolve(new Vue({
+                const options = this.getComponentOptions();
+                const app = new Vue({
                     services: this.services,
                     render: h => h(this.component, this.getData()),
-                    ...this.getComponentOptions()
-                }));
+                    ...options
+                });
+
+                resolve({ app, router: options.router });
             }
         });
     }
