@@ -17,6 +17,8 @@ export interface IVueSSRContext {
     rendered?: (context: IVueSSRContext) => void;
     /** Optional state that will get injected and passed to the client. */
     state?: any;
+    /** Opional url identifying the current request url and is used when the main SSR component uses a vue-router. */
+    url?: string;
     [key: string]: any;
 }
 
@@ -62,11 +64,6 @@ export function bootstrap(modules: IModule[], builder?: IVueSSRRenderHandlerBuil
 
         const instance = host.getInstance(VueServerModule);
         return instance.createApp().then(async ({ app, router }) => {
-            if (router) {
-                // internally vue will set the request url and if a router is being used use the url to set the router location
-                router.push(context.url);
-            }
-
             context.rendered = () => {
                 // if model state has been captured during SSR set it as the context so it can be loaded client side
                 const modelService = <ServerModelService>app.$services.get(IModelService);
@@ -78,7 +75,10 @@ export function bootstrap(modules: IModule[], builder?: IVueSSRRenderHandlerBuil
             // if a 'builder' is provided invoke it now to allow extending the Vue app instance
             app = builder ? await builder(context, app) : app;
 
-            if (router) {
+            if (router && context.url) {
+                // if a router and request url are avaiable update the router to use the request url as its route location
+                router.push(context.url);
+
                 // wait until the router has resolved
                 return new Promise<Vue>((resolve, reject) => router.onReady(() => {
                     if (!router.getMatchedComponents().length) {

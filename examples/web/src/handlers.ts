@@ -34,6 +34,8 @@ export function ssrViewHandler(options: ISSRViewOptions): RequestHandler {
             template
         });
 
+        // set the url for the Vue SSR module so that it can properly handle routes when using a vue-router on the client
+        context.url = req.url;
         renderer.renderToString(context, (err, html) => {
             if (err) {
                 next(err);
