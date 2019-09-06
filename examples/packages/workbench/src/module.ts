@@ -50,7 +50,10 @@ export class WorkbenchModule implements IModule {
         registration.register(IWorkbenchService, WorkbenchBrowserService);
     }
 
-    configure({ config, services }: IModuleConfigurator): void {
+    async configure({ config, services, next }: IModuleConfigurator): Promise<void> {
+        // allow other modules the ability to configure the workbench before attempting to mount
+        await next();
+        
         const workbenchService = services.get(IWorkbenchService);
         config.get(IVueConfiguration).mount(WorkbenchComponent, {
             data: () => ({

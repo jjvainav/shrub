@@ -1,6 +1,6 @@
 ﻿import Vue, { ComponentOptions, VNodeData } from "vue";
 import Router from "vue-router";
-import { IModule, IModuleConfigurator, IModuleInitializer, loadModules } from "@shrub/module";
+import { ILoadModuleOptions, IModule, IModuleConfigurator, IModuleInitializer, loadModules, ModuleInstanceOrConstructor } from "@shrub/module";
 import { IServiceCollection, IServiceRegistration } from "@shrub/service-collection";
 import { IModelService, IVueConfiguration, IVueMountOptions, VueCoreModule } from "@shrub/vue-core";
 import { ServerModelService } from "./model-service";
@@ -47,14 +47,21 @@ export interface IVueSSRCreateResult {
  * Note: modules will be loaded/created for each request so it's important that module instances passed
  * into the bootstrap function not maintain state.
  */
-export function bootstrap(modules: IModule[], builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler {
-    if (!modules.find(m => m.name === "vue-server")) {
-        modules = [...modules, VueServerModule];
+export function bootstrap(modules: ModuleInstanceOrConstructor[], builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler
+export function bootstrap(options: ILoadModuleOptions, builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler;
+export function bootstrap(modulesOrOptions: ModuleInstanceOrConstructor[] | ILoadModuleOptions, builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler {
+    let options = Array.isArray(modulesOrOptions) ? { modules: modulesOrOptions } : modulesOrOptions;
+
+    if (!options.modules.find(m => m.name === "vue-server")) {
+        options = {
+            ...options,
+            modules: [...options.modules, VueServerModule]
+        };
     }
 
     return async context => {
         // modules are loaded asynchronously so wait for them to finish loading and grab an instance of the host
-        const host = await loadModules(modules);
+        const host = await loadModules(options);
 
         if (context.beginRender) {
             // this allows server components the ability to configure the service collection before rendering it server-side

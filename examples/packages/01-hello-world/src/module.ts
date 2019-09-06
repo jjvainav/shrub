@@ -5,7 +5,7 @@ export class HelloWorldModule implements IModule {
     readonly name = "hello-world";
     readonly dependencies = [WorkbenchModule];
 
-    configure({ config, services }: IModuleConfigurator): void {
+    configure({ config }: IModuleConfigurator): void {
         config.get(IWorkbenchConfiguration).registerExample({
             name: "01-hello-world",
             component: () => import(/* webpackChunkName: "01-hello-world" */ "./components/hello-world"),

@@ -1,3 +1,4 @@
+const HtmlWebpackExcludeAssetsPlugin = require("html-webpack-exclude-assets-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const VueSSRClientPlugin = require("vue-server-renderer/client-plugin");
@@ -25,15 +26,19 @@ const createClientConfig = (bundle) => merge(base, {
                     test: /[\\/]node_modules[\\/]/
                 }
             }
-        }
+        },
+        runtimeChunk: "single"
     },
     plugins: [
         new HtmlWebpackPlugin({
+            // exclude the .js assets because they will get injected by vue SSR
+            excludeAssets: [/.*.js/],
             // the output file
             filename: path.resolve(__dirname, distRoot, "views", bundle.template),
             // the html template for the view
             template: path.resolve(__dirname, viewsRoot, bundle.template)
-        }),   
+        }),
+        new HtmlWebpackExcludeAssetsPlugin(),
         new webpack.DefinePlugin({
             "process.env.VUE_ENV": JSON.stringify("client")
         })
