@@ -1,7 +1,7 @@
 {
     "name": "@shrub/vue-server",
     "description": "Module for server side rendered vue components.",
-    "version": "0.1.13",
+    "version": "0.1.14",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -29,10 +29,10 @@
         "vue-server-renderer": "^2.6.10"
     },
     "devDependencies": {
-        "@shrub/module": "0.1.13",
-        "@shrub/serialization": "0.1.13",
-        "@shrub/service-collection": "0.1.13",
-        "@shrub/vue-core": "0.1.13",
+        "@shrub/module": "0.1.14",
+        "@shrub/serialization": "0.1.14",
+        "@shrub/service-collection": "0.1.14",
+        "@shrub/vue-core": "0.1.14",
         "@types/node": "^12.7.3"
     }
 }
