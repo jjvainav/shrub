@@ -1,7 +1,7 @@
 {
     "name": "@shrub/serialization",
     "description": "Provides support for class based JSON serialization/deserialization.",
-    "version": "0.1.16",
+    "version": "0.1.17",
     "license": "MIT",
     "repository": {
         "type": "git",
