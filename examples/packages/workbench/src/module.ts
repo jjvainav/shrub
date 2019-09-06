@@ -1,4 +1,5 @@
 import Vue from "vue";
+import Router from "vue-router";
 import Vuetify from "vuetify";
 import { createConfigType, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/module";
 import { IServiceRegistration } from "@shrub/service-collection";
@@ -12,6 +13,7 @@ import "material-design-icons-iconfont/dist/material-design-icons.css";
 import "vuetify/dist/vuetify.css";
 import "./styles/index.scss";
 
+Vue.use(Router);
 Vue.use(Vuetify);
 
 export const IWorkbenchConfiguration = createConfigType<IWorkbenchConfiguration>("workbench");

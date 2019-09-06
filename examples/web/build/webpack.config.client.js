@@ -1,5 +1,4 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const HtmlWebpackTagsPlugin = require("html-webpack-tags-plugin");
 const path = require("path");
 const VueSSRClientPlugin = require("vue-server-renderer/client-plugin");
 const webpack = require("webpack");
@@ -34,16 +33,7 @@ const createClientConfig = (bundle) => merge(base, {
             filename: path.resolve(__dirname, distRoot, "views", bundle.template),
             // the html template for the view
             template: path.resolve(__dirname, viewsRoot, bundle.template)
-        }),
-        // this injects a '<script>' tag into the html output file linking to the vendor .js file(s)
-        // it is expected that the vendor bundle has be built prior to bundling the client source
-        new HtmlWebpackTagsPlugin({
-            tags: [{ path: "", glob: "vendor_*.js", globPath: path.resolve(__dirname, distRoot, "public") }],
-            append: false
-        }),
-        new webpack.DllReferencePlugin({
-            manifest: path.resolve(__dirname, distRoot, "public/vendor.manifest.json")
-        }),        
+        }),   
         new webpack.DefinePlugin({
             "process.env.VUE_ENV": JSON.stringify("client")
         })

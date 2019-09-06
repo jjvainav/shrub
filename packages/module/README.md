@@ -55,7 +55,7 @@ export class BarModule implements IModule {
     readonly name = "bar";
 
     initialize({ config }: IModuleInitializer): void {
-        config(IFooModuleConfiguration).register(() => ({
+        config(IBarModuleConfiguration).register(() => ({
             registerWidget: widget => {}
         }));
     }

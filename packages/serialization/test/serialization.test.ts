@@ -127,7 +127,7 @@ describe("serialize", () => {
 
         const result = new JSONSerializer().serialize(obj);
 
-        expect(result.__type).toBe("SubObject");
+        expect(result.__type).toBe("sub");
         expect(result.foo).toBe("foo");
         expect(result.v).toBe("hello");
     });
@@ -287,7 +287,7 @@ describe("deserialize", () => {
 
     test("inheritance from base type", () => {
         const json = {
-            __type: "SubObject",
+            __type: "sub",
             foo: "foo",
             v: "hello"
         };
@@ -413,6 +413,7 @@ class BaseObject {
     }
 }
 
+@Serializable({ typeName: "sub" })
 class SubObject extends BaseObject {
     @Serialize({ type: String }) foo: string;
 

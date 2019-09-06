@@ -1,12 +1,10 @@
-import Vue, { VueConstructor } from "vue";
+import { VueConstructor } from "vue";
 import Router, { RawLocation, Route, RouteConfig } from "vue-router";
 import { EventEmitter, IEvent } from "@shrub/event-emitter";
 import { createService, Singleton } from "@shrub/service-collection";
 import { IComponent } from "@shrub/vue-core";
 import { ModuleExampleComponent } from "../components";
 import * as utils from "../utils";
-
-Vue.use(Router);
 
 export const IWorkbenchService = createService<IWorkbenchService>("workbench-service");
 

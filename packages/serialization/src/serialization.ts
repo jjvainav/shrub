@@ -1,12 +1,7 @@
-import { EventEmitter, IEvent } from "@shrub/event-emitter";
-
 type Constructor<T> = { new(...args: any[]): T };
+type Factory<T> = (ctor: Constructor<T>) => T;
 type PropertyNames<T> = { [K in keyof T]: K }[keyof T];
 export type PropertyOptions<T> = { [P in PropertyNames<T>]?: SerializablePropertyOptions<NonNullable<T[P]>> };
-
-export type JSONSerializerOptions = {
-    readonly typeSerializer?: ITypeSerializer;
-};
 
 export type SerializableTypeInfo<T> = {
     readonly autoRegisterProperties?: boolean;
@@ -26,8 +21,16 @@ type TypeInfoChangedEvent = {
     readonly oldTypeName: string;
 };
 
+export interface IJSONSerializerOptions {
+    /** An optional serializer for custom serialization/deserialization. */
+    readonly typeSerializer?: ITypeSerializer;
+    /** An optional factory used to create object instances. */
+    readonly factory?: Factory<any>;
+}
+
 export interface IJSONSerializerContext {
     readonly typeSerializer: ITypeSerializer;
+    readonly factory: Factory<any>;
 }
 
 export interface ITypeSerializer {
@@ -109,9 +112,9 @@ export function configureType<T>(ctor: Constructor<T>, props: PropertyOptions<T>
 }
 
 function getBaseType(ctor: Constructor<any>): SerializableType<any> | undefined {
-    // TODO: it seems __proto__ is deprecated but still used by browsers: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/proto
-    if (ctor.prototype.__proto__ && ctor.prototype.__proto__.constructor && ctor.prototype.__proto__.constructor !== Object) {
-        return types.get(ctor.prototype.__proto__.constructor);
+    const base = Object.getPrototypeOf(ctor.prototype);
+    if (base && base !== Object.prototype) {
+        return types.get(base.constructor);
     }
 
     return undefined;
@@ -155,18 +158,20 @@ const noOpValueSerializer: IValueSerializer<any, any> = {
 };
 
 /** 
- * Provides support serializing class objects to simple json objects. This is useful for
- * serializing complex class types into simple json objects. The serialization can be
- * controlled via the Serialize and Serializable decorators.
+ * Provides support for serializing complex class types into simple json objects
+ * with Serialize and Serializable decorator support.
+ * 
+ * Note: this does not stringify the JSON object, this can easily be done using JSON.stringify() 
  */
 export class JSONSerializer {
     private readonly typeSerializer: ITypeSerializer;
     private readonly context: IJSONSerializerContext;
 
-    constructor(options?: JSONSerializerOptions) {
+    constructor(options?: IJSONSerializerOptions) {
         this.typeSerializer = options && options.typeSerializer || defaultTypeSerializer;
         this.context = {
-            typeSerializer: this.typeSerializer
+            typeSerializer: this.typeSerializer,
+            factory: options && options.factory || (ctor => new ctor())
         };
     }
 
@@ -183,15 +188,23 @@ export class JSONSerializer {
         return this.typeSerializer.serialize(this.context, getType(ctor), obj);
     }
 
-    deserialize(obj: any): object;
-    deserialize<T>(obj: any, ctor: Constructor<T>): T;
-    deserialize(obj: any, ctor?: Constructor<any>): any {
-        if (!obj || typeof obj !== "object") {
-            throw new Error("Invalid json object");
+    deserialize(json: any): object;
+    deserialize<T>(json: any, ctor: Constructor<T>): T;
+    deserialize(json: any, ctor?: Constructor<any>): any {
+        if (typeof json === "undefined") {
+            throw new Error("json not defined");
+        }
+
+        if (typeof json === "string") {
+            json = JSON.parse(json);
+        }
+
+        if (typeof json !== "object") {
+            throw new Error("Invalid json, must be a string or object");
         }
 
         ctor = ctor || <Constructor<any>>Object.prototype.constructor;
-        return this.typeSerializer.deserialize(this.context, getTypeOrSubType(getType(ctor), obj), obj);
+        return this.typeSerializer.deserialize(this.context, getTypeOrSubType(getType(ctor), json), json);
     }
 }
 
@@ -226,7 +239,7 @@ class ObjectSerializer<T> implements IValueSerializer<object, any> {
     }
 
     deserialize(context: IJSONSerializerContext, json: any): any {
-        const obj: any = new this.type.ctor();
+        const obj: any = context.factory(this.type.ctor);
         for (const entry of this.type.getProperties(json)) {
             const value = json[entry[1].name];
 
@@ -305,9 +318,9 @@ class ObjectSerializer<T> implements IValueSerializer<object, any> {
 };
 
 class SerializableType<T> implements ISerializableType  {
-    private readonly typeInfoChanged = new EventEmitter<TypeInfoChangedEvent>("type-info-changed");
     private readonly properties = new Map<string, ISerializableProperty>();
     private readonly subTypes = new Map<string, SerializableType<any>>();
+    private typeInfoChanged = (evt: TypeInfoChangedEvent) => {};
 
     readonly baseType?: SerializableType<any>;
     readonly serializer: IValueSerializer<T, any>;
@@ -327,10 +340,6 @@ class SerializableType<T> implements ISerializableType  {
         }
     }
 
-    get onTypeInfoChanged(): IEvent<TypeInfoChangedEvent> {
-        return this.typeInfoChanged.event;
-    }
-
     private _typeKey: string;
     get typeKey(): string {
         return this._typeKey;
@@ -339,6 +348,14 @@ class SerializableType<T> implements ISerializableType  {
     private _typeName: string;
     get typeName(): string {
         return this._typeName;
+    }
+
+    onTypeInfoChanged(callback: (evt: TypeInfoChangedEvent) => void): void {
+        const next = this.typeInfoChanged;
+        this.typeInfoChanged = evt => {
+            callback(evt);
+            next(evt);
+        };
     }
 
     addSubType(type: SerializableType<any>): void {
@@ -389,7 +406,7 @@ class SerializableType<T> implements ISerializableType  {
     }
 
     setTypeInfo(typeInfo: SerializableTypeInfo<any>): void {
-        // it seems property decorators are invoked prior to class decorators...
+        // property decorators are invoked prior to class decorators
         const oldTypeName = this._typeName;
         this._typeKey = typeInfo.typeKey || this._typeKey;
 
@@ -397,7 +414,7 @@ class SerializableType<T> implements ISerializableType  {
             this._typeName = typeof typeInfo.typeName === "string" ? typeInfo.typeName : typeInfo.typeName(this.ctor)
         }
 
-        this.typeInfoChanged.emit({ type: this, oldTypeName });
+        this.typeInfoChanged({ type: this, oldTypeName });
     }
 
     getProperties(obj?: any): [string, ISerializableProperty][] {
@@ -462,6 +479,5 @@ types.set(Object.prototype.constructor, new SerializableType(<Constructor<any>>O
 // register primitive types
 types.set(Boolean.prototype.constructor, new SerializableType(<Constructor<any>>Boolean.prototype.constructor, { autoRegisterProperties: false }, noOpValueSerializer));
 types.set(Number.prototype.constructor, new SerializableType(<Constructor<any>>Number.prototype.constructor, { autoRegisterProperties: false }, noOpValueSerializer));
-types.set(BigInt.prototype.constructor, new SerializableType(<Constructor<any>>BigInt.prototype.constructor, { autoRegisterProperties: false }, noOpValueSerializer));
 types.set(String.prototype.constructor, new SerializableType(<Constructor<any>>String.prototype.constructor, { autoRegisterProperties: false }, noOpValueSerializer));
 types.set(Symbol.prototype.constructor, new SerializableType(<Constructor<any>>Symbol.prototype.constructor, { autoRegisterProperties: false }, noOpValueSerializer));
