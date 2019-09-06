@@ -19,8 +19,5 @@
         "build": "tsc -b .",
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
         "test": "jest"
-    },
-    "dependencies": {
-        "@shrub/event-emitter": "0.1.14"
     }
 }

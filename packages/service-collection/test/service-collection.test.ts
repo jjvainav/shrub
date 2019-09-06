@@ -137,6 +137,12 @@ class CompositeService2 implements ICompositeService2 {
     }
 }
 
+class SubCompositeService extends CompositeService {
+    getFooBar(): string {
+        return this.getFoo() + this.getBar();
+    }
+}
+
 @Singleton
 class SingletonService implements ISingletonService {
     value = "singleton";
@@ -402,6 +408,20 @@ describe("service dependency injection", () => {
 
         expect(service.getFoo()).toBe("foo");
         expect(service.getBar()).toBe("bar");
+    });
+
+    test("inject service dependencies into Base type", () => {
+        const services = new ServiceMap();
+
+        services.registerTransient(ICompositeService, SubCompositeService);
+        services.registerTransient(IFooService, FooBarService);
+        services.registerTransient(IBarService, FooBarService);
+
+        const service = <SubCompositeService>services.get(ICompositeService);
+
+        expect(service.getFoo()).toBe("foo");
+        expect(service.getBar()).toBe("bar");
+        expect(service.getFooBar()).toBe("foobar");
     });
 
     test("inject service whose dependent has the same dependencies", () => {

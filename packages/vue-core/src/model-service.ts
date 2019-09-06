@@ -1,9 +1,10 @@
 import { JSONSerializer } from "@shrub/serialization";
-import { createService, Singleton } from "@shrub/service-collection";
+import { createService, IInstantiationService, Singleton } from "@shrub/service-collection";
 
 export const IModelService = createService<IModelService>("model-service");
 
-export type ModelConstructor<T> = { new(): T };
+/** Defines a model constructor which supports service injection. */
+export type ModelConstructor<T> = { new(...args: any[]): T };
 
 /** Manages vue component model instances. */
 export interface IModelService {
@@ -15,16 +16,25 @@ export interface IModelService {
 export class ModelService implements IModelService {
     readonly models: { [key: string]: any } = {};
 
+    constructor(@IInstantiationService private readonly instantiation: IInstantiationService) {
+    }
+
     get<T>(key: string, ctor: ModelConstructor<T>): T {
         let model = this.models[key];
         if (model) {
+            // check if the cached model's constructor matches the constructor passed in
             if (model.constructor !== ctor) {
+                // if not check if the registered model is a POJO
                 if (model.constructor !== Object.prototype.constructor) {
-                    throw new Error("Model constructor mismatch");
+                    // if the model is not a POJO then there is a type mismatch 
+                    throw new TypeError(`Model constructor (${model.constructor.name}) mismatch (${ctor.name})`);
                 }
 
-                // handle if the registered model is a POJO; attempt to deserialize as the specified model type
-                model = new JSONSerializer().deserialize<T>(model, ctor);
+                // deserialize the POJO as the specified model type using the instantiation service for constructor injection support
+                const serializer = new JSONSerializer({
+                    factory: ctor => this.instantiation.createInstance(ctor)
+                });
+                model = serializer.deserialize<T>(model, ctor);
                 this.models[key] = model;
             }
 
