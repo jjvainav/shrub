@@ -1,4 +1,3 @@
-import { JSONSerializer } from "@shrub/serialization";
 import { Singleton } from "@shrub/service-collection";
 import { ModelConstructor, ModelService } from "@shrub/vue-core";
 
@@ -13,13 +12,8 @@ export class BrowserModelService extends ModelService {
             return this.models[key];
         }
 
-        // if the model has not been initialized check the global initial state to see if data for the model exists
-        if (this.initialState && this.initialState[key]) {
-            const model = new JSONSerializer().deserialize<T>(this.initialState[key], ctor);
-            this.models[key] = model;
-        }
-
-        // the base service will initialize a new instance of the model
+        // set the model to the initial state (if one exists) and let the base model deserialize it based on the provided constructor
+        this.models[key] = this.initialState && this.initialState[key];
         return super.get(key, ctor);
     }
 }

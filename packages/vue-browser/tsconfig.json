@@ -13,7 +13,6 @@
     "include": ["src", "types"],
     "references": [
         { "path": "../module" },
-        { "path": "../serialization" },
         { "path": "../service-collection" },
         { "path": "../vue-core" }
     ]

@@ -5,7 +5,14 @@ import { ModelService } from "@shrub/vue-core";
 @Singleton
 export class ServerModelService extends ModelService {
     get hasModels(): boolean {
-        return Object.keys(this.models).length > 0;
+        for (const key of Object.keys(this.models)) {
+            // make sure the property has an actual object and not just undefined/null
+            if (this.models[key]) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     serialize(): any {
