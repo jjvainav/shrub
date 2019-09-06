@@ -41,7 +41,7 @@ export class ModelService implements IModelService {
             return model;
         }
 
-        model = new ctor();
+        model = this.instantiation.createInstance(ctor);
         this.models[key] = model;
 
         return model;

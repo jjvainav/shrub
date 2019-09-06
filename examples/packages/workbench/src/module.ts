@@ -3,8 +3,9 @@ import Router from "vue-router";
 import Vuetify from "vuetify";
 import { createConfigType, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/module";
 import { IServiceRegistration } from "@shrub/service-collection";
-import { IVueConfiguration, VueCoreModule } from "@shrub/vue-core";
+import { IModelService, IVueConfiguration, VueCoreModule } from "@shrub/vue-core";
 import { NotFoundComponent, WorkbenchComponent } from "./components";
+import { WorkbenchModel } from "./model";
 import { DisplayService, IDisplayService, IWorkbenchExample, IWorkbenchRouteConfig, IWorkbenchService, WorkbenchBrowserService } from "./services";
 import * as utils from "./utils";
 
@@ -52,6 +53,11 @@ export class WorkbenchModule implements IModule {
     configure({ config, services }: IModuleConfigurator): void {
         const workbenchService = services.get(IWorkbenchService);
         config.get(IVueConfiguration).mount(WorkbenchComponent, {
+            data: () => ({
+                props: { 
+                    model: services.get(IModelService).get("workbench", WorkbenchModel) 
+                }
+            }),
             options: {
                 created: function (this: Vue) {
                     if (this.$vuetify) {

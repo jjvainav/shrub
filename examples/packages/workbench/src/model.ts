@@ -1,4 +1,3 @@
-import { IServiceCollection } from "@shrub/service-collection";
 import { DisplayBreakpoint, IDisplayService } from "./services";
 
 export interface IWorkbenchModel {
@@ -12,8 +11,7 @@ export class WorkbenchModel implements IWorkbenchModel {
     showSidebarToggle = false;
     wasSidebarToggledOpen = false;
 
-    constructor(private readonly services: IServiceCollection) {
-        const displayService = this.services.get(IDisplayService);
+    constructor(@IDisplayService displayService: IDisplayService) {
         displayService.onBreakpointChanged(() => { 
             this.updateSidebarToggle(displayService.breakpoint);
         });

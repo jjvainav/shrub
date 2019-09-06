@@ -337,6 +337,24 @@ describe("deserialize", () => {
         expect(obj.value.foo).toBe("foo");
         expect(obj.value.bar).toBe("bar");
     });
+
+    test("custom object factory", () => {
+        const serializer = new JSONSerializer({
+            factory: ctor => {
+                const obj = new ctor();
+                if (obj instanceof SimpleObject) {
+                    obj.foo = "foo";
+                }
+
+                return obj;
+            }
+        });
+
+        const obj = serializer.deserialize({}, SimpleObject);
+        
+        expect(obj.hello).toBe("hello");
+        expect(obj.foo).toBe("foo");
+    });
 });
 
 class SimpleObjectTestTypeSerializer implements ITypeSerializer {
