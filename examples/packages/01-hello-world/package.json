@@ -10,9 +10,9 @@
         "copy-vue": "copyfiles -u 1 ./src/components/**/*.vue dist"
     },
     "dependencies": {
-        "@shrub/module": "^0.1.14",
-        "@shrub/service-collection": "^0.1.14",
-        "@shrub/vue-core": "^0.1.14",
+        "@shrub/module": "^0.1.15",
+        "@shrub/service-collection": "^0.1.15",
+        "@shrub/vue-core": "^0.1.15",
         "vue": "^2.6.10"
     },
     "devDependencies": {
