@@ -1,7 +1,7 @@
 {
     "name": "@shrub/event-emitter",
     "description": "Simple event emitter for typed events.",
-    "version": "0.1.17",
+    "version": "0.1.18",
     "license": "MIT",
     "repository": {
         "type": "git",
