@@ -1,7 +1,7 @@
 {
     "name": "@shrub/express-core",
     "description": "Core module and host for express based apps.",
-    "version": "0.1.18",
+    "version": "0.1.19",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -27,8 +27,8 @@
         "@types/express": "^4.17.1"
     },
     "dependencies": {
-        "@shrub/module": "0.1.18",
-        "@shrub/service-collection": "0.1.18",
+        "@shrub/module": "0.1.19",
+        "@shrub/service-collection": "0.1.19",
         "express": "^4.17.1"
     }
 }
