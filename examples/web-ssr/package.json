@@ -1,5 +1,5 @@
 {
-    "name": "@examples/web",
+    "name": "@examples/web-ssr",
     "version": "1.0.0",
     "private": true,
     "scripts": {
@@ -14,7 +14,6 @@
         "@examples/01-hello-world": "1.0.0",
         "@examples/workbench": "1.0.0",
         "@shrub/express-core": "^0.1.19",
-        "@shrub/express-session": "^0.1.19",
         "@shrub/module": "^0.1.19",
         "@shrub/service-collection": "^0.1.19",
         "@shrub/vue-browser": "^0.1.19",

@@ -10,7 +10,7 @@ app.set("port", process.env.PORT || 3000);
 
 const host = createExpressHostBuilder({ app })
     .useModules([{
-        name: "example-app",
+        name: "example-ssr",
         dependencies: [ExpressCoreModule],
         configure: ({ config }: IModuleConfigurator) => {
             const app = config.get(IExpressConfiguration);
@@ -25,9 +25,9 @@ const host = createExpressHostBuilder({ app })
 
 const loading = host.load();
 const server = host.app.listen(host.app.get("port"), () => {
-    console.log("  Examples web app started at http://localhost:%d in %s mode", host.app.get("port"));
+    console.log("  Examples web-ssr app started at http://localhost:%d in %s mode", host.app.get("port"));
     loading.then(() => {
-        console.log("  Web app running");
+        console.log("  Web-ssr app running");
         console.log("  Press CTRL-C to stop\n");
     });
 });

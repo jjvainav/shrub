@@ -10,7 +10,8 @@
     },
     "workspaces": [
         "packages/*",
-        "web"
+        "web-csr",
+        "web-ssr"
     ],
     "scripts": {
         "bootstrap": "yarn install",
