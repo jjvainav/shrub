@@ -70,36 +70,36 @@ export function bootstrap(modulesOrOptions: ModuleInstanceOrConstructor[] | ILoa
         }
 
         const instance = host.getInstance(VueServerModule);
-        return instance.createApp().then(async ({ app, router }) => {
-            context.rendered = () => {
-                // if model state has been captured during SSR set it as the context so it can be loaded client side
-                const modelService = <ServerModelService>app.$services.get(IModelService);
-                if (modelService.hasModels) {
-                    context.state = modelService.serialize();
-                }
-            };
-            
-            // if a 'builder' is provided invoke it now to allow extending the Vue app instance
-            app = builder ? await builder(context, app) : app;
+        let { app, router } = instance.createApp();
 
-            if (router && context.url) {
-                // if a router and request url are avaiable update the router to use the request url as its route location
-                router.push(context.url);
-
-                // wait until the router has resolved
-                return new Promise<Vue>((resolve, reject) => router.onReady(() => {
-                    if (!router.getMatchedComponents().length) {
-                        // no routes matched the request url so reject with a 404
-                        return reject({ code: 404 });
-                    }
-
-                    resolve(app);
-                },
-                reject));
+        context.rendered = () => {
+            // if model state has been captured during SSR set it as the context so it can be loaded client side
+            const modelService = <ServerModelService>app.$services.get(IModelService);
+            if (modelService.hasModels) {
+                context.state = modelService.serialize();
             }
+        };
+        
+        // if a 'builder' is provided invoke it now to allow extending the Vue app instance
+        app = builder ? await builder(context, app) : app;
 
-            return app;
-        });
+        if (router && context.url) {
+            // if a router and request url are avaiable update the router to use the request url as its route location
+            router.push(context.url);
+
+            // wait until the router has resolved
+            return new Promise<Vue>((resolve, reject) => router!.onReady(() => {
+                if (!router!.getMatchedComponents().length) {
+                    // no routes matched the request url so reject with a 404
+                    return reject({ code: 404 });
+                }
+
+                resolve(app);
+            },
+            reject));
+        }
+
+        return app;
     };
 }
 
@@ -130,22 +130,19 @@ export class VueServerModule implements IModule {
         registration.register(IModelService, ServerModelService);
     }
 
-    createApp(): Promise<IVueSSRCreateResult> {
-        return new Promise((resolve, reject) => {
-            if (!this.component) {
-                reject(new Error("Vue component has not been mounted."));
-            }
-            else {
-                const options = this.getComponentOptions();
-                const app = new Vue({
-                    services: this.services,
-                    render: h => h(this.component, this.getData()),
-                    ...options
-                });
+    createApp(): IVueSSRCreateResult {
+        if (!this.component) {
+            throw new Error("Vue component has not been mounted.");
+        }
 
-                resolve({ app, router: options.router });
-            }
+        const options = this.getComponentOptions();
+        const app = new Vue({
+            services: this.services,
+            render: h => h(this.component, this.getData()),
+            ...options
         });
+
+        return { app, router: options.router };
     }
 
     private getComponentOptions(): ComponentOptions<Vue> {

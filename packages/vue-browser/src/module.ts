@@ -9,6 +9,11 @@ export interface IVueBrowserModuleSettings {
     readonly el?: string;
 }
 
+// defines the basic interface needed to interact with Vue router and avoid the need to import the vue-router package
+interface IVueRouter {
+    onReady(cb: Function): void;
+}
+
 /** Vue module for browser based vue components. */
 export class VueBrowserModule implements IModule {
     readonly name = "vue-browser";
@@ -22,13 +27,20 @@ export class VueBrowserModule implements IModule {
                     throw new Error(`Element with id (${el}) not found`);
                 }
 
+                const componentOptions = this.getComponentOptions(options);
+                const router = <IVueRouter>(<any>componentOptions).router;
                 const app = new Vue({
                     services,
                     render: h => h(component, this.getData(options)),
-                    ...this.getComponentOptions(options)
+                    ...componentOptions
                 });
 
-                app.$mount(el);
+                if (router) {
+                    router.onReady(() =>  app.$mount(el));
+                }
+                else {
+                    app.$mount(el);
+                }
             }
         }));
     }
