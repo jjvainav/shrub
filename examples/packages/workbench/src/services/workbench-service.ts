@@ -10,6 +10,7 @@ export const IWorkbenchService = createService<IWorkbenchService>("workbench-ser
 
 export interface IWorkbenchService {
     readonly onRouteChanged: IEvent;
+    readonly currentExample?: IWorkbenchExample;
     readonly currentRoute: IWorkbenchRoute;
     readonly router: Router;
     getExample(name: string): IWorkbenchExample | undefined;
@@ -49,6 +50,7 @@ export interface IWorkbenchRouteConfig {
 
 export interface IWorkbenchExample {
     readonly name: string;
+    readonly title: string;
     readonly component: () => Promise<IComponent | IEsModuleComponent>;
     readonly menu: IWorkbenchMenuItem;
 }
@@ -80,6 +82,14 @@ export class WorkbenchBrowserService implements IWorkbenchService {
 
     get onRouteChanged(): IEvent {
         return this.routeChanged.event;
+    }
+
+    get currentExample(): IWorkbenchExample | undefined {
+        if (this.router.currentRoute.name) {
+            return this.examples.get(this.router.currentRoute.name);
+        }
+
+        return undefined;
     }
 
     get currentRoute(): IWorkbenchRoute {

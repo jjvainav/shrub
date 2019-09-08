@@ -58,7 +58,7 @@ export class WorkbenchModule implements IModule {
         config.get(IVueConfiguration).mount(WorkbenchComponent, {
             data: () => ({
                 props: { 
-                    model: services.get(IModelService).get("workbench", WorkbenchModel) 
+                    model: Vue.observable(services.get(IModelService).get("workbench", WorkbenchModel))
                 }
             }),
             options: {

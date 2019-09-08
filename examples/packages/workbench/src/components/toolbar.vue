@@ -9,7 +9,7 @@
                 <v-icon>menu</v-icon>
             </v-btn>
         </v-toolbar-items>
-        <v-toolbar-title>Examples</v-toolbar-title>
+        <v-toolbar-title>{{ model.getCurrentTitle() }}</v-toolbar-title>
     </v-toolbar>
 </template>
 

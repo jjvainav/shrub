@@ -1,4 +1,4 @@
-import { DisplayBreakpoint, IDisplayService } from "./services";
+import { DisplayBreakpoint, IDisplayService, IWorkbenchExample, IWorkbenchService } from "./services";
 
 export interface IWorkbenchModel {
     readonly isSidebarOpen: boolean;
@@ -7,16 +7,32 @@ export interface IWorkbenchModel {
 }
 
 export class WorkbenchModel implements IWorkbenchModel {
+    private readonly workbenchService!: IWorkbenchService;
+
+    current = "";
     isSidebarOpen = true;
     showSidebarToggle = false;
     wasSidebarToggledOpen = false;
 
-    constructor(@IDisplayService displayService: IDisplayService) {
-        displayService.onBreakpointChanged(() => { 
-            this.updateSidebarToggle(displayService.breakpoint);
-        });
+    constructor(
+        @IWorkbenchService workbenchService: IWorkbenchService,
+        @IDisplayService displayService: IDisplayService) {
+        this.setNonReactive("workbenchService", workbenchService);
+
+        workbenchService.onRouteChanged(() => this.updateCurrentExample(workbenchService.currentExample));
+        displayService.onBreakpointChanged(() => this.updateSidebarToggle(displayService.breakpoint));
 
         this.updateSidebarToggle(displayService.breakpoint);
+        this.updateCurrentExample(workbenchService.currentExample);
+    }
+
+    getCurrentTitle(): string {
+        if (this.current) {
+            const example = this.workbenchService.getExample(this.current);
+            return example ? example.title : "";
+        }
+
+        return "";
     }
 
     toggleSidebar(): void {
@@ -24,10 +40,21 @@ export class WorkbenchModel implements IWorkbenchModel {
         this.wasSidebarToggledOpen = this.isSidebarOpen;
     }
 
+    private setNonReactive(name: string, value: any): void {
+        // the model is expected to be reactive but not all properties should be (e.g. injected services)
+        // by defining a property as non-enumerable vue will not be able to discover and make it reactive
+        Object.defineProperty(this, name, { value, enumerable: false });
+    }
+
+    private updateCurrentExample(example?: IWorkbenchExample): void {
+        this.current = example ? example.name : "";
+    }
+
     private updateSidebarToggle(breakpoint: DisplayBreakpoint): void {
         const isSmallDisplay = breakpoint === DisplayBreakpoint.extraSmall || breakpoint === DisplayBreakpoint.small;
 
         this.showSidebarToggle = isSmallDisplay;
         this.isSidebarOpen = !isSmallDisplay || this.wasSidebarToggledOpen;
+        console.log(this);
     }
 }

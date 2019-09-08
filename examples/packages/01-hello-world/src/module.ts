@@ -8,6 +8,7 @@ export class HelloWorldModule implements IModule {
     configure({ config }: IModuleConfigurator): void {
         config.get(IWorkbenchConfiguration).registerExample({
             name: "01-hello-world",
+            title: "Hello World!",
             component: () => import(/* webpackChunkName: "01-hello-world" */ "./components/hello-world"),
             menu: {
                 order: 1,
