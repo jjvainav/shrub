@@ -29,7 +29,7 @@
         "vue-server-renderer": "^2.6.10"
     },
     "devDependencies": {
-        "@shrub/module": "0.1.22",
+        "@shrub/core": "0.1.22",
         "@shrub/serialization": "0.1.22",
         "@shrub/service-collection": "0.1.22",
         "@shrub/vue": "0.1.22",

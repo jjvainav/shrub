@@ -1,5 +1,5 @@
 import * as express from "express";
-import { combineExtensions, createHostBuilder, IModuleHost, IModuleHostExtension, IModuleHostBuilder } from "@shrub/module";
+import { combineExtensions, createHostBuilder, IModuleHost, IModuleHostExtension, IModuleHostBuilder } from "@shrub/core";
 
 export interface IExpressHost extends IModuleHost {
     readonly app: express.Express;

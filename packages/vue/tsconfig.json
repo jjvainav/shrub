@@ -12,7 +12,7 @@
     },
     "include": ["src", "types"],
     "references": [
-        { "path": "../module" },
+        { "path": "../core" },
         { "path": "../serialization" },
         { "path": "../service-collection" }
     ]

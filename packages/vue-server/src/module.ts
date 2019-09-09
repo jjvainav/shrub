@@ -1,6 +1,6 @@
 ﻿import Vue, { ComponentOptions, VNodeData } from "vue";
 import Router from "vue-router";
-import { ILoadModuleOptions, IModule, IModuleConfigurator, IModuleInitializer, loadModules, ModuleInstanceOrConstructor } from "@shrub/module";
+import { ILoadModuleOptions, IModule, IModuleConfigurator, IModuleInitializer, loadModules, ModuleInstanceOrConstructor } from "@shrub/core";
 import { IServiceCollection, IServiceRegistration } from "@shrub/service-collection";
 import { IModelService, IVueConfiguration, IVueMountOptions, VueModule } from "@shrub/vue";
 import { ServerModelService } from "./model-service";

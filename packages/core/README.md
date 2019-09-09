@@ -1,6 +1,6 @@
-# Modules
+# Description
 
-An API for modular server-side applications and front-end components.
+Shrub is a simple framework for building modular server-side applications and front-end components. The Core package provides a basic API for defining and loading modules.
 
 ## Creating a Module
 

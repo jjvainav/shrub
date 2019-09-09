@@ -1,5 +1,5 @@
 ﻿import Vue, { ComponentOptions, VueConstructor, VNodeData } from "vue";
-import { createConfigType, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/module";
+import { createConfigType, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
 import { IServiceCollection, IServiceRegistration } from "@shrub/service-collection";
 import { ComponentService, IComponentService } from "./component-service";
 import { IModelService, ModelService } from "./model-service";

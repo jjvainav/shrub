@@ -8,7 +8,7 @@
     },
     "include": ["src"],
     "references": [
-        { "path": "../module" },
+        { "path": "../core" },
         { "path": "../serialization" },
         { "path": "../service-collection" },
         { "path": "../vue" }

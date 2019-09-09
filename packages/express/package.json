@@ -27,7 +27,7 @@
         "@types/express": "^4.17.1"
     },
     "dependencies": {
-        "@shrub/module": "0.1.22",
+        "@shrub/core": "0.1.22",
         "@shrub/service-collection": "0.1.22",
         "express": "^4.17.1"
     }

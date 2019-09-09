@@ -7,8 +7,8 @@
     },
     "include": ["src"],
     "references": [
+        { "path": "../core" },
         { "path": "../express" },
-        { "path": "../module" },
         { "path": "../service-collection" }
     ]
 }

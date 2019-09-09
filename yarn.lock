@@ -1107,6 +1107,13 @@
     universal-user-agent "^3.0.0"
     url-template "^2.0.8"
 
+"@shrub/module@0.1.22":
+  version "0.1.22"
+  resolved "https://registry.yarnpkg.com/@shrub/module/-/module-0.1.22.tgz#278779e00b4cd1b4286c16a6bb0eaee4c9079fc3"
+  integrity sha512-PY4pLcOCmXgNm6MTCh6sXUoSjesUw6gSu4LS+Yuvge/orjsCyTJccAvNZ/kWipBfW/Pn0WKeHocpl4vfjNhmyQ==
+  dependencies:
+    "@shrub/service-collection" "0.1.22"
+
 "@types/babel__core@^7.1.0":
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.2.tgz#608c74f55928033fce18b99b213c16be4b3d114f"

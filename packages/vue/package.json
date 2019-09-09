@@ -20,7 +20,7 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/module": "0.1.22",
+        "@shrub/core": "0.1.22",
         "@shrub/serialization": "0.1.22",
         "@shrub/service-collection": "0.1.22",
         "vue": "^2.6.10",

@@ -1,6 +1,6 @@
 import Cookies from "cookies";
+import { IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
 import { ExpressModule, IExpressConfiguration } from "@shrub/express";
-import { IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/module";
 import { createOptions, IOptionsService } from "@shrub/service-collection";
 import { cookies } from "./middleware";
 

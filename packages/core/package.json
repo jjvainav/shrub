@@ -1,6 +1,6 @@
 {
-    "name": "@shrub/module",
-    "description": "An API for modular server-side applications and front-end components.",
+    "name": "@shrub/core",
+    "description": "A framework for modular server-side applications and front-end components.",
     "version": "0.1.22",
     "license": "MIT",
     "repository": {
