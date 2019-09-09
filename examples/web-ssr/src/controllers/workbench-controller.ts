@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import * as path from "path";
-import { Get, Route } from "@shrub/express-core";
+import { Get, Route } from "@shrub/express";
 import { ssrViewHandler } from "../handlers";
 
 const viewHandler = ssrViewHandler({

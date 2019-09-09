@@ -1,5 +1,5 @@
 import * as express from "express";
-import { useController } from "@shrub/express-core";
+import { useController } from "@shrub/express";
 import { WorkbenchController } from "./controllers";
 
 export function createRoutes(): express.Router {

@@ -1,6 +1,6 @@
 import * as history from "connect-history-api-fallback";
 import { NextFunction, Request, Response } from "express";
-import { Get, Route } from "@shrub/express-core";
+import { Get, Route } from "@shrub/express";
 import { staticView } from "../handlers";
 
 const index = "/index.html";
