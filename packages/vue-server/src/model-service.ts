@@ -1,6 +1,6 @@
 import { JSONSerializer } from "@shrub/serialization";
 import { Singleton } from "@shrub/service-collection";
-import { ModelService } from "@shrub/vue-core";
+import { ModelService } from "@shrub/vue";
 
 @Singleton
 export class ServerModelService extends ModelService {

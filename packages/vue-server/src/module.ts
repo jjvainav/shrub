@@ -2,7 +2,7 @@
 import Router from "vue-router";
 import { ILoadModuleOptions, IModule, IModuleConfigurator, IModuleInitializer, loadModules, ModuleInstanceOrConstructor } from "@shrub/module";
 import { IServiceCollection, IServiceRegistration } from "@shrub/service-collection";
-import { IModelService, IVueConfiguration, IVueMountOptions, VueCoreModule } from "@shrub/vue-core";
+import { IModelService, IVueConfiguration, IVueMountOptions, VueModule } from "@shrub/vue";
 import { ServerModelService } from "./model-service";
 
 /** 
@@ -17,7 +17,7 @@ export interface IVueSSRContext {
     rendered?: (context: IVueSSRContext) => void;
     /** Optional state that will get injected and passed to the client. */
     state?: any;
-    /** Opional url identifying the current request url and is used when the main SSR component uses a vue-router. */
+    /** Opional url identifying the current request url and is needed when the main SSR component uses a vue-router. */
     url?: string;
     [key: string]: any;
 }
@@ -110,9 +110,10 @@ export class VueServerModule implements IModule {
     private mountOptions?: IVueMountOptions;
 
     readonly name = "vue-server";
-    readonly dependencies = [VueCoreModule];
+    readonly dependencies = [VueModule];
 
     initialize(init: IModuleInitializer): void {
+        // override the vue configuration to prevent mounting to an html element
         init.config(IVueConfiguration).register(({ services }: IModuleConfigurator) => ({
             mount: (component, options) => {
                 if (this.component) {

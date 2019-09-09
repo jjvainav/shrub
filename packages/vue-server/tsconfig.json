@@ -4,13 +4,16 @@
         "esModuleInterop": true,
         "outDir": "dist",
         "rootDir": "src",
-        "strictPropertyInitialization": true
+        "strictPropertyInitialization": true,
+        "paths": {
+            "vue": ["../../node_modules/vue"]
+        }
     },
     "include": ["src"],
     "references": [
         { "path": "../module" },
         { "path": "../serialization" },
         { "path": "../service-collection" },
-        { "path": "../vue-core" }
+        { "path": "../vue" }
     ]
   }
