@@ -1,8 +1,8 @@
 import * as cors from "cors";
 import * as express from "express";
 import * as path from "path";
+import { IModuleConfigurator } from "@shrub/core";
 import { createExpressHostBuilder, ExpressModule, IExpressConfiguration } from "@shrub/express";
-import { IModuleConfigurator } from "@shrub/module";
 import { createRoutes } from "./routes";
 
 const app = express();

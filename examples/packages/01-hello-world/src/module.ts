@@ -1,5 +1,5 @@
 import { IWorkbenchConfiguration, WorkbenchModule } from "@examples/workbench";
-import { IModule, IModuleConfigurator } from "@shrub/module";
+import { IModule, IModuleConfigurator } from "@shrub/core";
 
 export class HelloWorldModule implements IModule {
     readonly name = "hello-world";

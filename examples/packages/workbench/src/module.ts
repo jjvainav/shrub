@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Vuetify from "vuetify";
-import { createConfigType, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/module";
+import { createConfigType, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
 import { IServiceRegistration } from "@shrub/service-collection";
 import { IModelService, IVueConfiguration, VueModule } from "@shrub/vue";
 import { NotFoundComponent, WorkbenchComponent } from "./components";
