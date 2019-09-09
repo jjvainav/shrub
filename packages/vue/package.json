@@ -17,8 +17,7 @@
     },
     "scripts": {
         "build": "tsc -b .",
-        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
-        "watch": "tsc -b . -w"
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
         "@shrub/module": "0.1.21",

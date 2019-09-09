@@ -819,73 +819,62 @@
     once "^1.4.0"
     universal-user-agent "^3.0.0"
 
-"@shrub/event-emitter-dom@^0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@shrub/event-emitter-dom/-/event-emitter-dom-0.1.19.tgz#7b3a7f69ba23d82ba1f278cddfafdb6122c1e6a4"
-  integrity sha512-t4I+aS5or8J+7Mkh6jUkWrmSlb2QxvG8QunrZ19e97Z1AhicPQATzZPyI46KhOPhwuzv3BR/lhaeCetfAtJfYA==
+"@shrub/event-emitter-dom@^0.1.21":
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/@shrub/event-emitter-dom/-/event-emitter-dom-0.1.21.tgz#08161812d83dcf1711a33f1a4d1736524daea8ea"
+  integrity sha512-Td8tw1FT7kRPjbXrRaGSFSoHqX52FUv1F48IKGsvG+odY8Rpw48QbMCUMJwsat1In37l9ccgrt3OhWATsLiYmg==
   dependencies:
-    "@shrub/event-emitter" "0.1.19"
+    "@shrub/event-emitter" "0.1.21"
 
-"@shrub/event-emitter@0.1.19", "@shrub/event-emitter@^0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@shrub/event-emitter/-/event-emitter-0.1.19.tgz#7bf3f1752545f3e13f646a8fdfa4d9c483d06cb2"
-  integrity sha512-b9NnNbMKsuBTvINEnjRN1RbUJT8MSp1Zsin3E9y81d3PZrItEEhFXKMbsMbAKnTxQUIQrMgPyoV5ae6Q0onVrA==
+"@shrub/event-emitter@0.1.21", "@shrub/event-emitter@^0.1.21":
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/@shrub/event-emitter/-/event-emitter-0.1.21.tgz#91fc9a813e9dfb64f7609f3b9d4d6aee54815d73"
+  integrity sha512-AIwTYNIV2/i3MAvTYkXVmM2WYpVIWnXUsB7VyZM/iCv0S/Rfa6/XvaTwXdaR/0r8vMh5UfHfdRTwZ/nnglZXFQ==
 
-"@shrub/express-core@^0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@shrub/express-core/-/express-core-0.1.19.tgz#a8ed253041915252c030463aded01826c6fa5820"
-  integrity sha512-fFYEEJlQXPFBFv2YnsJZz36VBz5VIqbtmxAmh6Tgw1ExBghuWna0bIBn/lL9AflhwxfK2eUr7atnTuHKpZwiVQ==
+"@shrub/express-core@^0.1.21":
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/@shrub/express-core/-/express-core-0.1.21.tgz#c6acde25e1617096317c020c02145d4a7ea954bd"
+  integrity sha512-tyxPz1Sr6r7IZQ0nZmxcDVuJPydH2yv85duzcBl0w18pxqCfD9tujxFN8fnZOPrOX97pJSVWep+FhXojM/lMhA==
   dependencies:
-    "@shrub/module" "0.1.19"
-    "@shrub/service-collection" "0.1.19"
+    "@shrub/module" "0.1.21"
+    "@shrub/service-collection" "0.1.21"
     express "^4.17.1"
 
-"@shrub/module@0.1.19", "@shrub/module@^0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@shrub/module/-/module-0.1.19.tgz#afe07fd11a7dec2456dd60b1abcc234ebbbe63f7"
-  integrity sha512-3cCJoUhpuuBlUFYGH/DjKmOgLTR+fWtuByalAzNlmNwZDEfr2ywCys2qR14gm6grWFkhukGGA2suBwEWhZgovA==
+"@shrub/module@0.1.21", "@shrub/module@^0.1.21":
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/@shrub/module/-/module-0.1.21.tgz#1ac95600b2fed9fde45e53c42e5bd244e4fd1215"
+  integrity sha512-1CO0iKzrgd5oyz1vI1skHSeo3TyajXNvrKh8y2CpdIKcTXAMbbuOOJmr8wZijshye3qLGuHnuUkVP3fyJtGI4g==
   dependencies:
-    "@shrub/service-collection" "0.1.19"
+    "@shrub/service-collection" "0.1.21"
 
-"@shrub/serialization@0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@shrub/serialization/-/serialization-0.1.19.tgz#d1f397c4ba9a700f098e49ca1780cea8fec320cf"
-  integrity sha512-Q71OvmzdTqBsiPnO/CdpwzH1USVLWW3I5oyRujL9+U1VgQnsWLM4rU44zVtrZtecsFDSRIvTwvzs5sEge0B0Ug==
+"@shrub/serialization@0.1.21":
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/@shrub/serialization/-/serialization-0.1.21.tgz#e93600886e72739728616998d92082e531e2330c"
+  integrity sha512-OdahtvUYGhx4BCKLQG9xNdmjkaN5jnkbytpfjvimLQte1WAyuRElQ3Rl9srXW+ZPdwBahA69CZfuM9avCZx7tQ==
 
-"@shrub/service-collection@0.1.19", "@shrub/service-collection@^0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@shrub/service-collection/-/service-collection-0.1.19.tgz#73fd718aee1587747ecb5faeca37b4839e703f69"
-  integrity sha512-jM/9OrpjrLeDx6tBEj8E8seRsfUoG8YhamEP3XlmysyUQDkmckfo6WV5mVxBYKNdom1cm94ipyLO1aKVg0J87g==
+"@shrub/service-collection@0.1.21", "@shrub/service-collection@^0.1.21":
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/@shrub/service-collection/-/service-collection-0.1.21.tgz#3fc84374f9b7d63989530842b9bc65031c6873f4"
+  integrity sha512-ko37R7UUlH3lgNRNohDg0Be+2kqNGFTRTLMzeyORPDwfTQsQpSX1PNfvG5q6VtvJPJECD70o77mdGuu8Ektkvg==
 
-"@shrub/vue-browser@^0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@shrub/vue-browser/-/vue-browser-0.1.19.tgz#6b43c4e418c68fef17d451f12ae74a6bceacdf93"
-  integrity sha512-DrTkLtkr/BMRVWX3Bhcl/+TXNT5jx+8SaczP8KtRQmE40+VjjSfXgBtwYrVBECnjzm9MKscPgZNc36INssOdTw==
-  dependencies:
-    "@shrub/module" "0.1.19"
-    "@shrub/service-collection" "0.1.19"
-    "@shrub/vue-core" "0.1.19"
-    vue "^2.6.10"
-    vue-class-component "^7.1.0"
-
-"@shrub/vue-core@0.1.19", "@shrub/vue-core@^0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@shrub/vue-core/-/vue-core-0.1.19.tgz#e696f195a8796fdc6fdd38dbad8bf9e5f2a88166"
-  integrity sha512-QRvG6vXHl0gnIaeoAhBV3CiasahBRLAnm7MGLjbIu2jk3sfSYspW6t8JVZerWAsCiLhLA87NjpKgYT2ucflwJA==
-  dependencies:
-    "@shrub/module" "0.1.19"
-    "@shrub/serialization" "0.1.19"
-    "@shrub/service-collection" "0.1.19"
-    vue "^2.6.10"
-
-"@shrub/vue-server@^0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@shrub/vue-server/-/vue-server-0.1.19.tgz#c5ea7d084631a26cb4422c2dce5cf70b8069b6db"
-  integrity sha512-30URatMBhFd+bNTxsz/q8lfn2fwf+r/Ysspiv3/fL/xyu5T2msur0mwOpM9Z3Rw2fG7XMV76rbJUR8tMXnKbZw==
+"@shrub/vue-server@^0.1.21":
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-server/-/vue-server-0.1.21.tgz#6f3cc1bb8ca90eefbb9555407d084338bc95bce5"
+  integrity sha512-x4VCTBI7bwlM5h8tapc0XQTJx8fH/C4grtVU5h26E2+H2r2MlRlRlRiPgeAjfYh4Tb6atL/6zKAa6OEzkAcfwA==
   dependencies:
     vue "^2.6.10"
     vue-router "^3.1.3"
     vue-server-renderer "^2.6.10"
+
+"@shrub/vue@^0.1.21":
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.1.21.tgz#329dec7e9a9cfd631da333e66a7f92497ab5eb43"
+  integrity sha512-zWQPTitU/EYxjxIqeFW+NsWCYnketAZR5ydB/nJxJG+MNaUamszRPMlvFx5lhxvy4a1VvPITJJjOYW1/RmMD+A==
+  dependencies:
+    "@shrub/module" "0.1.21"
+    "@shrub/serialization" "0.1.21"
+    "@shrub/service-collection" "0.1.21"
+    vue "^2.6.10"
 
 "@types/body-parser@*":
   version "1.17.1"

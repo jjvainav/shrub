@@ -1,4 +1,4 @@
-import { IComponent } from "@shrub/vue-core";
+import { IComponent } from "@shrub/vue";
 import HelloWorldComponent from "./hello-world.vue";
 
 const component: IComponent = {

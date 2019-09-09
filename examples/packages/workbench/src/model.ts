@@ -55,6 +55,5 @@ export class WorkbenchModel implements IWorkbenchModel {
 
         this.showSidebarToggle = isSmallDisplay;
         this.isSidebarOpen = !isSmallDisplay || this.wasSidebarToggledOpen;
-        console.log(this);
     }
 }

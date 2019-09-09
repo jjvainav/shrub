@@ -16,7 +16,7 @@ export interface IModelService {
 export class ModelService implements IModelService {
     // TODO: create an options object to define the window property name containing the initial state
     /** Used for data injection and will be used when initializing a new model object. */
-    private readonly initialState = window && (<any>window).__INITIAL_STATE__;
+    private readonly initialState = typeof window !== "undefined" && (<any>window).__INITIAL_STATE__;
 
     readonly models: { [key: string]: any } = {};
 
