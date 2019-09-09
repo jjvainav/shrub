@@ -26,8 +26,8 @@
         "@types/express": "^4.17.1"
     },
     "dependencies": {
+        "@shrub/express": "0.1.21",
         "@shrub/express-cookies": "0.1.21",
-        "@shrub/express-core": "0.1.21",
         "@shrub/module": "0.1.21",
         "@shrub/service-collection": "0.1.21",
         "express": "^4.17.1"

@@ -1,7 +1,7 @@
 import Cookies from "cookies";
 import { Request, RequestHandler } from "express";
 
-declare module "@shrub/express-core/dist/request-context" {
+declare module "@shrub/express/dist/request-context" {
     interface IRequestContext {
         readonly cookies?: ICookies;
     }

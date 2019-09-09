@@ -16,7 +16,7 @@ declare global {
  * of extending the express Request object. This helps
  * avoid conflict with other libraries that extend express.
  * 
- * declare module "@shrub/express-core/dist/request-context" {
+ * declare module "@shrub/express/dist/request-context" {
  *     interface IRequestContext {
  *         readonly customProperty?: any;
  *     }

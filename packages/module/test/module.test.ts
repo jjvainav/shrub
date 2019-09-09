@@ -255,7 +255,7 @@ class BindSettingsModule implements IModule {
     }
 }
 
-const IConfigurableModuleConfiguration = createConfigType<IConfigurableModuleConfiguration>();
+const IConfigurableModuleConfiguration = createConfigType<IConfigurableModuleConfiguration>("configurable-module");
 interface IConfigurableModuleConfiguration {
     setValue(value: string): void;
 }

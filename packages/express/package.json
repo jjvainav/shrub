@@ -1,6 +1,6 @@
 {
-    "name": "@shrub/express-core",
-    "description": "Core module and host for express based apps.",
+    "name": "@shrub/express",
+    "description": "A module that adds support for Express based apps.",
     "version": "0.1.21",
     "license": "MIT",
     "repository": {

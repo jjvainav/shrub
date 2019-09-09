@@ -1,4 +1,4 @@
-declare module "@shrub/express-core/dist/request-context" {
+declare module "@shrub/express/dist/request-context" {
     interface IRequestContext {
         /** Session state for the request if session state is available. */
         readonly session?: ISession;

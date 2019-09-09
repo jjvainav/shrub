@@ -23,6 +23,7 @@
         "@shrub/module": "0.1.21",
         "@shrub/serialization": "0.1.21",
         "@shrub/service-collection": "0.1.21",
-        "vue": "^2.6.10"
+        "vue": "^2.6.10",
+        "vue-class-component": "^7.1.0"
     }
 }

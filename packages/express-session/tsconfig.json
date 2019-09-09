@@ -6,8 +6,8 @@
     },
     "include": ["src"],
     "references": [
+        { "path": "../express" },
         { "path": "../express-cookies" },
-        { "path": "../express-core" },
         { "path": "../module" },
         { "path": "../service-collection" }
     ]

@@ -4,10 +4,7 @@
         "esModuleInterop": true,
         "outDir": "dist",
         "rootDir": "src",
-        "strictPropertyInitialization": true,
-        "paths": {
-            "vue": ["../../node_modules/vue"]
-        }
+        "strictPropertyInitialization": true
     },
     "include": ["src"],
     "references": [

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
+import { ExpressModule, IExpressConfiguration } from "@shrub/express";
 import { ExpressCookiesModule } from "@shrub/express-cookies";
-import { ExpressCoreModule, IExpressConfiguration } from "@shrub/express-core";
 import { IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/module";
 import { IOptionsService } from "@shrub/service-collection";
 import { ICookieSessionOptions } from "./cookie-session";
@@ -10,7 +10,7 @@ export class ExpressSessionModule implements IModule {
     readonly name = "express-session";
     readonly dependencies = [
         ExpressCookiesModule,
-        ExpressCoreModule
+        ExpressModule
     ];
 
     initialize({ settings }: IModuleInitializer): void {

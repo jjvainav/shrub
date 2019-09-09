@@ -1,9 +1,9 @@
 import * as express from "express";
-import { createExpressHostBuilder, ExpressCoreModule } from "../src";
+import { createExpressHostBuilder, ExpressModule } from "../src";
 
 export async function createApp(): Promise<express.Express> {
     const host = createExpressHostBuilder()
-        .useModules([ExpressCoreModule])
+        .useModules([ExpressModule])
         .build();
 
     await host.load();

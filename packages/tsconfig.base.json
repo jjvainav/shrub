@@ -13,6 +13,10 @@
         "moduleResolution": "node",
         "module": "commonjs",
         "target": "esnext",
-        "lib": ["esnext"]
+        "lib": ["esnext"],
+        "paths": {
+            "express": ["../../node_modules/express"],
+            "vue": ["../../node_modules/vue"]
+        },
     }
 }

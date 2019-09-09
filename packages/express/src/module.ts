@@ -5,14 +5,14 @@ import { IExpressHost } from "./host";
 import { ControllerRequestService, IControllerRequestService } from "./internal";
 import { IRequestContext, IRequestContextService, RequestContextService } from "./request-context";
 
-export const IExpressConfiguration = createConfigType<IExpressConfiguration>("express-core");
+export const IExpressConfiguration = createConfigType<IExpressConfiguration>("express");
 export interface IExpressConfiguration extends Application {
 }
 
-export class ExpressCoreModule implements IModule {
+export class ExpressModule implements IModule {
     private readonly host: IExpressHost;
 
-    readonly name = "express-core";
+    readonly name = "express";
 
     constructor(host: IModuleHost) {
         if (!this.isExpressHost(host)) {

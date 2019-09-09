@@ -5,9 +5,6 @@
         "esModuleInterop": true,
         "outDir": "dist",
         "rootDir": "src",
-        "paths": {
-            "vue": ["../../node_modules/vue"]
-        },
         "lib": [
             "dom",
             "esnext"
