@@ -195,13 +195,7 @@ function createHost(services: ServiceMap, coreModules: IModule[], settingsCollec
                 if (module.initialize) {
                     module.initialize({
                         config: type => ({ 
-                            register: callback => { 
-                                if (configs.has(type.key)) {
-                                    throw new Error(`Duplicate config ${type.key.toString()}`);
-                                }
-
-                                configs.set(type.key, { callback, module });
-                            }
+                            register: callback => configs.set(type.key, { callback, module })
                         }),
                         get settings() { 
                             return {

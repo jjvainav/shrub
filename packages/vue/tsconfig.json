@@ -1,0 +1,19 @@
+{
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "outDir": "dist",
+        "rootDir": "src",
+        "lib": [
+            "dom",
+            "esnext"
+        ]
+    },
+    "include": ["src", "types"],
+    "references": [
+        { "path": "../module" },
+        { "path": "../serialization" },
+        { "path": "../service-collection" }
+    ]
+  }

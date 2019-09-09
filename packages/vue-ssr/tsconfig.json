@@ -1,0 +1,20 @@
+{
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "outDir": "dist",
+        "rootDir": "src",
+        "strictPropertyInitialization": true,
+        "paths": {
+            "vue": ["../../node_modules/vue"]
+        }
+    },
+    "include": ["src"],
+    "exclude": ["packages"],
+    "references": [
+        { "path": "../module" },
+        { "path": "../serialization" },
+        { "path": "../service-collection" },
+        { "path": "../vue" }
+    ]
+  }
