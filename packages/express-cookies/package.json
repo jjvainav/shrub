@@ -1,7 +1,7 @@
 {
     "name": "@shrub/express-cookies",
     "description": "Express module that provides cookie middleware.",
-    "version": "0.1.19",
+    "version": "0.1.20",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -27,9 +27,9 @@
         "@types/express": "^4.17.1"
     },
     "dependencies": {
-        "@shrub/express-core": "0.1.19",
-        "@shrub/module": "0.1.19",
-        "@shrub/service-collection": "0.1.19",
+        "@shrub/express-core": "0.1.20",
+        "@shrub/module": "0.1.20",
+        "@shrub/service-collection": "0.1.20",
         "cookies": "^0.7.3",
         "express": "^4.17.1"
     }

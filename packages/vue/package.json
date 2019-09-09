@@ -1,7 +1,7 @@
 {
     "name": "@shrub/vue",
     "description": "A module that adds support for Vue based apps.",
-    "version": "0.1.19",
+    "version": "0.1.20",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -21,9 +21,9 @@
         "watch": "tsc -b . -w"
     },
     "dependencies": {
-        "@shrub/module": "0.1.19",
-        "@shrub/serialization": "0.1.19",
-        "@shrub/service-collection": "0.1.19",
+        "@shrub/module": "0.1.20",
+        "@shrub/serialization": "0.1.20",
+        "@shrub/service-collection": "0.1.20",
         "vue": "^2.6.10"
     }
 }
