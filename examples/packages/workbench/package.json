@@ -12,10 +12,9 @@
     },
     "dependencies": {
         "@shrub/core": "^0.2.0",
-        "@shrub/event-emitter": "^0.2.0",
-        "@shrub/event-emitter-dom": "^0.2.0",
-        "@shrub/service-collection": "^0.2.0",
         "@shrub/vue": "^0.2.0",
+        "@sprig/event-emitter": "^0.1.1",
+        "@sprig/event-emitter-dom": "^0.1.1",
         "material-design-icons-iconfont": "^5.0.1",
         "vue": "^2.6.10",
         "vue-class-component": "^7.1.0",

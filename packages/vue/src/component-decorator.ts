@@ -1,6 +1,6 @@
 import Vue, { ComponentOptions, VueConstructor } from "vue";
 import Component from "vue-class-component";
-import { IServiceCollection } from "@shrub/service-collection";
+import { IServiceCollection } from "@shrub/core";
 import { IComponentCollection } from "./component";
 import { IComponentService } from "./component-service";
 

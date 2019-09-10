@@ -1,4 +1,4 @@
-import { IOptions, IServiceCollection, IServiceRegistration, ServiceMap } from "@shrub/service-collection";
+import { IOptions, IServiceCollection, IServiceRegistration, ServiceMap } from "./service-collection";
 
 export type ModuleConstructor<T extends IModule = IModule> = { new(host?: IModuleHost): T };
 export type ModuleInstanceOrConstructor = IModule | ModuleConstructor;

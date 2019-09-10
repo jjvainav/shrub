@@ -1,5 +1,5 @@
-import { createOptions, createService, IOptionsService, IServiceRegistration } from "@shrub/service-collection";
 import { combineExtensions, createConfigType, createHostBuilder, IModule, IModuleConfigurator, IModuleInitializer, loadModules } from "../src/module";
+import { createOptions, createService, IOptionsService, IServiceRegistration } from "../src/service-collection";
 
 describe("module loader", () => {
     beforeEach(() => modules.length = 0);

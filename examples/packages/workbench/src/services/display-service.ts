@@ -1,6 +1,6 @@
-import { EventEmitter, IEvent } from "@shrub/event-emitter";
-import { DOMEventEmitter } from "@shrub/event-emitter-dom";
-import { createService, Singleton } from "@shrub/service-collection";
+import { createService, Singleton } from "@shrub/core";
+import { EventEmitter, IEvent } from "@sprig/event-emitter";
+import { DOMEventEmitter } from "@sprig/event-emitter-dom";
 
 export const IDisplayService = createService<IDisplayService>("display-service");
 

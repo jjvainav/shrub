@@ -1107,12 +1107,10 @@
     universal-user-agent "^3.0.0"
     url-template "^2.0.8"
 
-"@shrub/module@0.1.22":
-  version "0.1.22"
-  resolved "https://registry.yarnpkg.com/@shrub/module/-/module-0.1.22.tgz#278779e00b4cd1b4286c16a6bb0eaee4c9079fc3"
-  integrity sha512-PY4pLcOCmXgNm6MTCh6sXUoSjesUw6gSu4LS+Yuvge/orjsCyTJccAvNZ/kWipBfW/Pn0WKeHocpl4vfjNhmyQ==
-  dependencies:
-    "@shrub/service-collection" "0.1.22"
+"@sprig/serialization@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.1.tgz#0486f96db967d0d67717b2ab342e465250c00584"
+  integrity sha512-scDYkYFyw5hDlup15tNePgP2pSq6Perc91z1fYL/+n3Ed0nLbBXC6Js2ZcTToee9BdviG9M+nQiemZYsyA8umQ==
 
 "@types/babel__core@^7.1.0":
   version "7.1.2"

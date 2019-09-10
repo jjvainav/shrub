@@ -1,8 +1,8 @@
 import { VueConstructor } from "vue";
 import Router, { RawLocation, Route, RouteConfig } from "vue-router";
-import { EventEmitter, IEvent } from "@shrub/event-emitter";
-import { createService, Singleton } from "@shrub/service-collection";
+import { createService, Singleton } from "@shrub/core";
 import { IComponent } from "@shrub/vue";
+import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import { ModuleExampleComponent } from "../components";
 import * as utils from "../utils";
 

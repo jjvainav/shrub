@@ -8,7 +8,6 @@
     "references": [
         { "path": "../core" },
         { "path": "../express" },
-        { "path": "../express-cookies" },
-        { "path": "../service-collection" }
+        { "path": "../express-cookies" }
     ]
 }

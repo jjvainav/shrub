@@ -1,11 +1,9 @@
 import Cookies from "cookies";
-import { IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
+import { createOptions, IModule, IModuleConfigurator, IModuleInitializer, IOptionsService } from "@shrub/core";
 import { ExpressModule, IExpressConfiguration } from "@shrub/express";
-import { createOptions, IOptionsService } from "@shrub/service-collection";
 import { cookies } from "./middleware";
 
 export const ICookiesOptions = createOptions<ICookiesOptions>("cookies-middleware");
-
 export interface ICookiesOptions {
     // TODO: look into using keygrip to secure the cookie: https://www.npmjs.com/package/keygrip
     readonly keys: string[]; // readonly keys: string[] | keygrip;

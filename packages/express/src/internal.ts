@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { createService, Singleton } from "@shrub/service-collection";
+import { createService, Singleton } from "@shrub/core";
 
 /** 
  * A service used to capture the current request context just before instantiating a Controller. 

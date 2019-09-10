@@ -1,6 +1,5 @@
 import { Application } from "express";
-import { createConfigType, IModule, IModuleConfigurator, IModuleHost, IModuleInitializer } from "@shrub/core";
-import { IServiceRegistration } from "@shrub/service-collection";
+import { createConfigType, IModule, IModuleConfigurator, IModuleHost, IModuleInitializer, IServiceRegistration } from "@shrub/core";
 import { IExpressHost } from "./host";
 import { ControllerRequestService, IControllerRequestService } from "./internal";
 import { IRequestContext, IRequestContextService, RequestContextService } from "./request-context";

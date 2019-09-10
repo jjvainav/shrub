@@ -19,8 +19,5 @@
         "build": "tsc -b .",
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
         "test": "jest"
-    },
-    "dependencies": {
-        "@shrub/service-collection": "0.2.0"
     }
 }

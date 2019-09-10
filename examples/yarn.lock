@@ -826,18 +826,6 @@
   dependencies:
     "@shrub/service-collection" "0.2.0"
 
-"@shrub/event-emitter-dom@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@shrub/event-emitter-dom/-/event-emitter-dom-0.2.0.tgz#77b5ec401730f4d8bbf0b5ed5b58937be3d84053"
-  integrity sha512-kKlzctm8xmgPw4XEQJeKovCtTmN5nVzbpx4Ja2/725eUKCBUrOAAERKT47/fC+UEHHeXdiUoc9Br/xwvs0AKdQ==
-  dependencies:
-    "@shrub/event-emitter" "0.2.0"
-
-"@shrub/event-emitter@0.2.0", "@shrub/event-emitter@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@shrub/event-emitter/-/event-emitter-0.2.0.tgz#1b0fe1b3f76ac18b1a4354ed145eb858f7851467"
-  integrity sha512-QAYBt2mDSYm2u/I08FqhkgWF963pjsd6m7U3BIcdJ7Mv9359ORc8p5jSQkZYL/Xm1oZn/v+5C3KjIiBw/8K6GQ==
-
 "@shrub/express@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.2.0.tgz#4c68da3735877ebbdf5d45cffa6b83cc325f5635"
@@ -852,7 +840,7 @@
   resolved "https://registry.yarnpkg.com/@shrub/serialization/-/serialization-0.2.0.tgz#70bd495535e279a4afefb88589754fb90f4e87f9"
   integrity sha512-5P2jlHyoXOUfSijhXyURVNmxO4jDt2XLX1fO/rLo9sM7WeH3TmimIgLTYStmXSQJ0BQt2yZ1haFIF8D+A71Mhw==
 
-"@shrub/service-collection@0.2.0", "@shrub/service-collection@^0.2.0":
+"@shrub/service-collection@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@shrub/service-collection/-/service-collection-0.2.0.tgz#d0dbb38c5b2c0bbe23f37c9f899e83338bc748c0"
   integrity sha512-CAr1EnM3OlERnMqJFvPzyNONs0eJbpsSMiKbi8ZXIMLLGhwA9Oz4gQIBvR3BlW03DN4CWUUqTMqhjp6EC9+yJw==
@@ -876,6 +864,18 @@
     "@shrub/service-collection" "0.2.0"
     vue "^2.6.10"
     vue-class-component "^7.1.0"
+
+"@sprig/event-emitter-dom@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.1.1.tgz#eff5ba81f165223c77ff54c17a4167363be2455f"
+  integrity sha512-5geEp+BMnHUo3p5UuUXTMjcMpp9cE+sXAnDxGSmXkro6/j27wiBhZMvVtg7XLGilUa8LZxf2t9uYb0y5pHIL/Q==
+  dependencies:
+    "@sprig/event-emitter" "0.1.1"
+
+"@sprig/event-emitter@0.1.1", "@sprig/event-emitter@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.1.tgz#1c6db91e16cec3044647f50759889b649fb2d396"
+  integrity sha512-l2WXk0x5R2mG0BXW46CAMyeuLYTVhzYd/f1Odc6kpfvo+JqaIH1DoNgdzPEbkMzk9W/S/IJa6SLQmvlvCAPFfA==
 
 "@types/body-parser@*":
   version "1.17.1"

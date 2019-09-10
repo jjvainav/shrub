@@ -1,4 +1,4 @@
-import { createService, IServiceCollection, Transient } from "@shrub/service-collection";
+import { createService, IServiceCollection, Transient } from "@shrub/core";
 import { IControllerRequestService } from "./internal";
 
 declare global {

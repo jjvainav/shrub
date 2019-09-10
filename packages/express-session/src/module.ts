@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ExpressModule, IExpressConfiguration } from "@shrub/express";
 import { ExpressCookiesModule } from "@shrub/express-cookies";
-import { IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
-import { IOptionsService } from "@shrub/service-collection";
+import { IModule, IModuleConfigurator, IModuleInitializer, IOptionsService } from "@shrub/core";
 import { ICookieSessionOptions } from "./cookie-session";
 import { cookieSession } from "./middleware";
 

@@ -1,5 +1,5 @@
+import { createOptions } from "@shrub/core";
 import { ICookie, ICookies } from "@shrub/express-cookies";
-import { createOptions } from "@shrub/service-collection";
 import { ISession, ISessionOptions, ISessionValueCollection } from "./session";
 
 export const ICookieSessionOptions = createOptions<ICookieSessionOptions>("cookie-session");

@@ -1,6 +1,6 @@
 import { RequestHandler, Router } from "express";
 import { PathParams } from "express-serve-static-core";
-import { IInstantiationService } from "@shrub/service-collection";
+import { IInstantiationService } from "@shrub/core";
 import { IControllerRequestService } from "./internal";
 
 export type Constructor<T> = { new(...args: any[]): T };

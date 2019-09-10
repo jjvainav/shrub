@@ -15,7 +15,6 @@
         "@examples/workbench": "1.0.0",
         "@shrub/core": "^0.2.0",
         "@shrub/express": "^0.2.0",
-        "@shrub/service-collection": "^0.2.0",
         "@shrub/vue": "^0.2.0",
         "@shrub/vue-server": "^0.2.0",
         "cors": "^2.8.5",

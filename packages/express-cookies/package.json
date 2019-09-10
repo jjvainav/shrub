@@ -29,7 +29,6 @@
     "dependencies": {
         "@shrub/core": "0.2.0",
         "@shrub/express": "0.2.0",
-        "@shrub/service-collection": "0.2.0",
         "cookies": "^0.7.3",
         "express": "^4.17.1"
     }

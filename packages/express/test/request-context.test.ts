@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import * as request from "supertest";
-import { IInstantiationService } from "@shrub/service-collection";
+import { IInstantiationService } from "@shrub/core";
 import { Get, Route, useController } from "../src/controller";
 import { IRequestContext, IRequestContextService } from "../src/request-context";
 import { createApp } from "./app";

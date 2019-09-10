@@ -1,4 +1,4 @@
-import { createService, Singleton } from "@shrub/service-collection";
+import { createService, Singleton } from "@shrub/core";
 import { ComponentCollection, IComponent, IComponentCollection } from "./component";
 
 export const IComponentService = createService<IComponentService>("component-service");

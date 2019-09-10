@@ -1,5 +1,5 @@
-import { JSONSerializer } from "@shrub/serialization";
-import { createService, IInstantiationService, Singleton } from "@shrub/service-collection";
+import { createService, IInstantiationService, Singleton } from "@shrub/core";
+import { JSONSerializer } from "@sprig/serialization";
 
 export const IModelService = createService<IModelService>("model-service");
 
