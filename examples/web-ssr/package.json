@@ -13,10 +13,10 @@
     "dependencies": {
         "@examples/01-hello-world": "1.0.0",
         "@examples/workbench": "1.0.0",
-        "@shrub/core": "^0.2.0",
-        "@shrub/express": "^0.2.0",
-        "@shrub/vue": "^0.2.0",
-        "@shrub/vue-server": "^0.2.0",
+        "@shrub/core": "^0.2.1",
+        "@shrub/express": "^0.2.1",
+        "@shrub/vue": "^0.2.1",
+        "@shrub/vue-server": "^0.2.1",
         "cors": "^2.8.5",
         "express": "^4.16.4"
     },
