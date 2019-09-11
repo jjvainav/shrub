@@ -8,7 +8,7 @@ export class IntroModule implements IModule {
     configure({ config }: IModuleConfigurator): void {
         config.get(IWorkbenchConfiguration).registerExample({
             name: "intro",
-            title: "Shrub Intro",
+            title: "Intro",
             component: () => import(/* webpackChunkName: "intro" */ "./component"),
             menu: {
                 order: 1,
