@@ -11,7 +11,7 @@
         "inlineSourceMap": true,
         "strict": true,
         "moduleResolution": "node",
-        "module": "commonjs",
+        "module": "esnext",
         "target": "esnext",
         "lib": [
             "dom",

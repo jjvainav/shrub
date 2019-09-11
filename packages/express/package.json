@@ -20,6 +20,7 @@
     },
     "scripts": {
         "build": "tsc -b .",
+        "build:esm": "tsc -p tsconfig.esm.json",
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
         "test": "jest"
     },

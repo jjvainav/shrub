@@ -14,8 +14,9 @@
     "scripts": {
         "bootstrap": "yarn install",
         "build": "./node_modules/.bin/lerna run build --stream",
+        "build:esm": "./node_modules/.bin/lerna run build:esm --stream",
         "clean": "./node_modules/.bin/lerna run clean --stream --parallel",
-        "publish": "yarn run build && ./node_modules/.bin/lerna publish --force-publish --exact -m \"chore(release): publish %s\"",
+        "publish": "yarn run build && yarn run build:esm && ./node_modules/.bin/lerna publish --force-publish --exact -m \"chore(release): publish %s\"",
         "test": "./node_modules/.bin/jest --silent"
     },
     "devDependencies": {

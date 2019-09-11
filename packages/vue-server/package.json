@@ -8,6 +8,7 @@
         "url": "https://github.com/jjvainav/shrub.git"
     },
     "main": "dist/index.js",
+    "module": "dist/esm/index.js",
     "typings": "dist/index.d.ts",
     "files": [
         "dist"
@@ -20,6 +21,7 @@
     },
     "scripts": {
         "build": "tsc -b .",
+        "build:esm": "tsc -p tsconfig.esm.json",
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
         "watch": "tsc -b . -w"
     },
