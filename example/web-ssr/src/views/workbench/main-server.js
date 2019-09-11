@@ -1,16 +1,16 @@
-import { HelloWorldModule } from "@examples/01-hello-world";
-import { WorkbenchModule } from "@examples/workbench";
+import { IntroModule } from "@example/intro";
+import { WorkbenchModule } from "@example/workbench";
 import { bootstrap, VueServerModule } from "@shrub/vue-server";
 
 export default bootstrap({
     modules: [
-        HelloWorldModule,
+        IntroModule,
         VueServerModule,
         WorkbenchModule
     ],
     settings: {
         workbench: {
-            defaultExample: "01-hello-world"
+            defaultExample: "intro"
         }
     }
 });

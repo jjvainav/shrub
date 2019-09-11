@@ -38,6 +38,10 @@ module.exports = {
                 loader: "url-loader"
             },
             {
+                test: /\.md$/,
+                use: "raw-loader"
+            },
+            {
                 test: /\.vue$/,
                 loader: "vue-loader",
                 options: {

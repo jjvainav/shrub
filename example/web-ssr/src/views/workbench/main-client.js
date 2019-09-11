@@ -1,17 +1,17 @@
-import { HelloWorldModule } from "@examples/01-hello-world";
-import { WorkbenchModule } from "@examples/workbench";
+import { IntroModule } from "@example/intro";
+import { WorkbenchModule } from "@example/workbench";
 import { loadModules } from "@shrub/core";
 import { VueModule } from "@shrub/vue";
 
 loadModules({
     modules: [
-        HelloWorldModule,
+        IntroModule,
         VueModule,
         WorkbenchModule
     ],
     settings: {
         workbench: {
-            defaultExample: "01-hello-world"
+            defaultExample: "intro"
         }
     }
 });

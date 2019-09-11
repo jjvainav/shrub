@@ -26,9 +26,9 @@ const createServerConfig = (name) => merge(base, {
     },
     externals: nodeExternals({
         modulesDir: path.resolve(__dirname, nodeModulesRoot),
-        // TODO: currently need to include the @examples packages because they are being generated as esnext modules and Vue SSR doesn't seem to support that 
-        // - if this changes and they are being generated as commonjs modules then the @examples packages can probably be removed from the whitelist
-        whitelist: [/\.css$/, /\?vue&type=style/, /^@examples\//]
+        // TODO: currently need to include the @example packages because they are being generated as esnext modules and Vue SSR doesn't seem to support that 
+        // - if this changes and they are being generated as commonjs modules then the @example packages can probably be removed from the whitelist
+        whitelist: [/\.css$/, /\?vue&type=style/, /^@example\//]
     }),
     plugins: [
         new VueSSRServerPlugin({

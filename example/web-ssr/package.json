@@ -1,5 +1,5 @@
 {
-    "name": "@examples/web-ssr",
+    "name": "@example/web-ssr",
     "version": "1.0.0",
     "private": true,
     "scripts": {
@@ -11,8 +11,8 @@
         "start": "node dist/server.js"
     },
     "dependencies": {
-        "@examples/01-hello-world": "1.0.0",
-        "@examples/workbench": "1.0.0",
+        "@example/intro": "1.0.0",
+        "@example/workbench": "1.0.0",
         "@shrub/core": "^0.2.2",
         "@shrub/express": "^0.2.2",
         "@shrub/vue": "^0.2.2",
@@ -28,6 +28,7 @@
         "html-webpack-exclude-assets-plugin": "^0.0.7",
         "html-webpack-plugin": "^3.2.0",
         "node-sass": "^4.11.0",
+        "raw-loader": "^3.1.0",
         "sass-loader": "^7.1.0",
         "style-loader": "^0.23.1",
         "url-loader": "^1.1.2",

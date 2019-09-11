@@ -9,7 +9,7 @@ const base = require("./webpack.config.base.js");
 
 // Bundles all the client-side JS
 
-// __dirname will be ./examples/web/build
+// __dirname will be ./example/web/build
 const appRoot = "../";
 const distRoot = appRoot + "dist";
 const viewsRoot = appRoot + "src/views";

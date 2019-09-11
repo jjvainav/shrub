@@ -13,7 +13,7 @@
         "src/server.ts"
     ],
     "references": [
-        { "path": "../packages/01-hello-world" },
+        { "path": "../packages/intro" },
         { "path": "../packages/workbench" }
     ]
 }

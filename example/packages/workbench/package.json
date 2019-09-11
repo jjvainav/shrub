@@ -1,5 +1,5 @@
 {
-    "name": "@examples/workbench",
+    "name": "@example/workbench",
     "version": "1.0.0",
     "private": true,
     "main": "dist/index.js",
