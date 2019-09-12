@@ -12,6 +12,7 @@
     },
     "dependencies": {
         "@example/intro": "1.0.0",
+        "@example/todo": "1.0.0",
         "@example/workbench": "1.0.0",
         "@shrub/core": "^0.2.2",
         "@shrub/express": "^0.2.2",

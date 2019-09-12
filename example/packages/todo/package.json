@@ -1,24 +1,22 @@
 {
-    "name": "@example/intro",
+    "name": "@example/todo",
     "version": "1.0.0",
     "private": true,
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "scripts": {
-        "build": "concurrently \"tsc -b\" \"yarn run copy-markdown\" \"yarn run copy-vue\"",
+        "build": "concurrently \"tsc -b\" \"yarn run copy-vue\"",
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
-        "copy-markdown": "copyfiles -u 1 ./src/intro.md dist",
         "copy-vue": "copyfiles -u 1 ./src/component/**/*.vue dist"
     },
     "dependencies": {
         "@shrub/core": "^0.2.2",
         "@shrub/vue": "^0.2.2",
-        "marked": "^0.7.0",
         "vue": "^2.6.10",
-        "vue-class-component": "^7.1.0"
+        "vue-class-component": "^7.1.0",
+        "vue-property-decorator": "^8.2.2"
     },
     "devDependencies": {
-        "@types/marked": "^0.3.0",
         "copyfiles": "^2.1.1",
         "concurrently": "^4.1.2"
     }

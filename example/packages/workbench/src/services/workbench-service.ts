@@ -43,7 +43,6 @@ export interface IWorkbenchRouteConfig {
     readonly name?: string;
     readonly path?: string;
     readonly component?: IComponent | (() => Promise<IComponent | IEsModuleComponent>);
-    readonly children?: IWorkbenchRouteConfig[];
     readonly redirect?: string;
     readonly props?: (route: IWorkbenchRoute) => Object;
 }
@@ -120,10 +119,8 @@ export class WorkbenchBrowserService implements IWorkbenchService {
 
         this.registerRoute({
             path: "/" + example.name,
-            children: [{
-                name: example.name,
-                component: example.component
-            }]
+            name: example.name,
+            component: example.component
         });
 
         this.examples.set(example.name, example);
@@ -149,7 +146,6 @@ export class WorkbenchBrowserService implements IWorkbenchService {
             path: route.path || "",
             redirect: route.redirect,
             meta: { key: this.key++ },
-            children: route.children && route.children.map(child => this.getRouteConfig(child)),
             component,
             props
         };
