@@ -1,6 +1,6 @@
-import { IntroModule } from "@example/intro";
-import { TodoModule } from "@example/todo";
-import { WorkbenchModule } from "@example/workbench";
+import { IntroModule } from "@app/intro";
+import { TodoModule } from "@app/todo";
+import { WorkbenchModule } from "@app/workbench";
 import { bootstrap, VueServerModule } from "@shrub/vue-server";
 
 export default bootstrap({

@@ -11,11 +11,11 @@ const base = require("./webpack.config.base.js");
 // the web app root folder relative to __dirname
 const appRoot = "../";
 // root to app in the dist folder
-const distAppRoot = appRoot + "dist";
+const distAppRoot = appRoot + "dist/app";
 // the main node_modules folder at the root of the repo relative to __dirname
 const nodeModulesRoot = "../../../node_modules";
 // the views folder relative to the web app root
-const viewsRoot = "./src/views";
+const viewsRoot = "./src/app/views";
 
 const createServerConfig = (name) => merge(base, {
     target: "node",
@@ -26,9 +26,9 @@ const createServerConfig = (name) => merge(base, {
     },
     externals: nodeExternals({
         modulesDir: path.resolve(__dirname, nodeModulesRoot),
-        // TODO: currently need to include the @example packages because they are being generated as esnext modules and Vue SSR doesn't seem to support that 
-        // - if this changes and they are being generated as commonjs modules then the @example packages can probably be removed from the whitelist
-        whitelist: [/\.css$/, /\?vue&type=style/, /^@example\//]
+        // TODO: currently need to include the @app packages because they are being generated as esnext modules and Vue SSR doesn't seem to support that 
+        // - if this changes and they are being generated as commonjs modules then the @app packages can probably be removed from the whitelist
+        whitelist: [/\.css$/, /\?vue&type=style/, /^@app\//]
     }),
     plugins: [
         new VueSSRServerPlugin({

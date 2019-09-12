@@ -13,7 +13,9 @@
         "src/server.ts"
     ],
     "references": [
-        { "path": "../packages/intro" },
-        { "path": "../packages/workbench" }
+        { "path": "../api/todo" },
+        { "path": "../app/intro" },
+        { "path": "../app/todo" },
+        { "path": "../app/workbench" }
     ]
 }

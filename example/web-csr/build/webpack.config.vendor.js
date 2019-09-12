@@ -1,7 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 
-const distPublic = "../dist/public";
+const distPublic = "../dist/app/public";
 
 module.exports = {
     entry: {

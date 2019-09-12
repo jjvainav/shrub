@@ -73,17 +73,30 @@ describe("controller", () => {
 
         expect(response.status).toBe(200);
         expect(response.body.foo).toBe("get");
-    });    
+    }); 
+    
+    test("with controller having base route attribute", async () => {
+        const app = await createApp();
+        const base = Router();
+
+        base.use(useController(RootController));
+        app.use(base);
+
+        const response = await request(app).get("/");
+
+        expect(response.status).toBe(200);
+        expect(response.body.data).toBe("get");
+    }); 
 });
 
 @Route("/foo")
 class FooController {
-    @Get("/")
+    @Get()
     getFoo(req: Request, res: Response, next: NextFunction): void {
         res.json({ foo: "get" });
     }
 
-    @Post("/")
+    @Post()
     saveFoo(req: Request, res: Response, next: NextFunction): void {
         res.json({ foo: "post" });
     }
@@ -102,5 +115,13 @@ class FooController {
     @Get("/:id")
     getFooById(req: Request, res: Response, next: NextFunction): void {
         res.json({ foo: req.params.id });
+    }
+}
+
+@Route()
+class RootController {
+    @Get()
+    getData(req: Request, res: Response, next: NextFunction): void {
+        res.json({ data: "get" });
     }
 }

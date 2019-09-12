@@ -824,7 +824,17 @@
   resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.2.2.tgz#1d41353e1285dbad8c90dcd631777f48c26116a6"
   integrity sha512-6FVidUkrKdZkLTbv9oAJ53YYTZAU1v0ip/WPTRBSrTN4bjUfXxIfB2V8UQnMhpHk7e6B8ApQz/2lvoJ2vKTVnw==
 
-"@shrub/express@^0.2.2":
+"@shrub/express-cookies@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@shrub/express-cookies/-/express-cookies-0.2.2.tgz#1e6d9f005d38fb93a212990ea49ad20db76d17b8"
+  integrity sha512-kpB8NvzRLZq4rPHYBadbPX0p4noQnIbnw7SQW8vnpXmzzpj4EGgGBYy0saiEAewzgi9QnS9kLBQjU4xsYhZgjw==
+  dependencies:
+    "@shrub/core" "0.2.2"
+    "@shrub/express" "0.2.2"
+    cookies "^0.7.3"
+    express "^4.17.1"
+
+"@shrub/express@0.2.2", "@shrub/express@^0.2.2":
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.2.2.tgz#f235b66febe265cd2370a133dc8c9a406a93c47f"
   integrity sha512-t4iJRtEtyHiLeur0sorGDzcH2XuwB9YJzTk8vo1q27RvnFr9iHcE9eV7HuX4QHSFgzYoNGptT4lKsghNcfxWQw==
@@ -2151,6 +2161,14 @@ cookie@0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.4.0.tgz#beb437e7022b3b6d49019d088665303ebe9c14ba"
   integrity sha512-+Hp8fLp57wnUSt0tY0tHEXh4voZRDnoIrZPqlo3DPiI4y9lwg/jqx+1Om94/W6ZaPDOUbnjOt/99w66zk+l1Xg==
+
+cookies@^0.7.3:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/cookies/-/cookies-0.7.3.tgz#7912ce21fbf2e8c2da70cf1c3f351aecf59dadfa"
+  integrity sha512-+gixgxYSgQLTaTIilDHAdlNPZDENDQernEMiIcZpYYP14zgHsCt4Ce1FEjFtcp6GefhozebB6orvhAAWx/IS0A==
+  dependencies:
+    depd "~1.1.2"
+    keygrip "~1.0.3"
 
 copy-concurrently@^1.0.0:
   version "1.0.5"
@@ -4102,6 +4120,11 @@ jsprim@^1.2.2:
     extsprintf "1.3.0"
     json-schema "0.2.3"
     verror "1.10.0"
+
+keygrip@~1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/keygrip/-/keygrip-1.0.3.tgz#399d709f0aed2bab0a059e0cdd3a5023a053e1dc"
+  integrity sha512-/PpesirAIfaklxUzp4Yb7xBper9MwP6hNRA6BGGUFCgbJ+BM5CKBtsoxinNXkLHAr+GXS1/lSlF2rP7cv5Fl+g==
 
 kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
   version "3.2.2"

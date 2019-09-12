@@ -9,6 +9,11 @@ interface IRouterMatcher {
     (path: PathParams, ...handlers: RequestHandler[]): Router;
 }
 
+interface IRouteAttribute {
+    (path: PathParams, ...handlers: RequestHandler[]): (ctor: Function) => void;
+    (...handlers: RequestHandler[]): (ctor: Function) => void;
+}
+
 const controllerKey = "__controller";
 const routerKey = "__router";
 const routesKey = "__routes";
@@ -28,38 +33,47 @@ const routeHandler: (proto: any, propertyKey: string) => RequestHandler = (proto
 };
 
 /** A class decorator for a Controller identifying the request route the controller handles. */
-export function Route(path: PathParams, ...handlers: RequestHandler[]) {
+export const Route: IRouteAttribute = function () {
+    const path = arguments.length && typeof arguments[0] !== "function" ? arguments[0] : undefined;
+    const handlers = path === undefined ? arguments : Array.prototype.slice.call(arguments, 1);
+
     return function (ctor: Function) {
         // the method/function decorators get called before the class decorator
         const sub: Router = ctor.prototype[routesKey];
         if (!sub) {
             throw new Error(`No sub-routes found for Controller '${ctor.name}.'`);
         }
-        
+
         const router = Router();
-        router.use(path, ...handlers, createController(<Constructor<any>>ctor), sub);
-        
+
+        if (path) {
+            router.use(path, ...handlers, createController(<Constructor<any>>ctor), sub);
+        }
+        else {
+            router.use(...handlers, createController(<Constructor<any>>ctor), sub);
+        }
+
         ctor.prototype[routerKey] = router;
-    }
+    };
 }
 
 /** A function decorator identifying a request handler on a controller for a specific path and HTTP DELETE method.*/        
-export function Delete(path: PathParams, ...handlers: RequestHandler[]) {
+export function Delete(path?: PathParams, ...handlers: RequestHandler[]) {
     return addRoutes(path, handlers, router => router.delete);
 }
 
 /** A function decorator identifying a request handler on a controller for a specific path and HTTP GET method.*/        
-export function Get(path: PathParams, ...handlers: RequestHandler[]) {
+export function Get(path?: PathParams, ...handlers: RequestHandler[]) {
     return addRoutes(path, handlers, router => router.get);
 }
 
 /** A function decorator identifying a request handler on a controller for a specific path and HTTP POST method.*/        
-export function Post(path: PathParams, ...handlers: RequestHandler[]) {
+export function Post(path?: PathParams, ...handlers: RequestHandler[]) {
     return addRoutes(path, handlers, router => router.post);
 }
 
 /** A function decorator identifying a request handler on a controller for a specific path and HTTP PUT method.*/        
-export function Put(path: PathParams, ...handlers: RequestHandler[]) {
+export function Put(path?: PathParams, ...handlers: RequestHandler[]) {
     return addRoutes(path, handlers, router => router.put);
 }
 
@@ -82,11 +96,11 @@ function createController<T>(ctor: Constructor<T>): RequestHandler {
     };
 }
 
-function addRoutes(path: PathParams, handlers: RequestHandler[], cb: (router: Router) => IRouterMatcher): (target: any, propertyKey: string) => void {
+function addRoutes(path: PathParams | undefined, handlers: RequestHandler[], cb: (router: Router) => IRouterMatcher): (target: any, propertyKey: string) => void {
     return (target, propertyKey) => {
         target[routesKey] = target[routesKey] || Router();
 
         const routes: Router = target[routesKey];
-        cb(routes).call(routes, path, ...handlers, routeHandler(target, propertyKey));
+        cb(routes).call(routes, path || "/", ...handlers, routeHandler(target, propertyKey));
     };
 }

@@ -1,5 +1,5 @@
 {
-    "name": "@example/web-ssr",
+    "name": "@app/web-ssr",
     "version": "1.0.0",
     "private": true,
     "scripts": {
@@ -11,9 +11,10 @@
         "start": "node dist/server.js"
     },
     "dependencies": {
-        "@example/intro": "1.0.0",
-        "@example/todo": "1.0.0",
-        "@example/workbench": "1.0.0",
+        "@api/todo": "1.0.0",
+        "@app/intro": "1.0.0",
+        "@app/todo": "1.0.0",
+        "@app/workbench": "1.0.0",
         "@shrub/core": "^0.2.2",
         "@shrub/express": "^0.2.2",
         "@shrub/vue": "^0.2.2",

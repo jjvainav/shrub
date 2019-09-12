@@ -11,8 +11,8 @@ const base = require("./webpack.config.base.js");
 
 // __dirname will be ./example/web/build
 const appRoot = "../";
-const distRoot = appRoot + "dist";
-const viewsRoot = appRoot + "src/views";
+const distRoot = appRoot + "dist/app";
+const viewsRoot = appRoot + "src/app/views";
 
 const createClientConfig = (bundle) => merge(base, {
     entry: { 

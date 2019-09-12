@@ -1,4 +1,4 @@
-import { IWorkbenchConfiguration, WorkbenchModule } from "@example/workbench";
+import { IWorkbenchConfiguration, WorkbenchModule } from "@app/workbench";
 import { IModule, IModuleConfigurator } from "@shrub/core";
 
 export class TodoModule implements IModule {

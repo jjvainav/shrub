@@ -9,6 +9,7 @@
         "url": "https://github.com/jjvainav/shrub.git"
     },
     "workspaces": [
+        "api/*",
         "app/*",
         "web-csr",
         "web-ssr"

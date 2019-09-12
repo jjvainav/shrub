@@ -2,7 +2,7 @@ const path = require("path");
 const { VueLoaderPlugin } = require("vue-loader");
 
 // when using __dirname to build a path this will 'back out' the path to the app root
-const distPublic = "../dist/public";
+const distPublic = "../dist/app/public";
 
 module.exports = {
     output: {
