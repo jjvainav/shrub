@@ -1,7 +1,7 @@
 {
     "name": "@shrub/vue",
     "description": "A module that adds support for Vue based apps.",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -22,7 +22,7 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.2.2",
+        "@shrub/core": "0.2.3",
         "@sprig/serialization": "0.1.1",
         "vue": "^2.6.10",
         "vue-class-component": "^7.1.0"
