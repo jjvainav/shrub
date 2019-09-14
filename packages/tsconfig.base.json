@@ -18,6 +18,7 @@
         "paths": {
             "express": ["../../node_modules/express"],
             "http": ["../../node_modules/@types/node/http"],
+            "socket.io": ["../../node_modules/@types/socket.io"],
             "vue": ["../../node_modules/vue"]
         }
     }

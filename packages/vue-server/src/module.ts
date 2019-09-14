@@ -1,6 +1,6 @@
 ﻿import Vue, { ComponentOptions, VNodeData } from "vue";
 import Router from "vue-router";
-import { ILoadModuleOptions, IModule, IModuleConfigurator, IModuleInitializer, IServiceCollection, IServiceRegistration, loadModules, ModuleInstanceOrConstructor } from "@shrub/core";
+import { ILoadOptions, IModule, IModuleConfigurator, IModuleInitializer, IServiceCollection, IServiceRegistration, ModuleInstanceOrConstructor, ModuleLoader } from "@shrub/core";
 import { IModelService, IVueConfiguration, IVueMountOptions, VueModule } from "@shrub/vue";
 import { ServerModelService } from "./model-service";
 
@@ -47,28 +47,22 @@ export interface IVueSSRCreateResult {
  * into the bootstrap function not maintain state.
  */
 export function bootstrap(modules: ModuleInstanceOrConstructor[], builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler
-export function bootstrap(options: ILoadModuleOptions, builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler;
-export function bootstrap(modulesOrOptions: ModuleInstanceOrConstructor[] | ILoadModuleOptions, builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler {
+export function bootstrap(options: ILoadOptions, builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler;
+export function bootstrap(modulesOrOptions: ModuleInstanceOrConstructor[] | ILoadOptions, builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler {
     let options = Array.isArray(modulesOrOptions) ? { modules: modulesOrOptions } : modulesOrOptions;
-
-    if (!options.modules.find(m => m.name === "vue-server")) {
-        options = {
-            ...options,
-            modules: [...options.modules, VueServerModule]
-        };
-    }
+    options = { ...options, modules: [...options.modules, VueServerModule] };
 
     return async context => {
-        // modules are loaded asynchronously so wait for them to finish loading and grab an instance of the host
-        const host = await loadModules(options);
+        // modules are loaded asynchronously so wait for them to finish loading and grab the modules collection
+        const modules = await ModuleLoader.load(options);
 
         if (context.beginRender) {
             // this allows server components the ability to configure the service collection before rendering it server-side
             // the services collection captured/used by the current module is the same one passed into the component when rendered
-            await context.beginRender(host.services);
+            await context.beginRender(modules.services);
         }
 
-        const instance = host.getInstance(VueServerModule);
+        const instance = modules.getInstance(VueServerModule);
         let { app, router } = instance.createApp();
 
         context.rendered = () => {

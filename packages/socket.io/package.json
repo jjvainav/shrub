@@ -21,14 +21,14 @@
     "scripts": {
         "build": "tsc -b .",
         "build:esm": "tsc -p tsconfig.esm.json",
-        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
-        "test": "jest"
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "devDependencies": {
         "@types/socket.io": "^1.4.33"
     },
     "dependencies": {
         "@shrub/core": "0.2.3",
+        "@shrub/http": "0.2.3",
         "socket.io": "^2.2.0"
     }
 }
