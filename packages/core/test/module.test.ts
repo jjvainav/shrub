@@ -1,106 +1,94 @@
-import { combineExtensions, createConfigType, createHostBuilder, IModule, IModuleConfigurator, IModuleInitializer, loadModules } from "../src/module";
+import { createConfig, IModule, IModuleConfigurator, IModuleInitializer, ModuleLoadError, ModuleLoader } from "../src/module";
 import { createOptions, createService, IOptionsService, IServiceRegistration } from "../src/service-collection";
 
 describe("module loader", () => {
-    beforeEach(() => modules.length = 0);
+    beforeEach(() => capturedModules.length = 0);
 
     test("load module with dependencies", async () => {
-        await loadModules([ModuleC]);
+        await ModuleLoader.load([ModuleC]);
 
-        expect(modules).toHaveLength(3);
-        expect(modules[0].name).toBe("module-a");
-        expect(modules[1].name).toBe("module-b");
-        expect(modules[2].name).toBe("module-c");
+        expect(capturedModules).toHaveLength(3);
+        expect(capturedModules[0].name).toBe("module-a");
+        expect(capturedModules[1].name).toBe("module-b");
+        expect(capturedModules[2].name).toBe("module-c");
     });
 
-    test("get instance from host", async () => {
-        const host = createHostBuilder()
-            .useModules([ModuleC])
-            .build();
-
-        await host.load();
+    test("get instance from module collection", async () => {
+        const modules = await ModuleLoader.load([ModuleC]);
 
         // ModuleA was loaded because ModuleC has it as a dependency
-        const moduleA = host.getInstance(ModuleA);
-        const moduleC = host.getInstance(ModuleC);
+        const moduleA = modules.getInstance(ModuleA);
+        const moduleC = modules.getInstance(ModuleC);
         expect(moduleA.name).toBe("module-a");
         expect(moduleC.name).toBe("module-c");
     });
     
     test("get module instance not created from constructor", async () => {
-        const moduleC = new ModuleC();
-        const host = createHostBuilder()
-            .useModules([moduleC])
-            .build();
+        const instance = new ModuleC();
+        const modules = await ModuleLoader.load([instance]);
 
-        await host.load();
-
-        const a = host.getInstance(ModuleA);
-        const b = host.getInstance(ModuleB);
-        const c = host.getInstance(ModuleC);
+        const a = modules.getInstance(ModuleA);
+        const b = modules.getInstance(ModuleB);
+        const c = modules.getInstance(ModuleC);
 
         expect(a.name).toBe("module-a");
         expect(b.name).toBe("module-b");
-        expect(c).toBe(moduleC);
+        expect(c).toBe(instance);
     });     
 
     test("load module that binds options to its settings", async () => {
-        const host = createHostBuilder()
+        const modules = await ModuleLoader
             .useModules([BindSettingsModule])
             .useSettings({
                 test: { value: "Hello World!" }
             })
-            .build();
+            .load();
 
-        await host.load();
-
-        const options = host.services.get(IOptionsService).getOptions(ITestOptions);
+        const options = modules.services.get(IOptionsService).getOptions(ITestOptions);
         expect(options.value).toBe("Hello World!");
     });
 
     test("load module that binds options to a section of its settings that then get injected into a service instance", async () => {
-        const host = createHostBuilder()
+        const modules = await ModuleLoader
             .useModules([FooModule])
             .useSettings({
                 foo: {
                     bar: { value: "Hello World!" }
                 }
             })
-            .build();
+            .load();
 
-        await host.load();
-
-        const module = host.getInstance(FooModule);
+        const module = modules.getInstance(FooModule);
         expect(module.bar!.getBar()).toBe("Hello World!");
     }); 
     
     test("load module that binds options that fallback to the option's default values", async () => {
         // by omitting the settings the service object should fallback to it's configured defaults
-        const host = await loadModules([FooModule]);
+        const host = await ModuleLoader.load([FooModule]);
         const module = host.getInstance(FooModule);
         expect(module.bar!.getBar()).toBe("default");
     });     
 
     test("load modules when defined out of order", async () => {
-        await loadModules([
+        await ModuleLoader.load([
             ModuleC,
             ModuleA
         ]);
 
-        expect(modules).toHaveLength(3);
-        expect(modules[0].name).toBe("module-a");
-        expect(modules[1].name).toBe("module-b");
-        expect(modules[2].name).toBe("module-c");
+        expect(capturedModules).toHaveLength(3);
+        expect(capturedModules[0].name).toBe("module-a");
+        expect(capturedModules[1].name).toBe("module-b");
+        expect(capturedModules[2].name).toBe("module-c");
     });
 
     test("load module that configures dependency", async () => {
-        const host = await loadModules([DependentAModule]);
+        const host = await ModuleLoader.load([DependentAModule]);
         const module = host.getInstance(ConfigurableModule);
         expect(module.value).toBe("test");
     });
 
     test("load module that forces dependent to configure first", async () => {
-        const host = createHostBuilder()
+        await ModuleLoader
             .useModules([
                 DependentAModule,
                 DependentBModule
@@ -108,18 +96,16 @@ describe("module loader", () => {
             .useSettings({
                 "configurable-module": { invokeNext: 1 }
             })
-            .build();
+            .load();
 
-        await host.load();
-
-        expect(modules).toHaveLength(3);
-        expect(modules[0].name).toBe("dependent-a-module");
-        expect(modules[1].name).toBe("dependent-b-module");
-        expect(modules[2].name).toBe("configurable-module");
+        expect(capturedModules).toHaveLength(3);
+        expect(capturedModules[0].name).toBe("dependent-a-module");
+        expect(capturedModules[1].name).toBe("dependent-b-module");
+        expect(capturedModules[2].name).toBe("configurable-module");
     }); 
     
     test("load module that invokes next multiple times during configure", async () => {
-        const host = createHostBuilder()
+        await ModuleLoader
             .useModules([
                 DependentAModule,
                 DependentBModule
@@ -127,62 +113,39 @@ describe("module loader", () => {
             .useSettings({
                 "configurable-module": { invokeNext: 2 }
             })
-            .build();
+            .load();
 
-        await host.load();
+        expect(capturedModules).toHaveLength(3);
+        expect(capturedModules[0].name).toBe("dependent-a-module");
+        expect(capturedModules[1].name).toBe("dependent-b-module");
+        expect(capturedModules[2].name).toBe("configurable-module");
+    });  
 
-        expect(modules).toHaveLength(3);
-        expect(modules[0].name).toBe("dependent-a-module");
-        expect(modules[1].name).toBe("dependent-b-module");
-        expect(modules[2].name).toBe("configurable-module");
+    test("load duplicate modules", async () => {
+        // make sure an error is not thrown
+        const modules = await ModuleLoader.load([ModuleC, ModuleC, ModuleC]);
+        modules.getInstance(ModuleC);
     });
 
-    test("extend module host", async () => {
-        const builder = createHostBuilder(factory => (services, modules, settings) => {
-            return factory(services, [...modules, FooModule], settings);
-        });
-
-        const host = builder.useModules([ModuleC]).build();
-        await host.load();
-
-        const module = host.getInstance(FooModule);
-        expect(module.name).toBe("foo");
+    test("load duplicate module instances", async () => {
+        try {
+            await ModuleLoader.load([new ModuleC(), new ModuleC(), new ModuleC()]);
+            fail();
+        }
+        catch (err) {
+            expect(err).toBeInstanceOf(ModuleLoadError);
+        }
     });
-
-    test("extend module host with multiple extensions using combineExtensions and ensure propery order", async () => {
-        let tag = "";
-        const extension = combineExtensions(
-            factory => {
-                tag += "1";
-                return factory;
-            },
-            factory => {
-                tag += "2";
-                return factory;
-            },
-            factory => {
-                tag += "3";
-                return factory;
-            }
-        );
-
-        const builder = createHostBuilder(extension);
-        const host = builder.useModules([ModuleC]).build();
-
-        await host.load();
-
-        expect(tag).toBe("123");
-    });    
 });
 
 // captures modules when they are configured
-const modules: IModule[] = [];
+const capturedModules: IModule[] = [];
 
 class ModuleA implements IModule {
     readonly name = "module-a";
 
     configure(): void {
-        modules.push(this);
+        capturedModules.push(this);
     }
 }
 
@@ -191,7 +154,7 @@ class ModuleB implements IModule {
     readonly dependencies = [ModuleA];
 
     configure(): void {
-        modules.push(this);
+        capturedModules.push(this);
     }
 }
 
@@ -200,7 +163,7 @@ class ModuleC implements IModule {
     readonly dependencies = [ModuleB];
 
     configure(): void {
-        modules.push(this);
+        capturedModules.push(this);
     }
 }
 
@@ -237,7 +200,7 @@ class FooModule implements IModule {
     }
 
     configure({ services }: IModuleConfigurator): void {
-        modules.push(this);
+        capturedModules.push(this);
         this.bar = services.get(IBarService);
     }
 }
@@ -255,7 +218,7 @@ class BindSettingsModule implements IModule {
     }
 }
 
-const IConfigurableModuleConfiguration = createConfigType<IConfigurableModuleConfiguration>("configurable-module");
+const IConfigurableModuleConfiguration = createConfig<IConfigurableModuleConfiguration>();
 interface IConfigurableModuleConfiguration {
     setValue(value: string): void;
 }
@@ -277,7 +240,7 @@ class ConfigurableModule implements IModule {
             }
         }
 
-        modules.push(this);
+        capturedModules.push(this);
     }
 }
 
@@ -286,7 +249,7 @@ class DependentAModule implements IModule {
     readonly dependencies = [ConfigurableModule];
 
     configure({ config }: IModuleConfigurator): void {
-        modules.push(this);
+        capturedModules.push(this);
         config.get(IConfigurableModuleConfiguration).setValue("test");
     }
 }
@@ -296,7 +259,7 @@ class DependentBModule implements IModule {
     readonly dependencies = [ConfigurableModule];
 
     configure({ config }: IModuleConfigurator): void {
-        modules.push(this);
+        capturedModules.push(this);
         config.get(IConfigurableModuleConfiguration).setValue("test");
     }
 }

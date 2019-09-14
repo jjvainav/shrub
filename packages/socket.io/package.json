@@ -1,6 +1,6 @@
 {
-    "name": "@shrub/vue-server",
-    "description": "A module that extends the Vue module for server-side rendering support.",
+    "name": "@shrub/socket.io",
+    "description": "A module and host extension for a socket.io server.",
     "version": "0.2.3",
     "license": "MIT",
     "repository": {
@@ -8,7 +8,6 @@
         "url": "https://github.com/jjvainav/shrub.git"
     },
     "main": "dist/index.js",
-    "module": "dist/esm/index.js",
     "typings": "dist/index.d.ts",
     "files": [
         "dist"
@@ -23,16 +22,13 @@
         "build": "tsc -b .",
         "build:esm": "tsc -p tsconfig.esm.json",
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
-        "watch": "tsc -b . -w"
-    },
-    "dependencies": {
-        "vue": "^2.6.10",
-        "vue-router": "^3.1.3",
-        "vue-server-renderer": "^2.6.10"
+        "test": "jest"
     },
     "devDependencies": {
+        "@types/socket.io": "^1.4.33"
+    },
+    "dependencies": {
         "@shrub/core": "0.2.3",
-        "@shrub/vue": "0.2.3",
-        "@sprig/serialization": "0.1.1"
+        "socket.io": "^2.2.0"
     }
 }

@@ -87,7 +87,6 @@ interface IServiceEntry<T = any> {
     readonly scope: ServiceScope;
     readonly ctor?: Constructor<T>;
     readonly factory?: IServiceFactory<T>;
-    readonly sealed?: boolean;
     instance?: T;
 }
 
@@ -224,12 +223,14 @@ export class ObjectCreateError extends Error {
 export class SingletonServiceFactory<T> implements IServiceFactory<T> {
     private instance?: T;
 
-    constructor(private readonly ctor: Constructor<T>) {
+    constructor(private readonly ctorOrFactory: Constructor<T> | IServiceFactory<T>) {
     }
 
     create(services: IServiceCollection): T {
         if (!this.instance) {
-            this.instance = services.get(IInstantiationService).createInstance(this.ctor);
+            this.instance = isServiceFactory(this.ctorOrFactory)
+                ? this.ctorOrFactory.create(services)
+                : services.get(IInstantiationService).createInstance(this.ctorOrFactory);
         }
 
         return this.instance;
@@ -243,32 +244,13 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
     constructor() {
         // the thisFactory is necessary for scoped collections
         const thisFactory = { create: () => this };
-        this.registerService(IInstantiationService, ServiceScope.scoped, thisFactory, true);
-        this.registerService(IServiceCollection, ServiceScope.scoped, thisFactory, true);
+        this.registerService(IInstantiationService, ServiceScope.scoped, thisFactory);
+        this.registerService(IServiceCollection, ServiceScope.scoped, thisFactory);
         this.registerSingleton(IOptionsService, OptionsService);
     }
 
     addOptionsProvider(provider: IOptionsProvider): void {
         return this.get(IOptionsService).addOptionsProvider(provider);
-    }
-
-    clone(): ServiceMap {
-        const clone = new ServiceMap();
-        for (const item of this.services) {
-            const cur = clone.services.get(item[0]);
-            if (cur && cur.sealed) {
-                // if the service map already has a registered and sealed service entry do not copy it over
-                continue;
-            }
-
-            const entry = item[1];
-            clone.registerEntry(
-                entry.scope === ServiceScope.instance
-                ? { ...entry }
-                : { ...entry, instance: undefined });
-        }
-
-        return clone;
     }
 
     configureOptions<T>(options: IOptions<T>, callback: (options: T) => T): void {
@@ -375,13 +357,12 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         this.isFrozen = true;
     }
 
-    private registerService(service: IService<any>, scope: ServiceScope, ctorOrFactory: Constructor<any> | IServiceFactory<any>, sealed?: boolean): void {
+    private registerService(service: IService<any>, scope: ServiceScope, ctorOrFactory: Constructor<any> | IServiceFactory<any>): void {
         this.registerEntry({
             service,
             scope,
             ctor: isConstructor(ctorOrFactory) ? ctorOrFactory : undefined,
-            factory: isServiceFactory(ctorOrFactory)  ? ctorOrFactory : undefined,
-            sealed
+            factory: isServiceFactory(ctorOrFactory)  ? ctorOrFactory : undefined
         });
     }
 

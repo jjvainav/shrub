@@ -10,13 +10,15 @@
         "noEmitOnError": true,
         "inlineSourceMap": true,
         "strict": true,
+        "stripInternal": true,
         "moduleResolution": "node",
         "module": "commonjs",
         "target": "esnext",
-        "lib": ["esnext"],
+        "lib": ["dom", "esnext"],
         "paths": {
             "express": ["../../node_modules/express"],
+            "http": ["../../node_modules/@types/node/http"],
             "vue": ["../../node_modules/vue"]
-        },
+        }
     }
 }

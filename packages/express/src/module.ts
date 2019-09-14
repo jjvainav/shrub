@@ -1,49 +1,53 @@
-import { Application } from "express";
-import { createConfigType, IModule, IModuleConfigurator, IModuleHost, IModuleInitializer, IServiceRegistration } from "@shrub/core";
-import { IExpressHost } from "./host";
+import * as express from "express";
+import * as http from "http";
+import { createConfig, createService, IModule, IModuleInitializer, IServiceRegistration, SingletonServiceFactory } from "@shrub/core";
+import { HttpModule, IHttpServer } from "@shrub/http";
 import { ControllerRequestService, IControllerRequestService } from "./internal";
 import { IRequestContext, IRequestContextService, RequestContextService } from "./request-context";
 
-export const IExpressConfiguration = createConfigType<IExpressConfiguration>("express");
-export interface IExpressConfiguration extends Application {
+export const IExpressConfiguration = createConfig<IExpressConfiguration>();
+export interface IExpressConfiguration extends express.Application {
+}
+
+export const IExpressServer = createService<IExpressServer>("express-server");
+export interface IExpressServer extends IHttpServer {
+    readonly app: express.Application;
 }
 
 export class ExpressModule implements IModule {
-    private readonly host: IExpressHost;
-
     readonly name = "express";
-
-    constructor(host: IModuleHost) {
-        if (!this.isExpressHost(host)) {
-            throw new Error("Express module requires an express host");
-        }
-
-        this.host = host;
-    }    
+    readonly dependencies = [HttpModule];
 
     initialize(init: IModuleInitializer): void {
-        init.config(IExpressConfiguration).register(() => this.host.app);
+        init.config(IExpressConfiguration).register(({ services }) => services.get(IExpressServer).app);
     }
 
     configureServices(registration: IServiceRegistration): void {
         registration.register(IControllerRequestService, ControllerRequestService);
         registration.register(IRequestContextService, RequestContextService);
-    }
+        
+        const factory = new SingletonServiceFactory<IExpressServer>({
+            create: services => {
+                const app = express();
+                const server = http.createServer(app);
 
-    configure({ services }: IModuleConfigurator): void {
-        this.host.app.use((req, res, next) => {
-            const context: IRequestContext = {
-                bag: {},
-                services
-            };
+                app.use((req, res, next) => {
+                    const context: IRequestContext = {
+                        bag: {},
+                        services
+                    };
+        
+                    (<any>req.context) = context;
+        
+                    next();
+                });
 
-            (<any>req.context) = context;
-
-            next();
+                (<any>server).app = app;
+                return <IExpressServer>server;
+            }
         });
-    } 
 
-    private isExpressHost(host: IModuleHost): host is IExpressHost {
-        return (<IExpressHost>host).app !== undefined;
-    }     
+        registration.registerSingleton(IHttpServer, factory);
+        registration.registerSingleton(IExpressServer, factory);
+    }
 }

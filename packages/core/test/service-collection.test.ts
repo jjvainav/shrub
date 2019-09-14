@@ -1,6 +1,6 @@
 import { 
-    createOptions, createService, IDisposable, IInstantiationService, IOptionsService, 
-    IServiceCollection, OptionsValidationError, ServiceMap, Singleton, SingletonServiceFactory 
+    createOptions, createService, IDisposable, IInstantiationService, IServiceCollection,
+    OptionsValidationError, ServiceMap, Singleton, SingletonServiceFactory 
 } from "../src/service-collection";
 
 const IFooService = createService<IFooService>("foo-service");
@@ -588,46 +588,5 @@ describe("service scope", () => {
         const scope = parent.createScope();
         const instantiation = scope.get(IInstantiationService);
         expect(instantiation).toBe(scope);
-    });
-});
-
-describe("service map clone", () => {
-    test("verify built-in service instances", () => {
-        const services = new ServiceMap();
-        const clone = services.clone();
-
-        expect(services).not.toBe(clone);
-        expect(services.get(IServiceCollection)).toBe(services);
-        expect(services.get(IInstantiationService)).toBe(services);
-        expect(clone.get(IServiceCollection)).toBe(clone);
-        expect(clone.get(IInstantiationService)).toBe(clone);
-
-        const options1 = services.get(IOptionsService);
-        const options2 = clone.get(IOptionsService);
-
-        expect(options1).not.toBe(options2);
-    });
-
-    test("verify instance service scope", () => {
-        const services = new ServiceMap();
-        const foo: IFooService = { foo: "Hello" };
-
-        services.registerInstance(IFooService, foo);
-
-        const clone = services.clone();
-
-        expect(services.get(IFooService)).toBe(foo);
-        expect(clone.get(IFooService)).toBe(foo);
-    });
-
-    test("verify singleton service scope", () => {
-        const services = new ServiceMap();
-        services.registerSingleton(IFooService, FooBarService);
-
-        const clone = services.clone();
-        const foo1 = services.get(IFooService);
-        const foo2 = clone.get(IFooService);
-
-        expect(foo1).not.toBe(foo2);
     });
 });

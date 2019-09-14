@@ -43,10 +43,10 @@ export class FooModule implements IModule {
 }
 ```
 
-## Dependency Configuration
+## Configuration
 
 ```typescript
-export const IBarModuleConfiguration = createConfigType<IBarModuleConfiguration>();
+export const IBarModuleConfiguration = createConfig<IBarModuleConfiguration>();
 export interface IBarModuleConfiguration {
     registerWidget(widget: IWidget): void;
 }
@@ -125,26 +125,27 @@ export class FooService implements IFooService {
 
 ## Loading Modules
 
-The easiest way to load modules is to call the `loadModules` function which will also return a module host instance.
+Modules are loaded using the `ModuleLoader` class by simply invoking `ModuleLoader.load`.
 
 ```typescript
-await loadModules([
+await ModuleLoader.load([
     FooModule,
     BarModule
 ]);
 ```
 
-Note: If a module has any dependencies not specified when calling `loadModules` those dependencies will automatically get loaded.
+Note: If a module has any dependencies not specified when calling `ModuleLoader.load` those dependencies will automatically get loaded.
 
-If you want a little more control or to extend the module host, use a host builder.
+If you want a little more control the module loader provides additional methods for configuring the service collection or settings.
 
 ```typescript
-const host = createHostBuilder()
+await ModuleLoader()
     .useModules([
         FooModule,
         BarModule
     ])
-    .build();
-
-await host.load();
+    .useSettings({
+        foo: { value: "Hello!" }
+    })
+    .load();
 ```

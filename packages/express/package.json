@@ -29,6 +29,7 @@
     },
     "dependencies": {
         "@shrub/core": "0.2.3",
+        "@shrub/http": "0.2.3",
         "express": "^4.17.1"
     }
 }

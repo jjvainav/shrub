@@ -1,5 +1,5 @@
 ﻿import Vue, { ComponentOptions, VueConstructor, VNodeData } from "vue";
-import { createConfigType, IModule, IModuleConfigurator, IModuleInitializer, IServiceCollection, IServiceRegistration } from "@shrub/core";
+import { createConfig, IModule, IModuleConfigurator, IModuleInitializer, IServiceCollection, IServiceRegistration } from "@shrub/core";
 import { ComponentService, IComponentService } from "./component-service";
 import { IModelService, ModelService } from "./model-service";
 
@@ -42,7 +42,7 @@ Vue.use({
     }
 });
 
-export const IVueConfiguration = createConfigType<IVueConfiguration>("vue");
+export const IVueConfiguration = createConfig<IVueConfiguration>();
 export interface IVueConfiguration {
     /** Mounts the specified Vue component. */
     mount(component: VueConstructor, options?: IVueMountOptions): void;

@@ -1,12 +1,6 @@
 import * as express from "express";
-import { createExpressHostBuilder, ExpressModule } from "../src";
+import { ExpressFactory } from "../src";
 
-export async function createApp(): Promise<express.Express> {
-    const host = createExpressHostBuilder()
-        .useModules([ExpressModule])
-        .build();
-
-    await host.load();
-
-    return host.app;
+export function createApp(): Promise<express.Application> {
+    return ExpressFactory.createServer().then(server => server.app);
 }
