@@ -1,6 +1,6 @@
 {
     "name": "@shrub/socket.io",
-    "description": "A module and host extension for a socket.io server.",
+    "description": "A module providing socket.io server support.",
     "version": "0.2.3",
     "license": "MIT",
     "repository": {
