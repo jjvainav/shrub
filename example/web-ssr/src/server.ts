@@ -1,21 +1,35 @@
-import * as express from "express";
-import createApiServer from "./api";
-import createAppServer from "./app";
+import { IModuleConfigurator } from "@shrub/core";
+import { ExpressFactory, ExpressModule, IExpressApplication } from "@shrub/express";
+import { IHttpServer } from "@shrub/http";
+import apiFactory from "./api";
+import appFactory from "./app";
 
 async function start() {
-    const root = express();
-    root.set("port", process.env.PORT || 3000);
+    const root = await ExpressFactory
+        .useModules([{
+            name: "example-csr-root",
+            dependencies: [ExpressModule],
+            configure: async ({ services }: IModuleConfigurator) => {
+                const server = services.get(IHttpServer);
+                const app = services.get(IExpressApplication);
 
-    const apiServer = await createApiServer();
-    const appServer = await createAppServer();
+                app.set("port", process.env.PORT || 3000);
 
-    root.use("/api", apiServer.app);
-    root.use("/", appServer.app);
+                // for sub-apps set the root server instance for modules that rely on it
+                const createSubApp = (factory: ExpressFactory) => factory
+                    .configureServices(registration => registration.registerInstance(IHttpServer, server))
+                    .create();
+
+                app.use("/api", await createSubApp(apiFactory));
+                app.use("/", await createSubApp(appFactory));             
+            }
+        }])
+        .create();
 
     root.listen(root.get("port"), () => {
         console.log("  Examples web-ssr app started at http://localhost:%d in %s mode", root.get("port"));
         console.log("  Web-ssr app running");
-        console.log("  Press CTRL-C to stop\n");
+        console.log("  Press CTRL-C to stop\n");;
     });
 }
 

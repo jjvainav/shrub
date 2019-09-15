@@ -1,5 +1,4 @@
-import * as express from "express";
-import { IModuleConfigurator, ModuleLoader } from "@shrub/core";
+import { IModuleConfigurator } from "@shrub/core";
 import { ExpressFactory, ExpressModule, IExpressApplication } from "@shrub/express";
 import { IHttpServer } from "@shrub/http";
 import apiFactory from "./api";

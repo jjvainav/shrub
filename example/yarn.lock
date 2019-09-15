@@ -819,42 +819,42 @@
     once "^1.4.0"
     universal-user-agent "^3.0.0"
 
-"@shrub/core@0.3.2", "@shrub/core@^0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.3.2.tgz#3ed5cb72bd570dfec8b1c7c456098a6a6c9e7a6e"
-  integrity sha512-7C+nGD/b9wHJK9ood7zaTTtz99jJQrhrJcZ7Ul7P2owUggjDRWTw705afdA3FNz/pdsovrCfb6M4M8nEuIIgkw==
+"@shrub/core@0.3.3", "@shrub/core@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.3.3.tgz#08007787339e4e703eb4d4661957beb611f4d032"
+  integrity sha512-BfkYiLQqhl/EtqqxbcXlrbqoTKIG/Gk3ShMmSKxeRwYlK3R3jiLCicRCp4a9xwW0r9xUKB+2gIlDGFnt98p+5Q==
 
-"@shrub/express@^0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.3.2.tgz#7c673497762ee631479f1a524618420dc88c52ac"
-  integrity sha512-qp9OqydA/lDro6OzPmGu0eq8KiquiRQenEFkYt5ZfBGHsuWjEW92oTeCtZyrfSY/EcfUPt+LcDesIUvJkBlUxw==
+"@shrub/express@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.3.3.tgz#30752daf6f0b0000f22e99c2f9d8b287ef0406d8"
+  integrity sha512-Q9KssjgKCQu04zOrqMXG07RB51LnySIVwTT2JQYJxiRlCHdKkpRjPx6T5DqEE2xSAE8n+tneDTq1SwFOWmLAJQ==
   dependencies:
-    "@shrub/core" "0.3.2"
-    "@shrub/http" "0.3.2"
+    "@shrub/core" "0.3.3"
+    "@shrub/http" "0.3.3"
     express "^4.17.1"
 
-"@shrub/http@0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.3.2.tgz#6ec086968bc1694c62660fc06b2f7a1f1cf49a13"
-  integrity sha512-nzXYzeKUwlP3hZigCUrF0RNgI8ZJZURp7FI7GsDOzegQFJjlVc6rUPPYfgmLM9y59Uhl1eNXWxU6cfI2cgL12Q==
+"@shrub/http@0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.3.3.tgz#f12e25fae35a4acc9cda437896aaa0159f0b71b2"
+  integrity sha512-ZWBDYrPV/BmKaTUcf86+GpAoUl1DabrtXn43g249V8K8DqWXwcGhxZ10g5bXVThDVK5ATjzchIMB+1bc2ZZ2RQ==
   dependencies:
-    "@shrub/core" "0.3.2"
+    "@shrub/core" "0.3.3"
 
-"@shrub/vue-server@^0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@shrub/vue-server/-/vue-server-0.3.2.tgz#1231f0fd06190228aa0a5e4e3b6addd6106cc740"
-  integrity sha512-sv03HjXGe4VpbeTPD/HQQOQ4+20HOyauY6dqoCLY6WRKGcZfCq1jOp2oA8XKI/9LpFo8H4XJs79BVPQVOt0U4w==
+"@shrub/vue-server@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-server/-/vue-server-0.3.3.tgz#984782476a84f7996754d53814be0ee7c0ae2ff2"
+  integrity sha512-9W/7+fm2G1IrBVMy7QOSRKX6P3SvEkKY4qdjNG7bW1Nyn6ckmqH3imvE9+DttXSKVYHM8dPXUTr5Mr1kXkyvdg==
   dependencies:
     vue "^2.6.10"
     vue-router "^3.1.3"
     vue-server-renderer "^2.6.10"
 
-"@shrub/vue@^0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.3.2.tgz#79d8dd50445f7203c024d78618f8aaa2a4312746"
-  integrity sha512-ZavNoLgPdnF/ZgP8Dlf2O4yNnFCvnvkpi+A9tzZDzcbrLh5UrR1cb5TugDqAaFqT8n6aPlA71mk0p1nf+GaYLg==
+"@shrub/vue@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.3.3.tgz#42099e1158123f251610734837deec526a5b6aa7"
+  integrity sha512-fJTZ4DrhI0HufBr87lrB29JnpriHnBG3j1Qw7erfeqlBk2n5mCIAsujeBgHcFvmq8OzTVbUXq4W5drOFcLkNHQ==
   dependencies:
-    "@shrub/core" "0.3.2"
+    "@shrub/core" "0.3.3"
     "@sprig/serialization" "0.1.1"
     vue "^2.6.10"
     vue-class-component "^7.1.0"
@@ -937,7 +937,7 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
-"@types/marked@^0.3.2":
+"@types/marked@^0.3.3":
   version "0.6.5"
   resolved "https://registry.yarnpkg.com/@types/marked/-/marked-0.6.5.tgz#3cf2a56ef615dad24aaf99784ef90a9eba4e29d8"
   integrity sha512-6kBKf64aVfx93UJrcyEZ+OBM5nGv4RLsI6sR1Ar34bpgvGVRoyTgpxn4ZmtxOM5aDTAaaznYuYUH8bUX3Nk3YA==
