@@ -4,7 +4,8 @@ export const ITodoRepository = createService<ITodoRepository>("todo-repository")
 
 export interface ITodoRepository {
     getItems(): Promise<ITodoItem[]>;
-    saveItem(item: ITodoItem): Promise<void>;
+    deleteItems(ids: string[]): Promise<void>;
+    saveItems(items: ITodoItem[]): Promise<void>;
 }
 
 export interface ITodoItem {
@@ -21,8 +22,13 @@ export class TodoRepository implements ITodoRepository {
         return Promise.resolve(Array.from(this.items.values()));
     }
 
-    saveItem(item: ITodoItem): Promise<void> {
-        this.items.set(item.id, item);
+    deleteItems(ids: string[]): Promise<void> {
+        ids.forEach(id => this.items.delete(id));
+        return Promise.resolve();
+    }
+
+    saveItems(items: ITodoItem[]): Promise<void> {
+        items.forEach(item => this.items.set(item.id, item));
         return Promise.resolve();
     }
 }

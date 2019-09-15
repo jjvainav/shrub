@@ -1,19 +1,30 @@
+import Vue from "vue";
 import { IWorkbenchConfiguration, WorkbenchModule } from "@app/workbench";
-import { IModule, IModuleConfigurator } from "@shrub/core";
+import { IModule, IModuleConfigurator, IServiceRegistration } from "@shrub/core";
+import { IModelService } from "@shrub/vue";
+import { TodoModel } from "./model";
+import { ITodoService, TodoService } from "./service";
 
 export class TodoModule implements IModule {
     readonly name = "todo";
     readonly dependencies = [WorkbenchModule];
 
-    configure({ config }: IModuleConfigurator): void {
+    configureServices(registration: IServiceRegistration): void {
+        registration.register(ITodoService, TodoService);
+    }
+
+    configure({ config, services }: IModuleConfigurator): void {
         config.get(IWorkbenchConfiguration).registerExample({
             name: "todo",
             title: "Todo Example",
             component: () => import(/* webpackChunkName: "todo" */ "./component"),
+            props: () => ({
+                model: Vue.observable(services.get(IModelService).get("todo", TodoModel))
+            }),
             menu: {
                 order: 1,
                 title: "Todo"
             }
         });
-    }    
+    }
 }

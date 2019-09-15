@@ -1,8 +1,5 @@
-export interface ITodoItem {
-    readonly id: string;
-    title: string;
-    completed: boolean;
-}
+import { ITodoItem } from "./item";
+import { ITodoService } from "./service";
 
 interface IEditState {
     readonly title: string;
@@ -21,15 +18,17 @@ const filters: { [key in Filter]: (items: ITodoItem[]) => ITodoItem[] } = {
     completed: (items: ITodoItem[]) => items.filter(item => item.completed)
 };
 
-let id = 1;
-
 export class TodoModel {
     private editState?: IEditState = undefined;
 
     filter = Filter.all;
     items: ITodoItem[] = [];
 
-    constructor() {
+    constructor(@ITodoService private readonly service: ITodoService) {
+        service.getItems().then(result => this.items = result);
+        service.onItemDeleted(id => this.deleteItem(id));
+        service.onItemSaved(item => this.saveItem(item));
+
         if (typeof window !== "undefined") {
             window.addEventListener("hashchange", () => {
                 const filter = <Filter>window.location.hash.replace(/#\/?/, "");
@@ -68,6 +67,11 @@ export class TodoModel {
         return filters[this.filter](this.items);
     }
 
+    setCompleted(item: ITodoItem, value: boolean): void {
+        item.completed = value;
+        this.service.saveItem(item);
+    }
+
     beginEdit(item: ITodoItem): void {
         this.editState = { title: item.title, item };
     }
@@ -83,8 +87,13 @@ export class TodoModel {
         if (this.editState) {
             const item = this.editState.item;
             item.title = item.title.trim();
+
             if (!item.title) {
                 this.removeTodo(item);
+                this.service.deleteItems([item]);
+            }
+            else {
+                this.service.saveItem(item);
             }
 
             this.editState = undefined;
@@ -92,21 +101,57 @@ export class TodoModel {
     }
 
     addTodo(title: string): void {
-        this.items.push({
-            id: (id++).toString(),
+        const item: ITodoItem = {
+            id: (Date.now()).toString(),
             title,
             completed: false
-        });
+        };
+
+        this.items.push(item);
+        this.service.saveItem(item);
     }
 
     removeTodo(item: ITodoItem): void {
         const index = this.items.indexOf(item);
         if (index > -1) {
             this.items.splice(index, 1);
+            this.service.deleteItems([item]);
         }
     }
 
     removeCompleted(): void {
-        this.items = filters.active(this.items);
+        const itemsToDelete: ITodoItem[] = [];
+        const filteredItems: ITodoItem[] = [];
+
+        for (const item of this.items) {
+            if (item.completed) {
+                itemsToDelete.push(item);
+            }
+            else {
+                filteredItems.push(item);
+            }
+        }
+
+        if (itemsToDelete.length) {
+            this.items = filteredItems;
+            this.service.deleteItems(itemsToDelete);
+        }
+    }
+
+    private saveItem(item: ITodoItem): void {
+        for (const cur of this.items) {
+            if (cur.id === item.id) {
+                cur.title = item.title;
+                cur.completed = item.completed;
+                return;
+            }
+        }
+
+        // the item does not exist so add it
+        this.items.push(item);
+    }
+
+    private deleteItem(id: string): void {
+        this.items = this.items.filter(item => item.id !== id);
     }
 }

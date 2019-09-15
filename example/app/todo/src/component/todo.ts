@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Component from "vue-class-component";
+import { Prop } from "vue-property-decorator";
 import { TodoModel } from "../model";
 
 @Component({
@@ -19,7 +20,7 @@ import { TodoModel } from "../model";
 export default class Todo extends Vue {
     newTodo = "";
 
-    readonly model = new TodoModel();
+    @Prop({ required: true }) model!: TodoModel;
 
     createTodo(): void {
         if (this.newTodo) {

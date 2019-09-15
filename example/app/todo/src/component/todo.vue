@@ -22,7 +22,7 @@
                         :key="item.id"
                         :class="{ completed: item.completed, editing: model.isBeingEdited(item) }">
                         <div class="view">
-                            <input class="toggle" type="checkbox" v-model="item.completed" />
+                            <input class="toggle" type="checkbox" :value="item.completed" @input="model.setCompleted(item, $event.target.value)" />
                             <label @dblclick="model.beginEdit(item)">{{ item.title }}</label>
                             <button class="todo-button destroy" @click="model.removeTodo(item)"></button>
                         </div>

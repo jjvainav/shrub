@@ -12,6 +12,7 @@
     "dependencies": {
         "@shrub/core": "^0.3.3",
         "@shrub/express": "^0.3.3",
+        "@shrub/socket.io": "^0.3.3",
         "express": "^4.17.1"
     },
     "devDependencies": {

@@ -52,6 +52,7 @@ export interface IWorkbenchExample {
     readonly title: string;
     readonly component: () => Promise<IComponent | IEsModuleComponent>;
     readonly menu: IWorkbenchMenuItem;
+    readonly props?: (route: IWorkbenchRoute) => Object;
 }
 
 export interface IWorkbenchMenuItem {
@@ -120,7 +121,8 @@ export class WorkbenchBrowserService implements IWorkbenchService {
         this.registerRoute({
             path: "/" + example.name,
             name: example.name,
-            component: example.component
+            component: example.component,
+            props: example.props
         });
 
         this.examples.set(example.name, example);
