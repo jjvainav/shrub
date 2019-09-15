@@ -1,24 +1,22 @@
 import * as express from "express";
-import apiHost from "./api";
-import appHost from "./app";
+import createApiServer from "./api";
+import createAppServer from "./app";
 
-const root = express();
-root.set("port", process.env.PORT || 3000);
+async function start() {
+    const root = express();
+    root.set("port", process.env.PORT || 3000);
 
-root.use("/api", apiHost.app);
-root.use("/", appHost.app);
+    const apiServer = await createApiServer();
+    const appServer = await createAppServer();
 
-const loading = Promise.all([
-    apiHost.load(),
-    appHost.load()
-]);
+    root.use("/api", apiServer.app);
+    root.use("/", appServer.app);
 
-const server = root.listen(root.get("port"), () => {
-    console.log("  Examples web-ssr app started at http://localhost:%d in %s mode", root.get("port"));
-    loading.then(() => {
+    root.listen(root.get("port"), () => {
+        console.log("  Examples web-ssr app started at http://localhost:%d in %s mode", root.get("port"));
         console.log("  Web-ssr app running");
         console.log("  Press CTRL-C to stop\n");
     });
-});
-    
-export default server;
+}
+
+start();

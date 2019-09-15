@@ -1,6 +1,6 @@
 import { TodoApiModule } from "@api/todo";
-import { createExpressHostBuilder } from "@shrub/express";
+import { ExpressFactory } from "@shrub/express";
 
-export default createExpressHostBuilder()
+export default () => ExpressFactory
     .useModules([TodoApiModule])
-    .build();
+    .createServer();

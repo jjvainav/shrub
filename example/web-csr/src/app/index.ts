@@ -1,10 +1,10 @@
 import * as cors from "cors";
 import * as path from "path";
 import { IModuleConfigurator } from "@shrub/core";
-import { createExpressHostBuilder, ExpressModule, IExpressConfiguration } from "@shrub/express";
+import { ExpressFactory, ExpressModule, IExpressConfiguration } from "@shrub/express";
 import { createRoutes } from "./routes";
 
-export default createExpressHostBuilder()
+export default () => ExpressFactory
     .useModules([{
         name: "example-csr",
         dependencies: [ExpressModule],
@@ -17,4 +17,4 @@ export default createExpressHostBuilder()
             app.use(createRoutes());
         }
     }])
-    .build();
+    .createServer();

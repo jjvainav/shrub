@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Vuetify from "vuetify";
-import { createConfigType, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration } from "@shrub/core";
+import { createConfig, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration } from "@shrub/core";
 import { IModelService, IVueConfiguration, VueModule } from "@shrub/vue";
 import { NotFoundComponent, WorkbenchComponent } from "./components";
 import { WorkbenchModel } from "./model";
@@ -16,7 +16,7 @@ import "./styles/index.scss";
 Vue.use(Router);
 Vue.use(Vuetify);
 
-export const IWorkbenchConfiguration = createConfigType<IWorkbenchConfiguration>("workbench");
+export const IWorkbenchConfiguration = createConfig<IWorkbenchConfiguration>();
 export interface IWorkbenchConfiguration {
     registerExample(example: IWorkbenchExample): void;
     registerRoute(route: IWorkbenchRouteConfig): void;
