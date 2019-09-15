@@ -29,7 +29,8 @@ export class HttpModule implements IModule {
     }
 
     configureServices(registration: IServiceRegistration): void {
-        registration.registerSingleton(IHttpServer, { 
+        // only register if an IHttpServer has not already been registered
+        registration.tryRegisterSingleton(IHttpServer, { 
             create: () => {
                 this.hasServer = true;
                 return http.createServer(this.requestListener);
