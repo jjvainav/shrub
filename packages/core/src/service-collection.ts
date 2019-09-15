@@ -58,6 +58,16 @@ export interface IServiceRegistration {
     registerSingleton<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): void;
     /** Registers a service that gets created each time the service is requested from a collection. */
     registerTransient<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): void;
+    /** Attempts to register a service using its required scope but only if a service has not already been registered. Note: a service class must define a required scope decorator. */
+    tryRegister<T, TInstance extends T>(service: IService<T>, ctor: Constructor<TInstance>): boolean;
+    /** Attempts to register a singleton instance that lives within the collection and is available to all child scopes. Note: if the instance implements IDisposable it will not be disposed automatically. */
+    tryRegisterInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance): boolean;
+    /** Attempts to register a service that gets created once per service collection scope. */
+    tryRegisterScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): boolean;
+    /** Attempts to register a service that gets created once and is available to all child scopes. */
+    tryRegisterSingleton<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): boolean;
+    /** Attempts to register a service that gets created each time the service is requested from a collection. */
+    tryRegisterTransient<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): boolean;
 }
 
 export interface IServiceCollection {
@@ -332,6 +342,51 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
 
     registerTransient<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): void {
         this.registerService(service, ServiceScope.transient, ctorOrFactory);
+    }
+
+    tryRegister<T, TInstance extends T>(service: IService<T>, ctor: Constructor<TInstance>): boolean {
+        if (!this.services.has(service.key)) {
+            this.register(service, ctor);
+            return true;
+        }
+
+        return false;
+    }
+
+    tryRegisterInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance): boolean{
+        if (!this.services.has(service.key)) {
+            this.registerInstance(service, instance);
+            return true;
+        }
+
+        return false;
+    }
+
+    tryRegisterScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): boolean{
+        if (!this.services.has(service.key)) {
+            this.registerScoped(service, ctorOrFactory);
+            return true;
+        }
+
+        return false;
+    }
+
+    tryRegisterSingleton<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): boolean{
+        if (!this.services.has(service.key)) {
+            this.registerSingleton(service, ctorOrFactory);
+            return true;
+        }
+
+        return false;
+    }
+
+    tryRegisterTransient<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): boolean{
+        if (!this.services.has(service.key)) {
+            this.registerTransient(service, ctorOrFactory);
+            return true;
+        }
+
+        return false;
     }
 
     get<T>(serviceOrKey: IService<T> | string): T {

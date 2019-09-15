@@ -1,13 +1,13 @@
 import { IModuleSettingsCollection, IServiceRegistration, ModuleInstanceOrConstructor, ModuleLoader } from "@shrub/core";
-import { ExpressModule, IExpressServer } from "./module";
+import { ExpressModule, IExpressApplication } from "./module";
 
-/** A factory class for registering modules within an Express context and creating an http server. */
+/** A factory class for registering modules within an Express application context. */
 export class ExpressFactory {
     private readonly loader = new ModuleLoader().useModules([ExpressModule]);
 
-    /** Creates an express http server. */
-    static createServer(): Promise<IExpressServer> {
-        return new ExpressFactory().createServer();
+    /** Creates an express application. */
+    static create(): Promise<IExpressApplication> {
+        return new ExpressFactory().create();
     }
 
     static configureServices(callback: (registration: IServiceRegistration) => void): ExpressFactory {
@@ -22,9 +22,9 @@ export class ExpressFactory {
         return new ExpressFactory().useSettings(settings);
     }
 
-    /** Loads registered modules and returns an instance of the configured http server. */
-    createServer(): Promise<IExpressServer> {
-        return this.loader.load().then(modules => modules.services.get(IExpressServer));
+    /** Loads registered modules and returns an instance of the configured express application. */
+    create(): Promise<IExpressApplication> {
+        return this.loader.load().then(modules => modules.services.get(IExpressApplication));
     }
 
     configureServices(callback: (registration: IServiceRegistration) => void): this {
