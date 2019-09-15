@@ -434,11 +434,11 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
     }
 
     private checkFactoryInstance(instance: any, scope: ServiceScope): void {
-        if (typeof instance !== "object") {
-            throw new Error("Instance must be an object");
+        if (typeof instance !== "object" && typeof instance !== "function") {
+            throw new Error("Instance must be an object or function");
         }
 
-        if (instance.constructor !== Object) {
+        if (instance.constructor !== Object && instance.constructor !== Function) {
             this.checkInstanceScope(instance.constructor, scope);
         }
     }
