@@ -1,0 +1,20 @@
+{
+    "name": "@api/todo",
+    "version": "1.0.0",
+    "private": true,
+    "main": "dist/index.js",
+    "typings": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "test": "jest --runInBand --forceExit"
+    },
+    "dependencies": {
+        "@shrub/core": "^0.3.3",
+        "@shrub/express": "^0.3.3",
+        "express": "^4.17.1"
+    },
+    "devDependencies": {
+        "@types/express": "^4.16.1"
+    }
+}

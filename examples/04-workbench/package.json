@@ -1,0 +1,19 @@
+{
+    "private": true,
+    "workspaces": [
+        "api/*",
+        "app/*",
+        "web"
+    ],
+    "scripts": {
+        "bootstrap": "yarn install",
+        "build": "./node_modules/.bin/lerna run build --stream",
+        "clean": "./node_modules/.bin/lerna run clean --stream --parallel"
+    },
+    "devDependencies": {
+        "@types/rimraf": "^2.0.2",
+        "lerna": "^3.13.1",
+        "rimraf": "^2.6.3",
+        "typescript": "^3.6.2"
+    }
+}
