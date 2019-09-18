@@ -1,3 +1,7 @@
-# Shrub
+# Workbench
 
-This example project demonstrates using Shrub for both front-end and back-end development. The core of Shrub is intended to be lightweight and not tied to other frameworks or libraries. Shrub provides a few modules making it easier to integrate with some well known libraries such as [Express](https://expressjs.com/) or [Vue](https://vuejs.org/), but these packages are not required.
+The workbench example demonstrates a simple admin template using [Vue](https://vuejs.org/) and [Vuetify](https://vuetifyjs.com/en/) for the front-end and [Express](https://expressjs.com/) for the back-end. The project uses [Lerna](https://github.com/lerna/lerna) to split the application and api modules into stand alone packages.
+
+## TODO
+
+The todo module is based on [TodoMVC](http://todomvc.com/) and uses [Socket.IO](https://socket.io/) for realtime editing/updating of the todo items.
