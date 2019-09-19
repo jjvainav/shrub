@@ -1,0 +1,37 @@
+{
+    "name": "@shrub/express-tracing",
+    "description": "A module that provides middleware for tracing express requests.",
+    "version": "0.3.4",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.0.0"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "build:esm": "tsc -p tsconfig.esm.json",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "test": "jest"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.1",
+        "@sprig/event-emitter": "^0.1.1"
+    },
+    "dependencies": {
+        "@shrub/core": "0.3.4",
+        "@shrub/express": "0.3.4",
+        "@shrub/tracing": "0.3.4",
+        "express": "^4.17.1"
+    }
+}

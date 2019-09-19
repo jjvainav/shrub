@@ -1114,6 +1114,11 @@
     universal-user-agent "^3.0.0"
     url-template "^2.0.8"
 
+"@sprig/event-emitter@^0.1.1":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.2.tgz#bff9dbdf8f61cdab36b043bf3140b1303c0eb1bf"
+  integrity sha512-UrErkMyCrLjDwmSwK81SZf/t+dZB8hiQDz0H82tTrh21f+NW7urwY+zqS7SuvZ2qvtbmuPLy+V3C5rl46wZzuw==
+
 "@sprig/random-string@^0.1.2":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@sprig/random-string/-/random-string-0.1.2.tgz#d130de1b3d2c0ceeb97badcef721b58ca0ba68d2"
