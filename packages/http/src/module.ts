@@ -1,4 +1,4 @@
-import * as http from "http";
+import http from "http";
 import { createConfig, createService, IModule, IModuleInitializer, IServiceRegistration } from "@shrub/core";
 
 export const IHttpModuleConfiguration = createConfig<IHttpModuleConfiguration>();

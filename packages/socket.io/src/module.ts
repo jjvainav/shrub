@@ -1,4 +1,4 @@
-import * as io from "socket.io";
+import io from "socket.io";
 import { createConfig, createService, IModule, IModuleInitializer, IServiceRegistration } from "@shrub/core";
 import { HttpModule, IHttpServer } from "@shrub/http";
 

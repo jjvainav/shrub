@@ -1,0 +1,37 @@
+{
+    "name": "@shrub/express-yup",
+    "description": "Express module that provides error middleware for yup validation errors.",
+    "version": "0.3.3",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "module": "dist/esm/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.0.0"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "build:esm": "tsc -p tsconfig.esm.json",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.1",
+        "@types/yup": "^0.26.24"
+    },
+    "dependencies": {
+        "@shrub/core": "0.3.3",
+        "@shrub/express": "0.3.3",
+        "express": "^4.17.1",
+        "yup": "^0.27.0"
+    }
+}

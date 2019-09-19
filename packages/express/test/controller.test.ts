@@ -1,11 +1,10 @@
 import { NextFunction, Request, Response, Router } from "express";
-import * as request from "supertest";
-import { Get, Post, Route, useController } from "../src/controller";
-import { createApp } from "./app";
+import request from "supertest";
+import { ExpressFactory, Get, Post, Route, useController } from "../src";
 
 describe("controller", () => {
     test("with basic GET handler", async () => {
-        const app = await createApp();
+        const app = await ExpressFactory.create();
         app.use(useController(FooController));
 
         const response = await request(app).get("/foo");
@@ -15,7 +14,7 @@ describe("controller", () => {
     });
 
     test("with basic POST handler", async () => {
-        const app = await createApp();
+        const app = await ExpressFactory.create();
         app.use(useController(FooController));
 
         const response = await request(app).post("/foo");
@@ -25,7 +24,7 @@ describe("controller", () => {
     });
 
     test("with GET handler for path containing parameter", async () => {
-        const app = await createApp();
+        const app = await ExpressFactory.create();
         app.use(useController(FooController));
 
         const response = await request(app).get("/foo/123");
@@ -35,7 +34,7 @@ describe("controller", () => {
     });
 
     test("with multiple Get decorators for the same handler", async () => {
-        const app = await createApp();
+        const app = await ExpressFactory.create();
         app.use(useController(FooController));
 
         const response1 = await request(app).get("/foo/1");
@@ -49,7 +48,7 @@ describe("controller", () => {
     });
 
     test("with multiple routes for the same handler", async () => {
-        const app = await createApp();
+        const app = await ExpressFactory.create();
         app.use(useController(FooController));
 
         const response1 = await request(app).get("/foo/3");
@@ -63,7 +62,7 @@ describe("controller", () => {
     });
 
     test("with base router", async () => {
-        const app = await createApp();
+        const app = await ExpressFactory.create();
         const base = Router();
 
         base.use("/base", useController(FooController));
@@ -76,7 +75,7 @@ describe("controller", () => {
     }); 
     
     test("with controller having base route attribute", async () => {
-        const app = await createApp();
+        const app = await ExpressFactory.create();
         const base = Router();
 
         base.use(useController(RootController));

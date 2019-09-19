@@ -1,4 +1,4 @@
-import * as express from "express";
+import express from "express";
 import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration, IServiceCollection } from "@shrub/core";
 import { HttpModule, IHttpModuleConfiguration, IHttpServer } from "@shrub/http";
 import { ControllerRequestService, IControllerRequestService } from "./internal";

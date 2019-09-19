@@ -1,13 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import * as request from "supertest";
+import request from "supertest";
 import { IInstantiationService } from "@shrub/core";
-import { Get, Route, useController } from "../src/controller";
-import { IRequestContext, IRequestContextService } from "../src/request-context";
-import { createApp } from "./app";
+import { ExpressFactory, Get, IRequestContext, IRequestContextService, Route, useController } from "../src";
 
 describe("request context service", () => {
     test("ensure request context instance is the same assigned to the current request", async () => {
-        const app = await createApp();
+        const app = await ExpressFactory.create();
         app.use(useController(FooController));
 
         const response = await request(app).get("/foo");

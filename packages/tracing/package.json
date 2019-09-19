@@ -1,0 +1,31 @@
+{
+    "name": "@shrub/tracing",
+    "description": "Node.js module for distributed logging based on dapper.",
+    "version": "0.3.3",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "module": "dist/esm/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.0.0"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "test": "jest"
+    },
+    "dependencies": {
+        "@shrub/core": "^0.3.3",
+        "@sprig/random-string": "^0.1.2"
+    }
+}
