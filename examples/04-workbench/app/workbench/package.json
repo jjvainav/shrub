@@ -13,8 +13,8 @@
     "dependencies": {
         "@shrub/core": "^0.3.6",
         "@shrub/vue": "^0.3.6",
-        "@sprig/event-emitter": "^0.1.1",
-        "@sprig/event-emitter-dom": "^0.1.1",
+        "@sprig/event-emitter": "^0.1.4",
+        "@sprig/event-emitter-dom": "^0.1.4",
         "material-design-icons-iconfont": "^5.0.1",
         "vue": "^2.6.10",
         "vue-class-component": "^7.1.0",
