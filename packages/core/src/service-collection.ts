@@ -478,7 +478,7 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
             return injectable.factory(this);
         }
 
-        throw new Error(`Invalid injectable (${injectable.key}), custom injectables must define a factory.`);
+        throw new Error(`Invalid injectable (${injectable.key}), either a service has not been registered or the injectable does not define a factory.`);
     }
 
     private createServiceInstance<T>(entry: IServiceEntry<T>, ancestors?: Constructor<any>[]): T {
