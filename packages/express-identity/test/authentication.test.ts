@@ -84,5 +84,24 @@ describe("session authentication", () => {
 
         expect(response.status).toBe(302);
         expect(response.header.location).toBe("http://localhost/login?v1=foo&v2=bar&return_to=%2Ftest");
-    });    
+    });  
+    
+    test("unauthenticated request that redirects to login using relative url path", async () => {
+        const authorization: IAuthorizationOptions = {
+            challengeParameters: {
+                v1: "foo",
+                v2: "bar"
+            }
+        };
+        const app = createTestApp([sessionAuthentication({
+            failureRedirectUrl: "/login",
+            returnToUrlKey: "return_to"
+        })],
+        authorization);
+
+        const response = await request(app).get("/test");
+
+        expect(response.status).toBe(302);
+        expect(response.header.location).toBe("/login?v1=foo&v2=bar&return_to=%2Ftest");
+    });      
 });

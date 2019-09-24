@@ -1,5 +1,6 @@
 import { Request } from "express";
 import createError, { HttpError } from "http-errors";
+import url from "url";
 
 export type AuthenticationVerifyResult = {
     /** Indicates the authentication was successful. */
@@ -144,13 +145,33 @@ function tryChallengeRedirect(req: Request, result: ChallengeResult, parameters:
             ? { ...parameters, [options.returnToUrlKey]: req.originalUrl }
             : parameters;
 
-        const url = new URL(options.failureRedirectUrl);
+        // the below logic is weird but there seems to be an issue setting the query object
+        // if the value has certain characters where it won't be included in the output
+        // e.g. return_to = /test/sub?value=foo
 
+        const temp = url.parse(options.failureRedirectUrl, true);
+
+        // append any parameters to the redirect url
+        let flag = false;
         for (const key in parameters) {
-            url.searchParams.append(key, <any>parameters[key]);
+            temp.query[key] = <any>parameters[key];
+            flag = true;
         }
 
-        return tryRedirect(result, 401, url.toString());
+        // the temp.query object will still contain the 'invalid' parameters
+        // so convert it into a URLSearchParams object
+        const searchParams = new URLSearchParams(<any>temp.query);
+
+        // this will clear the query/search params for the url
+        temp.query = {};
+        temp.search = "";
+
+        // convert the url object to a string and manually append the query parameters
+        const redirect = flag 
+            ? `${url.format(temp)}?${searchParams.toString()}`
+            : url.format(temp);
+
+        return tryRedirect(result, 401, redirect);
     }
 
     return tryRedirect(result, 401, undefined);
