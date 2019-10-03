@@ -81,6 +81,90 @@ describe("module loader", () => {
         expect(capturedModules[2].name).toBe("module-c");
     });
 
+    test("load JSON object module instance that depends on another JSON object module instance", async () => {
+        const test = { 
+            name: "test",
+            configure(): void {
+                capturedModules.push(this);
+            }
+        };
+        const tester = { 
+            name: "tester",
+            dependencies: [test],
+            configure(): void {
+                capturedModules.push(this);
+            }
+        };
+
+
+        await ModuleLoader.useModules([test, tester]).load();
+
+        expect(capturedModules).toHaveLength(2);
+        expect(capturedModules[0].name).toBe("test");
+        expect(capturedModules[1].name).toBe("tester");
+    });
+
+    test("load multiple JSON object module instances", async () => {
+        await ModuleLoader
+            .useModules([
+                { 
+                    name: "test",
+                    configure(): void {
+                        capturedModules.push(this);
+                    }
+                },
+                { 
+                    name: "tester",
+                    configure(): void {
+                        capturedModules.push(this);
+                    }
+                }
+            ])
+            .load();
+
+        expect(capturedModules).toHaveLength(2);
+        expect(capturedModules[0].name).toBe("test");
+        expect(capturedModules[1].name).toBe("tester");
+    }); 
+
+    test("load JSON object module instance multiple times", async () => {
+        const module = { 
+            name: "test",
+            configure(): void {
+                capturedModules.push(this);
+            }
+        };
+
+        await ModuleLoader.useModules([module, module, module]).load();
+
+        expect(capturedModules).toHaveLength(1);
+        expect(capturedModules[0].name).toBe("test");
+    }); 
+
+    test("load modules invoking the ModuleLoader useModules method multiple times", async () => {
+        await ModuleLoader
+            .useModules([ModuleA])
+            .useModules([ModuleC])
+            .load();
+
+        expect(capturedModules).toHaveLength(3);
+        expect(capturedModules[0].name).toBe("module-a");
+        expect(capturedModules[1].name).toBe("module-b");
+        expect(capturedModules[2].name).toBe("module-c");
+    });   
+
+    test("load module instances invoking the ModuleLoader useModules method multiple times", async () => {
+        await ModuleLoader
+            .useModules([new ModuleA()])
+            .useModules([new ModuleC()])
+            .load();
+
+        expect(capturedModules).toHaveLength(3);
+        expect(capturedModules[0].name).toBe("module-a");
+        expect(capturedModules[1].name).toBe("module-b");
+        expect(capturedModules[2].name).toBe("module-c");
+    });
+
     test("load module that configures dependency", async () => {
         const host = await ModuleLoader.load([DependentAModule]);
         const module = host.getInstance(ConfigurableModule);

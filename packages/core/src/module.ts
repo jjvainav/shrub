@@ -284,11 +284,14 @@ export class ModuleLoader {
                 const instance = moduleOrCtor;
                 const ctor = <ModuleConstructor<IModule>>moduleOrCtor.constructor;
 
-                if (instances.has(ctor)) {
-                    throw new ModuleLoadError(`Duplicate module instances ${instance.name}.`);
+                if (ctor !== Object.prototype.constructor) {
+                    if (instances.has(ctor)) {
+                        throw new ModuleLoadError(`Duplicate module instances ${instance.name}.`);
+                    }
+
+                    instances.set(ctor, instance);
                 }
 
-                instances.set(ctor, instance);
                 return instance;
             }
 
