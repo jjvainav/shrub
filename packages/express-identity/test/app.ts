@@ -8,8 +8,7 @@ import { identity } from "../src/identity";
 export interface ITestResponse {
     readonly isAuthenticated: boolean;
     readonly scheme?: string;
-    readonly auth: any;
-    readonly user: any;
+    readonly claims: any;
 }
 
 export const session = new class implements ISession {
@@ -40,8 +39,7 @@ export function createTestApp(authenticationHandlers: IAuthenticationHandler[], 
         const response: ITestResponse = {
             isAuthenticated: req.context.identity!.isAuthenticated,
             scheme: req.context.identity!.scheme, 
-            auth: req.context.identity!.auth,
-            user: req.context.identity!.user
+            claims: req.context.identity!.claims
         };
 
         res.status(200).json(response);

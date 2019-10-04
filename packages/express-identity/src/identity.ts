@@ -17,18 +17,15 @@ export interface IChallengeOptions {
 
 export interface ILoginOptions {
     readonly scheme?: string;
-    readonly user: any;
-    readonly auth: any;
+    readonly claims: any;
 }
 
 /** Manages authenticated users for a request. */
 export interface IIdentity {
     /** The authentication scheme responsible for authenticating the user. */
     readonly scheme?: string;
-    /** The authorization info for the current user. */
-    readonly auth?: any;
-    /** The user information for an authenticated user. */
-    readonly user?: any;
+    /** The claims for the currently authenticated user. */
+    readonly claims?: any;
     /** True if the current request has an authenticated user. */
     readonly isAuthenticated: boolean;
 
@@ -36,9 +33,9 @@ export interface IIdentity {
     challenge(options?: IChallengeOptions): void;
     /** Denies access for the current user. */
     deny(): void;    
-    /** Invoke to create a new user session for an authenticated user. */
-    login(user: any, auth: any): void;
-    /** Invoke to log out the currently authenticated user and destroy the user session. */
+    /** Invoke to create a new session for an authenticated user with the provided claims. */
+    login(claims: any): void;
+    /** Invoke to log out and destroy the current session. */
     logout(): void;
 }
 
@@ -57,7 +54,7 @@ export function identity(options: IIdentityOptions): RequestHandler {
     return (req, res, next) => {
         const identity = {
             get isAuthenticated(): boolean { 
-                return (<any>this).user !== undefined; 
+                return (<any>this).claims !== undefined; 
             },
             challenge: function(challengeOptions?: IChallengeOptions) {
                 let scheme = challengeOptions && challengeOptions.scheme
@@ -88,21 +85,20 @@ export function identity(options: IIdentityOptions): RequestHandler {
                     next(createError(403));
                 }
             },
-            login: function(user: any, auth: any) {
-                // note: When a user is logged in do not set the user/auth, the authentication handlers
-                // are responsible for processing requests and setting the user/auth properties. In general,
-                // the user/auth properties will be available upon the next request.
-                on(options.authenticationHandlers, o => o.onLogin, fn => fn(req, user, auth));
-                on(options.authenticationObservers, o => o.onLogin, fn => fn(req, user, auth));
+            login: function(claims: any) {
+                // note: When a user is logged in do not set the claims, the authentication handlers
+                // are responsible for processing requests and setting the claims. In general,
+                // the claims will be available upon the next request.
+                on(options.authenticationHandlers, o => o.onLogin, fn => fn(req, claims));
+                on(options.authenticationObservers, o => o.onLogin, fn => fn(req, claims));
             },
             logout: function() {
                 if (this.isAuthenticated) {
-                    on(options.authenticationHandlers, o => o.onLogout, fn => fn(req, (<any>this).user, (<any>this).auth));
-                    on(options.authenticationObservers, o => o.onLogout, fn => fn(req, (<any>this).user, (<any>this).auth));
+                    on(options.authenticationHandlers, o => o.onLogout, fn => fn(req, (<any>this).claims));
+                    on(options.authenticationObservers, o => o.onLogout, fn => fn(req, (<any>this).claims));
 
                     delete (<any>this).scheme;
-                    delete (<any>this).user;
-                    delete (<any>this).auth;
+                    delete (<any>this).claims;
                 }
             }
         };
@@ -120,14 +116,12 @@ export function identity(options: IIdentityOptions): RequestHandler {
             // index for the current authentication handler
             let index = 0;
             const result: AuthenticationVerifyResult = {
-                success: (user, auth) => {
+                success: (claims) => {
                     if (isDone) { throw new Error("Authentication processing is already done."); }
-                    if (!user) { throw new Error("user required"); }
-                    if (!auth) { throw new Error("auth required"); }
+                    if (!claims) { throw new Error("claims required"); }
 
                     (<any>identity).scheme = options.authenticationHandlers[index].scheme;
-                    (<any>identity).user = user;
-                    (<any>identity).auth = auth;
+                    (<any>identity).claims = claims;
 
                     done();
                 },

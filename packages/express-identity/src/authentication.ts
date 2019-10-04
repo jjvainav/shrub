@@ -4,7 +4,7 @@ import url from "url";
 
 export type AuthenticationVerifyResult = {
     /** Indicates the authentication was successful. */
-    readonly success: (user: any, auth: any) => void;
+    readonly success: (claims: any) => void;
     /** Indicates the authentication failed (e.g. invalid credentials). */
     readonly fail: (message: string) => void;
     /** Indicates an error occurred during authentication. */
@@ -38,9 +38,9 @@ export interface IChallengeParameters {
 /** An observer for the authentication login/logout events. */
 export interface IAuthenticationObserver {
     /** Gets invoked when a user has logged in. */
-    readonly onLogin?: (req: Request, user: any, auth: any) => void;
+    readonly onLogin?: (req: Request, claims: any) => void;
     /** Gets invoked when a user has logged out. */
-    readonly onLogout?: (req: Request, user: any, auth: any) => void;
+    readonly onLogout?: (req: Request, claims: any) => void;
 }
 
 /** Handles authenticating a request. */
@@ -73,19 +73,14 @@ export interface ISessionAuthenticationOptions {
     readonly returnToUrlKey?: string;
     /** The session key for the user's session; the default is 'identity'. */
     readonly sessionKey?: string;
-    /** An optional function for serializing a user's authorization object before saving it to a user session. */
-    readonly serializeAuth?: (user: any) => any;
-    /** An optional function for serializing a user object before saving it to a user session. */
-    readonly serializeUser?: (user: any) => any;
-    /** An optional function for deserializing a user's authorization information stored in a session; the result is set as the identity auth. */
-    readonly deserializeAuth?: (data: any) => any;
-    /** An optional function for deserializing user information stored in a session; the result is set as the identity user. */
-    readonly deserializeUser?: (data: any) => any;
+    /** An optional function for serializing the claims object before saving it to a user session. */
+    readonly serialize?: (claims: any) => any;
+    /** An optional function for deserializing the claims authorization information stored in a session. */
+    readonly deserialize?: (data: any) => any;
 }
 
 interface IIdentitySession {
-    auth: any;
-    user: any;
+    claims: any;
 }
 
 const defaultSessionKey = "identity";
@@ -107,28 +102,24 @@ export function sessionAuthentication(options?: ISessionAuthenticationOptions): 
                 return result.skip();
             }
 
-            if (!session.user || !session.auth) {
+            if (!session.claims) {
                 // TODO: instead of failing remove session state and skip?
                 return result.fail("Identity missing in session store.");
             }
 
-            result.success(session.user, session.auth);
+            result.success(session.claims);
         },
         challenge: (req, result, parameters) => tryChallengeRedirect(req, result, parameters || {}, options!),
         deny: (req, result) => tryRedirect(result, 403, options!.deniedRedirectUrl),
-        onLogin: (req, user, auth) => {
+        onLogin: (req, claims) => {
             if (!req.context.session) {
                 throw new Error("Session middleware not installed.");
             }
 
-            const session: IIdentitySession = {
-                auth: options!.serializeAuth ? options!.serializeAuth(auth) : auth,
-                user: options!.serializeUser ? options!.serializeUser(user) : user
-            };
-
+            const session: IIdentitySession = { claims: options!.serialize ? options!.serialize(claims) : claims };
             req.context.session.values[key] = encode(session);
         },
-        onLogout: (req, user, auth) => {
+        onLogout: req => {
             if (!req.context.session) {
                 throw new Error("Session middleware not installed.");
             }

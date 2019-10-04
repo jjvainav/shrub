@@ -1,8 +1,16 @@
 import { Request, RequestHandler } from "express";
 import { IChallengeParameters } from "./authentication";
 
-/** A callback to authorize the provide auth and user info. */
-export type AuthorizeCallback = (auth: any, user: any) => Promise<boolean>;
+/** A callback to authorize the provide claims info. */
+export type AuthorizeCallback = (context: IAuthorizeContext) => Promise<boolean>;
+
+/** Defines the context in which to authorize a request. */
+export interface IAuthorizeContext {
+    /** The claims for the currently authenticated user. */
+    readonly claims: any;
+    /** The request to authorize. */
+    readonly request: Request;
+}
 
 /** Defines a set of options for the authorization middleware. */
 export interface IAuthorizationOptions {
@@ -11,7 +19,7 @@ export interface IAuthorizationOptions {
     /** The authentication schemes allowed for the authorized request; if not defined, all schemes are allowed. */
     readonly schemes?: string[];
     /** 
-     * An optional callback to verify and authorize the specified auth and user information. 
+     * An optional callback to verify and authorize the specified claims information. 
      * If omitted, the authorization middleware will only verify that a request is made by an authenticated user.
      */
     readonly verify?: AuthorizeCallback;
@@ -59,7 +67,7 @@ export function useAuthorization(verifyOrOptions?: AuthorizeCallback | IAuthoriz
         }
 
         if (verify) {
-            verify(req.context.identity.auth, req.context.identity.user).then(result => {
+            verify({ request: req, claims: req.context.identity.claims }).then(result => {
                 if (result) {
                     next();
                 }

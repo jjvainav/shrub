@@ -6,7 +6,7 @@ describe("identity", () => {
     test("identity middleware with authenticated user", async () => {
         const app = createTestApp([{
             scheme: "test",
-            authenticate: (req, result) => result.success({ id: "1" }, { scope: "read" })
+            authenticate: (req, result) => result.success({ id: "1", scope: "read" })
         }]);
 
         const response = await request(app).get("/test");
@@ -14,8 +14,8 @@ describe("identity", () => {
         expect(response.status).toBe(200);
         expect((<ITestResponse>response.body).isAuthenticated).toBe(true);
         expect((<ITestResponse>response.body).scheme).toBe("test");
-        expect((<ITestResponse>response.body).auth.scope).toBe("read");
-        expect((<ITestResponse>response.body).user.id).toBe("1");
+        expect((<ITestResponse>response.body).claims.id).toBe("1");
+        expect((<ITestResponse>response.body).claims.scope).toBe("read");
     });
 
     test("identity middleware with no authentication handlers", async () => {
@@ -25,8 +25,7 @@ describe("identity", () => {
         expect(response.status).toBe(200);
         expect((<ITestResponse>response.body).isAuthenticated).toBe(false);
         expect((<ITestResponse>response.body).scheme).toBeUndefined();
-        expect((<ITestResponse>response.body).auth).toBeUndefined();
-        expect((<ITestResponse>response.body).user).toBeUndefined();
+        expect((<ITestResponse>response.body).claims).toBeUndefined();
     });
 
     test("identity middleware with authentication handler that fails", async () => {
@@ -49,7 +48,7 @@ describe("identity", () => {
             },
             {
                 scheme: "bar",
-                authenticate: (req, result) => result.success({ id: "1" }, { scope: "read" })
+                authenticate: (req, result) => result.success({ id: "1", scope: "read" })
             }
         ]);
 
@@ -58,19 +57,19 @@ describe("identity", () => {
         expect(response.status).toBe(200);
         expect((<ITestResponse>response.body).isAuthenticated).toBe(true);
         expect((<ITestResponse>response.body).scheme).toBe("bar");
-        expect((<ITestResponse>response.body).auth.scope).toBe("read");
-        expect((<ITestResponse>response.body).user.id).toBe("1");
+        expect((<ITestResponse>response.body).claims.id).toBe("1");
+        expect((<ITestResponse>response.body).claims.scope).toBe("read");
     });
 
     test("identity middleware with multiple authentication handlers that all succeed", async () => {
         const app = createTestApp([
             {
                 scheme: "foo",
-                authenticate: (req, result) => result.success({ id: "1" }, { scope: "read" })
+                authenticate: (req, result) => result.success({ id: "1", scope: "read" })
             },
             {
                 scheme: "bar",
-                authenticate: (req, result) => result.success({ id: "2" }, { scope: "write" })
+                authenticate: (req, result) => result.success({ id: "2", scope: "write" })
             }
         ]);
 
@@ -80,8 +79,8 @@ describe("identity", () => {
         // the first one to succeed wins
         expect((<ITestResponse>response.body).isAuthenticated).toBe(true);
         expect((<ITestResponse>response.body).scheme).toBe("foo");
-        expect((<ITestResponse>response.body).auth.scope).toBe("read");
-        expect((<ITestResponse>response.body).user.id).toBe("1");
+        expect((<ITestResponse>response.body).claims.id).toBe("1");
+        expect((<ITestResponse>response.body).claims.scope).toBe("read");
     });    
 
     test("identity middleware with multiple authentication handlers that all skip", async () => {
@@ -101,7 +100,6 @@ describe("identity", () => {
         expect(response.status).toBe(200);
         expect((<ITestResponse>response.body).isAuthenticated).toBe(false);
         expect((<ITestResponse>response.body).scheme).toBeUndefined();
-        expect((<ITestResponse>response.body).auth).toBeUndefined();
-        expect((<ITestResponse>response.body).user).toBeUndefined();
+        expect((<ITestResponse>response.body).claims).toBeUndefined();
     });    
 });

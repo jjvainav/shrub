@@ -9,7 +9,7 @@ describe("authorization", () => {
         const authorization: IAuthorizationOptions = {};
         const app = createTestApp([{
             scheme: "test",
-            authenticate: (req, result) => result.success({ id: "1" }, { scope: "read" })
+            authenticate: (req, result) => result.success({ id: "1", scope: "read" })
         }],
         authorization);
 
@@ -20,11 +20,11 @@ describe("authorization", () => {
 
     test("authorize authenticated user with custom verification", async () => {
         const authorization: IAuthorizationOptions = {
-            verify: auth => Promise.resolve(auth.scope === "read")
+            verify: context => Promise.resolve(context.claims.scope === "read")
         };
         const app = createTestApp([{
             scheme: "test",
-            authenticate: (req, result) => result.success({ id: "1" }, { scope: "read" })
+            authenticate: (req, result) => result.success({ id: "1", scope: "read" })
         }],
         authorization);
 
@@ -35,11 +35,11 @@ describe("authorization", () => {
     
     test("authorize authenticated user with custom verification that fails", async () => {
         const authorization: IAuthorizationOptions = {
-            verify: auth => Promise.resolve(auth.scope === "write")
+            verify: context => Promise.resolve(context.claims.scope === "write")
         };
         const app = createTestApp([{
             scheme: "test",
-            authenticate: (req, result) => result.success({ id: "1" }, { scope: "read" })
+            authenticate: (req, result) => result.success({ id: "1", scope: "read" })
         }],
         authorization);
 

@@ -13,8 +13,7 @@ describe("session authentication", () => {
         const app = createTestApp([sessionAuthentication()], authorization);
 
         session.values["identity"] = encode({
-            user: { id: "1" },
-            auth: { scope: "read" }
+            claims: { id: "1", scope: "read" }
         });
 
         const response = await request(app).get("/test");
@@ -22,8 +21,8 @@ describe("session authentication", () => {
         expect(response.status).toBe(200);
         expect((<ITestResponse>response.body).isAuthenticated).toBe(true);
         expect((<ITestResponse>response.body).scheme).toBe("session");
-        expect((<ITestResponse>response.body).auth.scope).toBe("read");
-        expect((<ITestResponse>response.body).user.id).toBe("1");
+        expect((<ITestResponse>response.body).claims.id).toBe("1");
+        expect((<ITestResponse>response.body).claims.scope).toBe("read");
     });
 
     test("unauthenticated request that redirects to login url without return to", async () => {
