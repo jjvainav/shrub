@@ -17,7 +17,7 @@ class CaptureRequestContext {
     constructor(@IRequestContextService private readonly service: IRequestContextService) {
     }
 
-    getContext(): IRequestContext {
+    getContext(): IRequestContext | undefined {
         return this.service.current;
     }
 }

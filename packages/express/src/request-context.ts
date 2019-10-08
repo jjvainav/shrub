@@ -36,21 +36,17 @@ export interface IRequestContext {
  * to the current request context and any API service that depends on this service must be transient.
  */
 export interface IRequestContextService {
-    readonly current: IRequestContext;
+    readonly current?: IRequestContext;
 }
 
 export const IRequestContextService = createService<IRequestContextService>("request-context-service");
 
 @Transient
 export class RequestContextService implements IRequestContextService {
-    readonly current: IRequestContext;
+    readonly current?: IRequestContext;
 
     constructor(@IControllerRequestService service: IControllerRequestService) {
         const req = service.getCurrentRequest();
-        if (!req) {
-            throw new Error("Current request not defined.");
-        }
-
-        this.current = req.context;
+        this.current = req && req.context;
     }
 }
