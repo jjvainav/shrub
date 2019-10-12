@@ -3,7 +3,11 @@ import { ExpressModule, IExpressApplication } from "./module";
 
 /** A factory class for registering modules within an Express application context. */
 export class ExpressFactory {
-    private readonly loader = new ModuleLoader().useModules([ExpressModule]);
+    //private readonly loader = new ModuleLoader().useModules([ExpressModule]);
+    private readonly modules: ModuleInstanceOrConstructor[] = [ExpressModule];
+    private readonly settings: IModuleSettingsCollection[] = [];
+    private configureCallback: (registration: IServiceRegistration) => void = () => {};
+
 
     /** Creates an express application. */
     static create(): Promise<IExpressApplication> {
@@ -22,23 +26,33 @@ export class ExpressFactory {
         return new ExpressFactory().useSettings(settings);
     }
 
-    /** Loads registered modules and returns an instance of the configured express application. */
+    /** Creates a new loader instance and loads registered modules; returns an instance of the configured express application. */
     create(): Promise<IExpressApplication> {
-        return this.loader.load().then(modules => modules.services.get(IExpressApplication));
+        const loader = new ModuleLoader()
+            .configureServices(this.configureCallback)
+            .useModules(this.modules);
+
+        this.settings.forEach(cur => loader.useSettings(cur));
+        return loader.load().then(modules => modules.services.get(IExpressApplication));
     }
 
     configureServices(callback: (registration: IServiceRegistration) => void): this {
-        this.loader.configureServices(callback);
+        const base = this.configureCallback;
+        this.configureCallback = registration => {
+            callback(registration);
+            base(registration);
+        };
+        
         return this;
     }
 
     useModules(modules: ModuleInstanceOrConstructor[]): this {
-        this.loader.useModules(modules);
+        this.modules.push(...modules);
         return this;
     }
 
     useSettings(settings: IModuleSettingsCollection): this {
-        this.loader.useSettings(settings);
+        this.settings.push(settings);
         return this;
     }    
 }
