@@ -10,9 +10,9 @@
         "start": "node dist/server.js"
     },
     "dependencies": {
-        "@shrub/core": "^0.4.1",
-        "@shrub/express": "^0.4.1",
-        "@shrub/vue": "^0.4.1",
+        "@shrub/core": "^0.4.2",
+        "@shrub/express": "^0.4.2",
+        "@shrub/vue": "^0.4.2",
         "express": "^4.16.4",
         "vue": "^2.6.10"
     },
