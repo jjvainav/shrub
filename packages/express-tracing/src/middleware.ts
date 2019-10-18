@@ -13,7 +13,12 @@ attachErrorListener();
 /** Request tracing middleware that will start a new span for a request. */
 export const useRequestTracing = (options?: IRequestTracingOptions): RequestHandler => {
     return (req, res, next) => {
-        const span = req.context.services.get(IExpressTracingService).startSpan(req, options);
+        const service = req.context.services.tryGet(IExpressTracingService);
+        if (!service) {
+            return next(new Error("express-tracing-service not registered, make sure the ExpressTracingModule is loaded when using request tracing."));
+        }
+
+        const span = service.startSpan(req, options);
         (<any>req.context).span = span;
 
         // https://nodejs.org/api/http.html#http_event_finish
