@@ -30,6 +30,31 @@ describe("token authentication", () => {
         expect((<ITestResponse>response.body).scheme).toBe("bearer-token");
     });
 
+    test("authorize user from token in query string", async () => {
+        const token = "my_token";
+        const claims = { scope: ["read"] };
+        const authorization: IAuthorizationOptions = {};
+        const handler = tokenAuthentication({
+            key: "token",
+            getScopes: claims => claims.scope,
+            verifyToken: (t, success, fail) => {
+                if (t === token) {
+                    success(claims);
+                }
+                else {
+                    fail("Invalid token");
+                }
+            }
+        });
+        const app = createTestApp([handler], authorization);
+
+        const response = await request(app).get("/test?token=" + token);
+
+        expect(response.status).toBe(200);
+        expect((<ITestResponse>response.body).isAuthenticated).toBe(true);
+        expect((<ITestResponse>response.body).scheme).toBe("bearer-token");
+    });
+
     test("with request missing authorization header", async () => {
         const authorization: IAuthorizationOptions = {};
         const handler = tokenAuthentication({
@@ -55,5 +80,29 @@ describe("token authentication", () => {
             .set("Authorization", "Bearer invalid");
 
         expect(response.status).toBe(401);
-    });      
+    }); 
+
+    test("with multiple tokens", async () => {
+        const token = "my_token";
+        const claims = { scope: ["read"] };
+        const authorization: IAuthorizationOptions = {};
+        const handler = tokenAuthentication({
+            getScopes: claims => claims.scope,
+            verifyToken: (t, success, fail) => {
+                if (t === token) {
+                    success(claims);
+                }
+                else {
+                    fail("Invalid token");
+                }
+            }
+        });
+        const app = createTestApp([handler], authorization);
+
+        const response = await request(app)
+            .get("/test?access_token=" + token)
+            .set("Authorization", "Bearer " + token);
+
+        expect(response.status).toBe(400);
+    });
 });
