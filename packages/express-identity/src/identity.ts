@@ -128,7 +128,8 @@ export function identity(options: IIdentityOptions): RequestHandler {
                 fail: message => {
                     if (isDone) { throw new Error("Authentication processing is already done."); }
                     // TODO: raise an event with the message so it can be logged? tie into the trace support?
-                    challenge(options.authenticationHandlers[index], undefined, message, req, res, done);
+                    // set a 'fail' parameter letting handlers know the challenge is the result of a failed authentication
+                    challenge(options.authenticationHandlers[index], { fail: true }, message, req, res, done);
                 },
                 error: err => {
                     if (isDone) { throw new Error("Authentication processing is already done."); }
@@ -174,7 +175,7 @@ function on<TFunction extends Function>(
 function challenge(handler: IAuthenticationHandler, parameters: IChallengeParameters | undefined, message: string | undefined, req: Request, res: Response, next: NextFunction): void {
     // note: need to be careful to ONLY invoke next with an error since this function is exposed to handlers down the chain
     if (handler.challenge) {
-        handler.challenge!(req, {
+        handler.challenge(req, {
             redirect: url => res.redirect(url),
             send: err => next(err),
             error: err => next(err)

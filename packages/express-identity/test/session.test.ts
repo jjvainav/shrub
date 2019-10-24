@@ -1,6 +1,6 @@
 import request from "supertest";
-import { sessionAuthentication } from "../src/authentication";
 import { IAuthorizationOptions } from "../src/authorization";
+import { sessionAuthentication } from "../src/session";
 import { createTestApp, ITestResponse, session } from "./app";
 
 function encode(obj: any): string {
