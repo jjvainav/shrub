@@ -23,6 +23,16 @@ describe("controller", () => {
         expect(response.body.foo).toBe("post");
     });
 
+    test("with async handler", async () => {
+        const app = await ExpressFactory.create();
+        app.use(useController(AsyncController));
+
+        const response = await request(app).get("/async");
+
+        expect(response.status).toBe(200);
+        expect(response.body.value).toBe("hello");
+    });
+
     test("with GET handler for path containing parameter", async () => {
         const app = await ExpressFactory.create();
         app.use(useController(FooController));
@@ -87,6 +97,19 @@ describe("controller", () => {
         expect(response.body.data).toBe("get");
     }); 
 });
+
+function timeout(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+@Route("/async")
+class AsyncController {
+    @Get()
+    async getFoo(req: Request, res: Response, next: NextFunction): Promise<void> {
+        await timeout(1);
+        res.json({ value: "hello" });
+    }
+}
 
 @Route("/foo")
 class FooController {
