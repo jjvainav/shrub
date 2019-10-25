@@ -28,7 +28,14 @@ export class ExpressIdentityModule implements IModule {
 
     initialize({ config }: IModuleInitializer): void {
         config(IExpressIdentityConfiguration).register(() => ({
-            useAuthentication: (handler, options) => { 
+            useAuthentication: (handler, options) => {
+                for (const h of this.options.authenticationHandlers) {
+                    if (h.scheme === handler.scheme) {
+                        // ignore the handler if one is already registered with the same scheme
+                        return;
+                    }
+                }
+
                 this.options.authenticationHandlers.push(handler);
 
                 if (options && options.isDefault) {
