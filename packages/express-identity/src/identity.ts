@@ -72,6 +72,9 @@ export function identity(options: IIdentityOptions): RequestHandler {
                 else if (options.authenticationHandlers.length === 1) {
                     challenge(options.authenticationHandlers[0], challengeOptions && challengeOptions.parameters, undefined, req, res, next);
                 }
+                else if (options.authenticationHandlers.length === 0) {
+                    throw new Error("No authentication handlers have been registered.");
+                }
                 else {
                     throw new Error("Multiple authentication handlers registered and no default scheme defined.");
                 }
