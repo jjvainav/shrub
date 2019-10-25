@@ -32,6 +32,7 @@ export class ExpressIdentityModule implements IModule {
                 for (const h of this.options.authenticationHandlers) {
                     if (h.scheme === handler.scheme) {
                         // ignore the handler if one is already registered with the same scheme
+                        // this is useful for scenarios where multiple modules try to register the same handler
                         return;
                     }
                 }
