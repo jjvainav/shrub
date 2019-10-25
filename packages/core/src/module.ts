@@ -189,6 +189,7 @@ export class ModuleLoader {
                 await configure(module);
             }
         };
+        const self = this;
         const configure = (module: IModule) => module.configure && module.configure({
             services: this.services,
             settings: this.getSettingsForModule(module),
@@ -196,7 +197,7 @@ export class ModuleLoader {
                 return {
                     get: (options: IOptions<any>, name?: string) => {
                         // the path to the options is expected to be: {module-name}/{options-name}
-                        return this.getSettingsForModule(module)[name || options.key];
+                        return self.getSettingsForModule(module)[name || options.key];
                     }
                 };
             },

@@ -67,7 +67,7 @@ describe("module loader", () => {
         const host = await ModuleLoader.load([FooModule]);
         const module = host.getInstance(FooModule);
         expect(module.bar!.getBar()).toBe("default");
-    });     
+    });
 
     test("load modules when defined out of order", async () => {
         await ModuleLoader.load([
@@ -283,7 +283,10 @@ class FooModule implements IModule {
         registration.registerTransient(IBarService, BarService);
     }
 
-    configure({ services }: IModuleConfigurator): void {
+    configure({ services, options }: IModuleConfigurator): void {
+        // simply test that the IBarOptions can be read during configuration
+        options.get(IBarOptions);
+
         capturedModules.push(this);
         this.bar = services.get(IBarService);
     }
