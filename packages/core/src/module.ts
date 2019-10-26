@@ -21,8 +21,11 @@ type ConfigurationEntry = {
 };
 
 type OptionsProvider = {
-    /** A helper function for getting an option instance from the current module settings. */
-    readonly get: <T>(options: IOptions<T>, name?: string) => T;
+    /** 
+     * A helper function for getting an option instance from the current module settings. 
+     * It's expected that the module also use bindToOptions to bind to the module's settings.
+     */
+    readonly get: <T>(options: IOptions<T>) => T;
 };
 
 /** A collection of settings for one or more module keyed by the module name. */
@@ -195,10 +198,7 @@ export class ModuleLoader {
             settings: this.getSettingsForModule(module),
             get options() { 
                 return {
-                    get: (options: IOptions<any>, name?: string) => {
-                        // the path to the options is expected to be: {module-name}/{options-name}
-                        return self.getSettingsForModule(module)[name || options.key];
-                    }
+                    get: (options: IOptions<any>) => self.services.getOptions(options)
                 };
             },
             get config() {
