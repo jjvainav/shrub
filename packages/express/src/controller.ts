@@ -29,7 +29,9 @@ const routeHandler: (proto: any, propertyKey: string) => RequestHandler = (proto
         return next(new Error(`Request handler method '${propertyKey}' not found on controller '${proto.constructor.name}'.`));
     }
 
-    handler.call(controller, req, res, next);
+    // a request handler may return a promise or not; if the request handler is async capture unhandled errors and pass them to next
+    // this can easly be done by wrapping the result in a Promise.resolve() and handling catch 
+    Promise.resolve(handler.call(controller, req, res, next)).catch(err => next(err));
 };
 
 /** A class decorator for a Controller identifying the request route the controller handles. */

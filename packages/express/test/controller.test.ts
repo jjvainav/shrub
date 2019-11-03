@@ -33,6 +33,19 @@ describe("controller", () => {
         expect(response.body.value).toBe("hello");
     });
 
+    test("with async handler that throws", async () => {
+        const app = await ExpressFactory.create();
+        app.use(useController(AsyncController));
+        app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+            res.status(500).json({ error: true });
+        });
+
+        const response = await request(app).get("/async/throw");
+
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe(true);
+    });
+
     test("with GET handler for path containing parameter", async () => {
         const app = await ExpressFactory.create();
         app.use(useController(FooController));
@@ -108,6 +121,12 @@ class AsyncController {
     async getFoo(req: Request, res: Response, next: NextFunction): Promise<void> {
         await timeout(1);
         res.json({ value: "hello" });
+    }
+
+    @Get("/throw")
+    async getFooThatThrows(req: Request, res: Response, next: NextFunction): Promise<void> {
+        await timeout(1);
+        throw new Error("Test");
     }
 }
 
