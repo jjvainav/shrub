@@ -11,11 +11,18 @@ export interface ITestResponse {
     readonly claims: any;
 }
 
+export interface ILoginRequest {
+    readonly id: string;
+    readonly scope: string;
+}
+
 export const session = new class implements ISession {
+    isDeleted?: boolean;
     maxAge?: number;
     values: ISessionValueCollection = {};
     
     delete(): void {
+        this.isDeleted = true;
     }
 
     keepAlive(): void {
@@ -29,6 +36,8 @@ export function createTestApp(authenticationHandlers: IAuthenticationHandler[], 
     const requestHandlers: express.RequestHandler[] = [];
 
     // clear the session for each test
+    delete session.isDeleted;
+    delete session.maxAge;
     session.values = {};
 
     if (authorizationOptions) {
@@ -52,10 +61,22 @@ export function createTestApp(authenticationHandlers: IAuthenticationHandler[], 
     subRouter.get("/sub", requestHandlers);
     router.use("/test", subRouter);
 
+    // the login/logout routes are to simply test the identity login/logout methods
+    router.post("/login", (req, res) => {
+        // just use the query for this, otherwise a body-parser would need to be installed
+        const claims = <ILoginRequest>req.query;
+        req.context.identity!.login(claims);
+        res.status(200).json(claims);
+    });
+
+    router.post("/logout", (req, res) => {
+        req.context.identity!.logout();
+        res.status(200).json({ success: true });
+    })
+
     app.use((req, res, next) => {
         // the context property is set by the express-core module; since the modules are not being used create it manually
         (<any>req).context = { session };
-
         next();
     });
     app.use(identity({ authenticationHandlers }));

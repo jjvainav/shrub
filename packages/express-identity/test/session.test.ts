@@ -102,5 +102,52 @@ describe("session authentication", () => {
 
         expect(response.status).toBe(302);
         expect(response.header.location).toBe("/login?v1=foo&v2=bar&return_to=%2Ftest");
-    });      
+    });
+    
+    test("log user into session", async () => {
+        const authorization: IAuthorizationOptions = {};
+        const app = createTestApp([sessionAuthentication()], authorization);
+
+        // first log the user into a session using the login end-point
+        const login = await request(app).post("/login?id=1&scope=read");
+        expect(login.status).toBe(200);
+
+        // the identity info gets stored in the 'identity' session value
+        expect(session.values["identity"]).toBeDefined();
+
+        // next, invoke a secure endpoint to verify the login was successful
+        const response = await request(app).get("/test");
+
+        expect(response.status).toBe(200);
+        expect((<ITestResponse>response.body).isAuthenticated).toBe(true);
+        expect((<ITestResponse>response.body).scheme).toBe("session");
+        expect((<ITestResponse>response.body).claims.id).toBe("1");
+        expect((<ITestResponse>response.body).claims.scope).toBe("read");
+    });
+
+    test("log user out of session", async () => {
+        const authorization: IAuthorizationOptions = {};
+        const app = createTestApp([sessionAuthentication({
+            failureRedirectUrl: "http://localhost/login"
+        })],
+        authorization);
+
+        // log the user into a session using the login end-point
+        const login = await request(app).post("/login?id=1&scope=read");
+        expect(login.status).toBe(200);
+
+        // log the user out of the user session
+        const logout = await request(app).post("/logout");
+        expect(logout.status).toBe(200);
+
+        // test that the session has been logged out
+        const response = await request(app).get("/test");
+        expect(response.status).toBe(302);
+        expect(response.header.location).toBe("http://localhost/login");
+
+        // verify the session has not been deleted but that the identity info has been removed
+        // note: sessions are anonymous so the session itself should still exist
+        expect(session.isDeleted).toBeFalsy();
+        expect(session.values["identity"]).toBeUndefined();
+    });    
 });
