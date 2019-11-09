@@ -8,7 +8,7 @@ export interface ITokenAuthenticationOptions {
     /** An optional realm to include with the response header. */
     readonly realm?: string;
     /** Gets one or more scopes for the provided claims; this is used when denying an unauthenticated request. */
-    readonly getScopes: (claims: any) => string | string[];
+    readonly getScopes?: (claims: any) => string | string[];
     /** A callback to verify the bearer token and return the identity claims associated with the token if successful. */
     readonly verifyToken: (token: string, success: (claims: any) => void, fail: (reason: string) => void) => void;
 }
@@ -69,7 +69,7 @@ export function tokenAuthentication(options: ITokenAuthenticationOptions): IAuth
         challenge: (req, result, parameters, message) => result.send(invalidToken(message)),
         deny: (req, result) => {
             if (req.context.identity && req.context.identity.claims) {
-                const scopes = options.getScopes(req.context.identity.claims);
+                const scopes = options.getScopes && options.getScopes(req.context.identity.claims);
                 return result.send(insufficientScope(options.realm, scopes));
             }   
             
@@ -107,7 +107,7 @@ function invalidToken(realm?: string, description?: string): HttpError {
     });
 }
 
-function insufficientScope(realm: string | undefined, scope: string | string[]): HttpError {
+function insufficientScope(realm: string | undefined, scope?: string | string[]): HttpError {
     return createError(403, "Insufficient scope.", {
         headers: {
             "WWW-Authenticate": buildAuthenticateHeader({
