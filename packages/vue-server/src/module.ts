@@ -14,8 +14,8 @@ export interface IVueSSRContext {
     beginRender?: (services: IServiceCollection) => Promise<void>;
     /** An optional callback that Vue will invoke when the app as finished rendering. */
     rendered?: (context: IVueSSRContext) => void;
-    /** Optional state that will get injected and passed to the client. */
-    state?: any;
+    /** Optional set of models that will get injected before rendering server-side and also serialized and set as the state to pass to the client. */
+    models?: { readonly [key: string]: any };
     /** Opional url identifying the current request url and is needed when the main SSR component uses a vue-router. */
     url?: string;
     [key: string]: any;
@@ -56,6 +56,14 @@ export function bootstrap(modulesOrOptions: ModuleInstanceOrConstructor[] | ILoa
         // modules are loaded asynchronously so wait for them to finish loading and grab the modules collection
         const modules = await ModuleLoader.load(options);
 
+        if (context.models) {
+            // inject the model objects so that they are available when rendering server-side
+            const service = modules.services.get(IModelService);
+            for (const key in context.models) {
+                service.set(key, context.models[key]);
+            }
+        }
+
         if (context.beginRender) {
             // this allows server components the ability to configure the service collection before rendering it server-side
             // the services collection captured/used by the current module is the same one passed into the component when rendered
@@ -69,6 +77,8 @@ export function bootstrap(modulesOrOptions: ModuleInstanceOrConstructor[] | ILoa
             // if model state has been captured during SSR set it as the context so it can be loaded client side
             const modelService = <ServerModelService>app.$services.get(IModelService);
             if (modelService.hasModels) {
+                // by setting context.state Vue will inline a global __INITIAL_STATE__ variable
+                // https://ssr.vuejs.org/api/#template
                 context.state = modelService.serialize();
             }
         };
