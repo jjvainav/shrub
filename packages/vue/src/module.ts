@@ -1,7 +1,7 @@
 ﻿import Vue, { ComponentOptions, VueConstructor, VNodeData } from "vue";
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer, IServiceCollection, IServiceRegistration } from "@shrub/core";
+import { ModelModule } from "@shrub/model";
 import { ComponentService, IComponentService } from "./component-service";
-import { IModelService, ModelService } from "./model-service";
 
 declare module "vue/types/vue" {
     interface Vue {
@@ -98,7 +98,7 @@ function createValueKeyProvider() {
 
 export class VueModule implements IModule {
     readonly name = "vue";
-    readonly dependencies = [];   
+    readonly dependencies = [ModelModule]; 
 
     initialize({ config }: IModuleInitializer): void {
         config(IVueConfiguration).register(({ settings, services }: IModuleConfigurator) => ({
@@ -128,7 +128,6 @@ export class VueModule implements IModule {
 
     configureServices(registration: IServiceRegistration): void {
         registration.register(IComponentService, ComponentService);
-        registration.register(IModelService, ModelService);
     }
 
     private getElementId(settings: IVueModuleSettings): string {

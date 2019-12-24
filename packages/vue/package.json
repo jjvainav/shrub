@@ -23,6 +23,7 @@
     },
     "dependencies": {
         "@shrub/core": "0.4.11",
+        "@shrub/model": "0.4.11",
         "@sprig/serialization": "0.1.4",
         "vue": "^2.6.10",
         "vue-class-component": "^7.1.0"

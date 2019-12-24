@@ -2,7 +2,8 @@ import Vue from "vue";
 import Router from "vue-router";
 import Vuetify from "vuetify";
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration } from "@shrub/core";
-import { IModelService, IVueConfiguration, VueModule } from "@shrub/vue";
+import { IModelService, ModelModule } from "@shrub/model";
+import { IVueConfiguration, VueModule } from "@shrub/vue";
 import { NotFoundComponent, WorkbenchComponent } from "./components";
 import { WorkbenchModel } from "./model";
 import { DisplayService, IDisplayService, IWorkbenchExample, IWorkbenchRouteConfig, IWorkbenchService, WorkbenchBrowserService } from "./services";
@@ -28,7 +29,10 @@ export interface IWorkbenchModuleSettings {
 
 export class WorkbenchModule implements IModule {
     readonly name = "workbench";
-    readonly dependencies = [VueModule];
+    readonly dependencies = [
+        ModelModule,
+        VueModule
+    ];
 
     initialize(init: IModuleInitializer): void {
         init.config(IWorkbenchConfiguration).register(({ services, settings }: IModuleConfigurator) => ({

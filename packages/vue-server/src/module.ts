@@ -1,7 +1,8 @@
 ﻿import Vue, { ComponentOptions, VNodeData } from "vue";
 import Router from "vue-router";
 import { ILoadOptions, IModule, IModuleConfigurator, IModuleInitializer, IServiceCollection, IServiceRegistration, ModuleInstanceOrConstructor, ModuleLoader } from "@shrub/core";
-import { IModelService, IVueConfiguration, IVueMountOptions, VueModule } from "@shrub/vue";
+import { IModelService, ModelModule } from "@shrub/model";
+import { IVueConfiguration, IVueMountOptions, VueModule } from "@shrub/vue";
 import { ServerModelService } from "./model-service";
 
 /** 
@@ -113,7 +114,10 @@ export class VueServerModule implements IModule {
     private mountOptions?: IVueMountOptions;
 
     readonly name = "vue-server";
-    readonly dependencies = [VueModule];
+    readonly dependencies = [
+        ModelModule, 
+        VueModule
+    ];
 
     initialize(init: IModuleInitializer): void {
         // override the vue configuration to prevent mounting to an html element

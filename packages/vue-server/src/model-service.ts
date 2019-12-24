@@ -1,5 +1,5 @@
 import { Singleton } from "@shrub/core";
-import { ModelService } from "@shrub/vue";
+import { ModelService } from "@shrub/model";
 import { JSONSerializer } from "@sprig/serialization";
 
 @Singleton

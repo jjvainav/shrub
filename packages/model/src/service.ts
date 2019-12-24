@@ -1,10 +1,19 @@
-import { createService, IInstantiationService, Singleton } from "@shrub/core";
+import { createOptions, createService, IInstantiationService, Singleton } from "@shrub/core";
 import { JSONSerializer } from "@sprig/serialization";
 
 export const IModelService = createService<IModelService>("model-service");
+export const IModelServiceOptions = createOptions<IModelServiceOptions>("model-service", {
+    globalVariableName: "__INITIAL_STATE__"
+});
 
 /** Defines a model constructor which supports service injection. */
 export type ModelConstructor<T> = { new(...args: any[]): T };
+
+/** Defines options for the model service. */
+export interface IModelServiceOptions {
+    /** The name of the global variable containing the initial state used to load models from. */
+    readonly globalVariableName: string;
+}
 
 /** Defines a factory for creating models from an optionally defined initial state. */
 export interface IModelFactory<T> {
@@ -21,13 +30,17 @@ export interface IModelService {
 
 @Singleton
 export class ModelService implements IModelService {
-    // TODO: create an options object to define the window property name containing the initial state
     /** Used for data injection and will be used when initializing a new model object. */
-    private readonly initialState = typeof window !== "undefined" && (<any>window).__INITIAL_STATE__;
+    private readonly initialState?: any;
 
     readonly models: { [key: string]: any } = {};
 
-    constructor(@IInstantiationService private readonly instantiation: IInstantiationService) {
+    constructor(
+        @IModelServiceOptions private readonly options: IModelServiceOptions,
+        @IInstantiationService private readonly instantiation: IInstantiationService) {
+        if (typeof window !== "undefined") {
+            this.initialState = (<any>window)[this.options.globalVariableName];
+        }
     }
 
     get<T>(key: string, ctor: ModelConstructor<T>): T;

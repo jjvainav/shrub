@@ -1,13 +1,16 @@
 import Vue from "vue";
 import { IWorkbenchConfiguration, WorkbenchModule } from "@app/workbench";
 import { IModule, IModuleConfigurator, IServiceRegistration } from "@shrub/core";
-import { IModelService } from "@shrub/vue";
+import { IModelService, ModelModule } from "@shrub/model";
 import { TodoModel } from "./model";
 import { ITodoService, TodoService } from "./service";
 
 export class TodoModule implements IModule {
     readonly name = "todo";
-    readonly dependencies = [WorkbenchModule];
+    readonly dependencies = [
+        ModelModule, 
+        WorkbenchModule
+    ];
 
     configureServices(registration: IServiceRegistration): void {
         registration.register(ITodoService, TodoService);
