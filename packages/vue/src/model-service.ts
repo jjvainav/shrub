@@ -6,9 +6,16 @@ export const IModelService = createService<IModelService>("model-service");
 /** Defines a model constructor which supports service injection. */
 export type ModelConstructor<T> = { new(...args: any[]): T };
 
+/** Defines a factory for creating models from an optionally defined initial state. */
+export interface IModelFactory<T> {
+    create(state: any): T;
+}
+
 /** Manages vue component model instances. */
 export interface IModelService {
     get<T>(key: string, ctor: ModelConstructor<T>): T;
+    get<T>(key: string, factory: IModelFactory<T>): T;
+    get<T>(key: string, ctorOrFactory: ModelConstructor<T> | IModelFactory<T>): T;
     set(key: string, model: object): void;
 }
 
@@ -23,38 +30,32 @@ export class ModelService implements IModelService {
     constructor(@IInstantiationService private readonly instantiation: IInstantiationService) {
     }
 
-    get<T>(key: string, ctor: ModelConstructor<T>): T {
-        let model = this.models[key];
-
-        if (!model && this.initialState) {
-            // check if there is initial state for the model; if so, it will get deserialized into the model class below
-            model = this.initialState && this.initialState[key];
+    get<T>(key: string, ctor: ModelConstructor<T>): T;
+    get<T>(key: string, factory: IModelFactory<T>): T;
+    get<T>(key: string, ctorOrFactory: ModelConstructor<T> | IModelFactory<T>): T {
+        if (this.models[key]) {
+            return this.models[key];
         }
 
-        if (model) {
-            // check if the cached model's constructor matches the constructor passed in
-            if (model.constructor !== ctor) {
-                // if not check if the registered model is a POJO
-                if (model.constructor !== Object.prototype.constructor) {
-                    // if the model is not a POJO then there is a type mismatch 
-                    throw new TypeError(`Model constructor (${model.constructor.name}) mismatch (${ctor.name})`);
-                }
+        const state = this.initialState && this.initialState[key];
 
-                // deserialize the POJO as the specified model type using the instantiation service for constructor injection support
-                const serializer = new JSONSerializer({
-                    factory: ctor => this.instantiation.createInstance(ctor)
-                });
-                model = serializer.deserialize<T>(model, ctor);
-                this.models[key] = model;
-            }
-
-            return model;
+        // note: a factory object is used instead of a factory method due to lack of ability to determine a factory method from a constructor
+        if (this.isFactory(ctorOrFactory)) {
+            this.models[key] = ctorOrFactory.create(state);
+            return this.models[key];
         }
 
-        model = this.instantiation.createInstance(ctor);
-        this.models[key] = model;
+        if (!state) {
+            this.models[key] = this.instantiation.createInstance(ctorOrFactory);
+            return this.models[key];
+        }
 
-        return model;
+        // deserialize the state as the specified model type using the instantiation service for constructor injection support
+        const serializer = new JSONSerializer({
+            factory: ctor => this.instantiation.createInstance(ctor)
+        });
+        this.models[key] = serializer.deserialize<T>(state, ctorOrFactory);
+        return this.models[key];
     }
     
     set(key: string, model: object): void {
@@ -63,5 +64,9 @@ export class ModelService implements IModelService {
         }
 
         this.models[key] = model;
+    }
+
+    private isFactory<T>(ctorOrFactory: ModelConstructor<T> | IModelFactory<T>): ctorOrFactory is IModelFactory<T> {
+        return (<any>ctorOrFactory).create !== undefined;
     }
 }
