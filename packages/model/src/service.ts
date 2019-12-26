@@ -20,11 +20,17 @@ export interface IModelFactory<T> {
     create(state: any): T;
 }
 
+/** Defines a factory for creating models asynchronously from an optionally defined initial state. */
+export interface IAsyncModelFactory<T> {
+    create(state: any): Promise<T>;
+}
+
 /** Manages vue component model instances. */
 export interface IModelService {
     get<T>(key: string, ctor: ModelConstructor<T>): T;
     get<T>(key: string, factory: IModelFactory<T>): T;
     get<T>(key: string, ctorOrFactory: ModelConstructor<T> | IModelFactory<T>): T;
+    getAsync<T>(key: string, factory: IAsyncModelFactory<T>): Promise<T>;
     set(key: string, model: object): void;
 }
 
@@ -69,6 +75,18 @@ export class ModelService implements IModelService {
         });
         this.models[key] = serializer.deserialize<T>(state, ctorOrFactory);
         return this.models[key];
+    }
+
+    getAsync<T>(key: string, factory: IAsyncModelFactory<T>): Promise<T> {
+        if (this.models[key]) {
+            return Promise.resolve(this.models[key]);
+        }
+
+        const state = this.initialState && this.initialState[key];
+        return factory.create(state).then(model => {
+            this.models[key] = model;
+            return model;
+        });
     }
     
     set(key: string, model: object): void {
