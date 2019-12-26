@@ -2,7 +2,7 @@ import { createOptions, createService, IInstantiationService, Singleton } from "
 import { JSONSerializer } from "@sprig/serialization";
 
 export const IModelService = createService<IModelService>("model-service");
-export const IModelServiceOptions = createOptions<IModelServiceOptions>("model-service", {
+export const IModelServiceOptions = createOptions<IModelServiceOptions>("model-service-options", {
     globalVariableName: "__INITIAL_STATE__"
 });
 
