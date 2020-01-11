@@ -3,7 +3,7 @@ import { ISerializer, ITracingConfiguration, TracingModule } from "@shrub/tracin
 import { RequestError } from "@sprig/request-client";
 
 const requestErrorSerializer: ISerializer = (obj, data, serialize) => {
-    if (obj instanceof RequestError) {
+    if (RequestError.isRequestError(obj)) {
         data = { 
             ...data, 
             code: obj.code,
