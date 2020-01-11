@@ -1114,10 +1114,10 @@
     universal-user-agent "^3.0.0"
     url-template "^2.0.8"
 
-"@sprig/event-emitter@^0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.4.tgz#c1e63f0829eb158b518ef11a6afa60674f2dd5e4"
-  integrity sha512-H36BGl9umNWIZxyJP/tU0JmRFrpwb+yO7LNEoZjtTG4xDIe33RR+y+DwB/WFvwDvbvaY8OPSuOYPf/gqouibxQ==
+"@sprig/event-emitter@^0.1.9":
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.9.tgz#4604ce8c5c82437c87228e9b3c7d772a62e41433"
+  integrity sha512-2faDjfSM96uNG4euTzybhX/ezORl1mY2czLCRi9NICwDTKrZoejXF3qC6g2iQSDK0gzsXZ2NHfxw2t4ZzJgvvA==
 
 "@sprig/random-string@^0.1.2":
   version "0.1.2"
@@ -1126,17 +1126,17 @@
   dependencies:
     base62 "^2.0.1"
 
-"@sprig/request-client@^0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.4.tgz#10326fd66c2a6c3776068f43f74553d1aa8d113a"
-  integrity sha512-s+USCAz25mDRbdPLjtRLPIeBfYtw6hcD23W1bFMxWm7ZQjjAAn2gx/q4pI07m+DKUMngSIfoAIGSmFQPtW3Sbw==
+"@sprig/request-client@^0.1.9":
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.9.tgz#acac919b83223933363a6c746b67c001c7f1eee7"
+  integrity sha512-s74g6FJNE9jbBPKpMusYEMQCrv+X7d8YgKEtgvRGapq1kPChx2ZRioawykA20sJv2rDRP4+XW9n1LD3tS9xv8A==
   dependencies:
     axios "^0.19.0"
 
-"@sprig/serialization@0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.4.tgz#b06cb1eca92e5c250a61b16b732e8f31e4e4be38"
-  integrity sha512-eko8sf43v/+yMUdE9F0j7MbZwuVhchWx9NW4vSH788HQkZ/zIMR8YpfpExm8gp2eEYJ0szVpfXv81D95ieaD9A==
+"@sprig/serialization@0.1.9":
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.9.tgz#7559a305db130eba34c35d072f06808e18c99c64"
+  integrity sha512-1M5i0DjVyCBj5HI2LAUXsCks13Gjb8VxuiscY/nXP2RWjEecebqKCeWWlHq3J8V0bn/F8g+nF0zCMvSzXODfHQ==
 
 "@types/babel__core@^7.1.0":
   version "7.1.2"
