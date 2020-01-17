@@ -13,6 +13,17 @@ describe("module loader", () => {
         expect(capturedModules[2].name).toBe("module-c");
     });
 
+    test("load module with async dependencies", async () => {
+        await ModuleLoader.load([ModuleE]);
+
+        expect(capturedModules).toHaveLength(5);
+        expect(capturedModules[0].name).toBe("module-a");
+        expect(capturedModules[1].name).toBe("module-b");
+        expect(capturedModules[2].name).toBe("module-c");
+        expect(capturedModules[3].name).toBe("module-d");
+        expect(capturedModules[4].name).toBe("module-e");
+    });
+
     test("get instance from module collection", async () => {
         const modules = await ModuleLoader.load([ModuleC]);
 
@@ -245,6 +256,29 @@ class ModuleB implements IModule {
 class ModuleC implements IModule {
     readonly name = "module-c";
     readonly dependencies = [ModuleB];
+
+    configure(): void {
+        capturedModules.push(this);
+    }
+}
+
+const ModuleD = () => new Promise(resolve => {
+    setTimeout(() => {
+        resolve(new class implements IModule {
+            readonly name = "module-d";
+            readonly dependencies = [ModuleC];
+
+            configure(): void {
+                capturedModules.push(this);
+            }
+        });
+    }, 
+    1);
+});
+
+class ModuleE implements IModule {
+    readonly name = "module-e";
+    readonly dependencies = [ModuleD];
 
     configure(): void {
         capturedModules.push(this);

@@ -2,6 +2,7 @@ import { IOptions, IServiceCollection, IServiceRegistration, ServiceMap } from "
 
 export type ModuleConstructor<T extends IModule = IModule> = { new(): T };
 export type ModuleInstanceOrConstructor = IModule | ModuleConstructor;
+export type ModuleDependency = ModuleInstanceOrConstructor | (() => Promise<ModuleInstanceOrConstructor>);
 
 export type SettingsInitializer = {
     /** 
@@ -40,7 +41,7 @@ export interface IModuleSettings {
 
 export interface IModule {
     readonly name: string;
-    readonly dependencies?: ModuleInstanceOrConstructor[];
+    readonly dependencies?: ModuleDependency[];
     initialize?(init: IModuleInitializer): void;
     configureServices?(registration: IServiceRegistration): void;
     configure?(configurator: IModuleConfigurator): void | Promise<void>;
@@ -140,12 +141,12 @@ export class ModuleLoader {
      * 2) Configure Services 
      * 3) Configure
      */   
-    load(): Promise<IModuleCollection> {
+    async load(): Promise<IModuleCollection> {
         this.ensureNotLoaded();
         this.isLoaded = true;
 
         // get all modules and sort by dependencies
-        const loadedModules = this.expandAndSortModules();
+        const loadedModules = await this.expandAndSortModules();
 
         // initialize discovered modules
         const loader = this;
@@ -263,44 +264,54 @@ export class ModuleLoader {
         return this.settings[module.name] || {};
     }
 
-    private expandAndSortModules(): IModule[] {
-        const instances = new Map<ModuleConstructor, IModule>();
+    private async expandAndSortModules(): Promise<IModule[]> {
+        const instances = new Map<Function, IModule>();
         const sorted: IModule[] = [];
         const visited: { [name: string]: boolean } = {};
     
-        const getInstance = (moduleOrCtor: ModuleInstanceOrConstructor) => {
-            if (typeof moduleOrCtor === "function") {
-                const ctor = moduleOrCtor;
-                let instance = instances.get(ctor);
-        
+        const getInstance = (dependency: ModuleDependency): Promise<IModule> => {
+            if (typeof dependency === "function") {
+                let instance = instances.get(<any>dependency);
                 if (!instance) {
-                    instance = new ctor();
-                    instances.set(ctor, instance);
+                    try {
+                        instance = new (<ModuleConstructor<IModule>>dependency)();
+                        if (instance.constructor === dependency) {
+                            // save the instance if the dependency is a constructor
+                            instances.set(<any>dependency, instance);
+                        }
+                    }
+                    catch {
+                        // the dependency is a non-constructble function so invoke and assume the return will be a promise
+                        instance = (<Function>dependency)();
+                    }
                 }
         
-                return instance;
+                // resolve incase the dependency is a function that returned a promise
+                return Promise.resolve(<IModule>instance);
             }
 
-            if (typeof moduleOrCtor === "object") {
-                const instance = moduleOrCtor;
-                const ctor = <ModuleConstructor<IModule>>moduleOrCtor.constructor;
+            if (typeof dependency === "object") {
+                if (!this.isModule(dependency)) {
+                    throw new ModuleLoadError(`Object (${(<object>dependency).constructor.name}) is not a module.`);
+                }
 
+                const ctor = <ModuleConstructor<IModule>>dependency.constructor;
                 if (ctor !== Object.prototype.constructor) {
                     if (instances.has(ctor)) {
-                        throw new ModuleLoadError(`Duplicate module instances ${instance.name}.`);
+                        throw new ModuleLoadError(`Duplicate module instances ${dependency.name}.`);
                     }
 
-                    instances.set(ctor, instance);
+                    instances.set(ctor, dependency);
                 }
 
-                return instance;
+                return Promise.resolve(dependency);
             }
 
-            throw new ModuleLoadError(`Invalid type (${typeof moduleOrCtor}).`);
+            throw new ModuleLoadError(`Invalid dependency type (${typeof dependency}).`);
         };
     
-        const visit = (moduleOrCtor: ModuleInstanceOrConstructor, ancestors?: { [name: string]: boolean }) => {
-            const module = getInstance(moduleOrCtor);
+        const visit = async (dependency: ModuleDependency, ancestors?: { [name: string]: boolean }) => {
+            const module = await getInstance(dependency);
     
             if (visited[module.name]) {
                 return;
@@ -318,7 +329,7 @@ export class ModuleLoader {
     
             if (module.dependencies) {
                 for (const dependency of module.dependencies) {
-                    visit(dependency, ancestors);
+                    await visit(dependency, ancestors);
                 }
             }
     
@@ -331,9 +342,9 @@ export class ModuleLoader {
         };
     
         for (const module of this.modules) {
-            visit(module);
+            await visit(module);
         }
-    
+
         return sorted;
     }
 
@@ -356,6 +367,11 @@ export class ModuleLoader {
     }
     
     private isObject(obj: any): boolean {
-        return obj && typeof obj === "object" && !Array.isArray(obj);
+        return typeof obj === "object" && !Array.isArray(obj);
+    }
+
+    private isModule(obj: any): obj is IModule {
+        // a module only requires a name so that's all we can really check for
+        return typeof obj === "object" && obj.name !== undefined;
     }
 }
