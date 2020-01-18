@@ -269,7 +269,7 @@ export class ModuleLoader {
         const sorted: IModule[] = [];
         const visited: { [name: string]: boolean } = {};
     
-        const getInstance = (dependency: ModuleDependency): Promise<IModule> => {
+        const getInstance = async (dependency: ModuleDependency): Promise<IModule> => {
             if (typeof dependency === "function") {
                 let instance = instances.get(<any>dependency);
                 if (!instance) {
@@ -281,13 +281,14 @@ export class ModuleLoader {
                         }
                     }
                     catch {
-                        // the dependency is a non-constructble function so invoke and assume the return will be a promise
-                        instance = (<Function>dependency)();
+                        // the dependency is a non-constructble function so invoke and assume the return will be a promise and use Promise.resolve to resolve it
+                        const instanceOrCtor = await Promise.resolve<ModuleInstanceOrConstructor>((<Function>dependency)());
+                        instance = await getInstance(instanceOrCtor);
                     }
                 }
         
                 // resolve incase the dependency is a function that returned a promise
-                return Promise.resolve(<IModule>instance);
+                return <IModule>instance;
             }
 
             if (typeof dependency === "object") {
@@ -304,7 +305,7 @@ export class ModuleLoader {
                     instances.set(ctor, dependency);
                 }
 
-                return Promise.resolve(dependency);
+                return dependency;
             }
 
             throw new ModuleLoadError(`Invalid dependency type (${typeof dependency}).`);

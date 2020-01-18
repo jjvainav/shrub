@@ -24,6 +24,20 @@ describe("module loader", () => {
         expect(capturedModules[4].name).toBe("module-e");
     });
 
+    test("load module with async dependency that returns class", async () => {
+        await ModuleLoader.load([{
+            name: "test",
+            dependencies: [() => Promise.resolve(ModuleE)]
+        }]);
+
+        expect(capturedModules).toHaveLength(5);
+        expect(capturedModules[0].name).toBe("module-a");
+        expect(capturedModules[1].name).toBe("module-b");
+        expect(capturedModules[2].name).toBe("module-c");
+        expect(capturedModules[3].name).toBe("module-d");
+        expect(capturedModules[4].name).toBe("module-e");
+    });
+
     test("get instance from module collection", async () => {
         const modules = await ModuleLoader.load([ModuleC]);
 
