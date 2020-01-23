@@ -1114,10 +1114,10 @@
     universal-user-agent "^3.0.0"
     url-template "^2.0.8"
 
-"@sprig/event-emitter@^0.1.9":
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.9.tgz#4604ce8c5c82437c87228e9b3c7d772a62e41433"
-  integrity sha512-2faDjfSM96uNG4euTzybhX/ezORl1mY2czLCRi9NICwDTKrZoejXF3qC6g2iQSDK0gzsXZ2NHfxw2t4ZzJgvvA==
+"@sprig/event-emitter@^0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.10.tgz#9915eb21190ca8b685b4426fd4bda5f6f909a123"
+  integrity sha512-lUdWQqAvymfXsbQbaeWHFKfK5/zzbGegCnMc1bSzG+zogupAq+oETUO7iPCM1MIo/LGuOVh5jFvRIAVWqL8LEQ==
 
 "@sprig/random-string@^0.1.2":
   version "0.1.2"
@@ -1126,17 +1126,17 @@
   dependencies:
     base62 "^2.0.1"
 
-"@sprig/request-client@^0.1.9":
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.9.tgz#acac919b83223933363a6c746b67c001c7f1eee7"
-  integrity sha512-s74g6FJNE9jbBPKpMusYEMQCrv+X7d8YgKEtgvRGapq1kPChx2ZRioawykA20sJv2rDRP4+XW9n1LD3tS9xv8A==
+"@sprig/request-client@^0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.10.tgz#9dddae594ae949d4ec71ae887324d8f1f14ca25c"
+  integrity sha512-5fbkmdbg5upOFB7hssP2Wo2wY3p0+NtHLzQKeaw4CxT6CS0a9vDQeCRDJFf8wlIvtXxPKtx8ocTP3+mv3uaNZg==
   dependencies:
     axios "^0.19.0"
 
-"@sprig/serialization@0.1.9":
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.9.tgz#7559a305db130eba34c35d072f06808e18c99c64"
-  integrity sha512-1M5i0DjVyCBj5HI2LAUXsCks13Gjb8VxuiscY/nXP2RWjEecebqKCeWWlHq3J8V0bn/F8g+nF0zCMvSzXODfHQ==
+"@sprig/serialization@0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.10.tgz#11d25e840f3bfd70dfd5de732235bd4abc19bf99"
+  integrity sha512-Z+y6bQzcXfk3AwgzKQ704VT0EsZsTpVZ1Sbni7q9i0OoVCTHI2K1yalpJPc/OkR/mLJmpFuDQLt7ijbeuZt7CA==
 
 "@types/babel__core@^7.1.0":
   version "7.1.2"
