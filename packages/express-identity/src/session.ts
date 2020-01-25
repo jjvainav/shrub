@@ -1,3 +1,4 @@
+import "@shrub/express-session";
 import { Request } from "express";
 import createError from "http-errors";
 import url from "url";
@@ -25,7 +26,10 @@ interface IIdentitySession {
 
 const defaultSessionKey = "identity";
 
-/** Creates an authentication handler that manages authenticating identity information stored in the current user session. */
+/** 
+ * Creates an authentication handler that manages authenticating identity information stored in the current user session.
+ * Important: when using session authentication the ExpressSession module must be manually included as a dependency.
+ */
 export function sessionAuthentication(options?: ISessionAuthenticationOptions): IAuthenticationHandler {
     options = options || {};
     const key = options.sessionKey || defaultSessionKey;

@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
 import { ExpressModule, IExpressConfiguration } from "@shrub/express";
-import { ExpressSessionModule } from "@shrub/express-session";
 import { IAuthenticationHandler, IAuthenticationObserver } from "./authentication";
 import { identity, IIdentityOptions } from "./identity";
 
@@ -21,10 +20,7 @@ export class ExpressIdentityModule implements IModule {
     private options: IIdentityOptions = { authenticationHandlers: [] };
 
     readonly name = "express-identity";
-    readonly dependencies = [
-        ExpressModule,
-        ExpressSessionModule
-    ];
+    readonly dependencies = [ExpressModule];
 
     initialize({ config }: IModuleInitializer): void {
         config(IExpressIdentityConfiguration).register(() => ({
