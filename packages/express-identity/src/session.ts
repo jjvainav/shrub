@@ -1,4 +1,3 @@
-import "@shrub/express-session";
 import { Request } from "express";
 import createError from "http-errors";
 import url from "url";
@@ -28,7 +27,7 @@ const defaultSessionKey = "identity";
 
 /** 
  * Creates an authentication handler that manages authenticating identity information stored in the current user session.
- * Important: when using session authentication the ExpressSession module must be manually included as a dependency.
+ * Important: when using session authentication you must manually enable the session middleware via the ExpressSession module configuration.
  */
 export function sessionAuthentication(options?: ISessionAuthenticationOptions): IAuthenticationHandler {
     options = options || {};
