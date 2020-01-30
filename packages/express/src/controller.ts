@@ -69,6 +69,11 @@ export function Get(path?: PathParams, ...handlers: RequestHandler[]) {
     return addRoutes(path, handlers, router => router.get);
 }
 
+/** A function decorator identifying a request handler on a controller for a specific path and HTTP PATCH method.*/        
+export function Patch(path?: PathParams, ...handlers: RequestHandler[]) {
+    return addRoutes(path, handlers, router => router.patch);
+}
+
 /** A function decorator identifying a request handler on a controller for a specific path and HTTP POST method.*/        
 export function Post(path?: PathParams, ...handlers: RequestHandler[]) {
     return addRoutes(path, handlers, router => router.post);
