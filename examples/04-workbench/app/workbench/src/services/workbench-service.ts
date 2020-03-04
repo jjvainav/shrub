@@ -1,8 +1,9 @@
-import { VueConstructor } from "vue";
-import Router, { RawLocation, Route, RouteConfig } from "vue-router";
 import { createService, Singleton } from "@shrub/core";
 import { IComponent } from "@shrub/vue";
+import { IEsModuleLocalMessages, ILocaleMessages, IVueI18nService } from "@shrub/vue-i18n";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
+import { VueConstructor } from "vue";
+import Router, { RawLocation, Route, RouteConfig } from "vue-router";
 import { ModuleExampleComponent } from "../components";
 import * as utils from "../utils";
 
@@ -51,6 +52,7 @@ export interface IWorkbenchExample {
     readonly name: string;
     readonly title: string;
     readonly component: () => Promise<IComponent | IEsModuleComponent>;
+    readonly locale: (locale: string) => Promise<ILocaleMessages | IEsModuleLocalMessages>;
     readonly menu: IWorkbenchMenuItem;
     readonly props?: (route: IWorkbenchRoute) => Object;
 }
@@ -76,7 +78,15 @@ export class WorkbenchBrowserService implements IWorkbenchService {
         scrollBehavior: (to, from, savedPosition) => savedPosition || { x: 0, y: 0 }
     });
 
-    constructor() {
+    constructor(@IVueI18nService private readonly i18nService: IVueI18nService) {
+        this.router.beforeEach((to, from, next) => {
+            // TODO: determine current language/locale
+            console.log("fullPath", to.fullPath);
+            console.log("path", to.path);
+
+            i18nService.setLocale("en-US", to.path).then(() => next());
+        });
+
         this.router.afterEach(() => this.routeChanged.emit());
     }
 
@@ -118,11 +128,20 @@ export class WorkbenchBrowserService implements IWorkbenchService {
             throw new Error(`Duplicate example (${example.name})`);
         }
 
+        const path = "/" + example.name;
         this.registerRoute({
-            path: "/" + example.name,
+            path,
             name: example.name,
             component: example.component,
             props: example.props
+        });
+
+        this.i18nService.registerLoader(options => {
+            if (options.path === path) {
+                return example.locale(options.locale);
+            }
+
+            return Promise.resolve({});
         });
 
         this.examples.set(example.name, example);

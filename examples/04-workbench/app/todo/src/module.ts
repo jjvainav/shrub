@@ -21,6 +21,7 @@ export class TodoModule implements IModule {
             name: "todo",
             title: "Todo Example",
             component: () => import(/* webpackChunkName: "todo" */ "./component"),
+            locale: locale => import(/* webpackChunkName: "todo.locale.[request]" */ `./locale/${locale}`),
             props: () => ({
                 model: Vue.observable(services.get(IModelService).get("todo", TodoModel))
             }),

@@ -1,12 +1,12 @@
 {
     "extends": "../tsconfig.base.json",
     "compilerOptions": {
-        "allowSyntheticDefaultImports": true,
         "outDir": "dist",
         "rootDir": "src"
     },
-    "include": ["src", "types"],
+    "include": ["src"],
     "references": [
-        { "path": "../workbench" }
+        { "path": "../core" },
+        { "path": "../vue" }
     ]
-  }
+}
