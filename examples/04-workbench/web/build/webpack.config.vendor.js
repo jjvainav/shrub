@@ -7,6 +7,7 @@ module.exports = {
     entry: {
         vendor: [
             "vue", 
+            "vue-i18n",
             "vuetify", 
             "vuetify/dist/vuetify.css"
         ]

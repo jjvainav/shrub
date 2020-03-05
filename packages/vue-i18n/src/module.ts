@@ -1,4 +1,4 @@
-import { createService, IModule, IServiceRegistration, Singleton } from "@shrub/core";
+import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration, Singleton } from "@shrub/core";
 import { VueModule } from "@shrub/vue";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import merge from "lodash.merge";
@@ -16,9 +16,25 @@ declare module "vue/types/vue" {
     }
 }
 
-Vue.use(VueI18n);
+Vue.use({
+    install(vue: typeof Vue) {
+        Vue.mixin({
+            beforeCreate: function() {
+                this.$options.i18n = this.$options.i18n || getInstance();
+            }
+        });
 
+        VueI18n.install(vue);
+    }
+});
+
+export const IVueI18nConfiguration = createConfig<IVueI18nConfiguration>();
 export const IVueI18nService = createService<IVueI18nService>("vue-i18n");
+
+export interface IVueI18nConfiguration {
+    /** Registers a static set of locale messages. */
+    registerMessages(messages: VueI18n.LocaleMessages): void;
+}
 
 export interface IVueI18nService {
     /** The current locale. */
@@ -34,6 +50,11 @@ export interface IVueI18nService {
     setLocale(locale: string, path?: string): Promise<void>;
 }
 
+export interface IVueI18nSettings {
+    /** The locale to set after loading all the modules; the default is en-US. */
+    readonly locale?: string;
+}
+
 /** Defines a set of options for loading a language data. */
 export interface ILanguageLoaderOptions {
     /** The locale to load. */
@@ -43,8 +64,8 @@ export interface ILanguageLoaderOptions {
 }
 
 /** 
- * A callback that handles loading messages for a given locale. The result can be a local messages object
- * or a es compatible module for async import support (e.g. import(./locales/en.js)).
+ * A callback that handles loading messages asynchronously for a given locale. The result can be a local messages object
+ * or an es compatible module for async import support (e.g. import(./locales/en.js)).
  */
 export interface ILanguageLoader {
     (options: ILanguageLoaderOptions): Promise<ILocaleMessages | IEsModuleLocalMessages>;
@@ -58,30 +79,65 @@ export interface IEsModuleLocalMessages {
     readonly default: ILocaleMessages;
 }
 
-// TODO: this needs to be injected when creating the Vue app
-// TODO: update Vue module configuration to support injecting options that get merged together?
-const i18n = new VueI18n({
-    // TODO: best way to set current locale on load?
-    locale: "en-US",
-    fallbackLocale: "en-US"
-});
+/** Gets the global instance of the i18n object. */
+const getInstance = (function () {
+    let i18n: VueI18n;
+    let initializing = false;
+
+    return () => {
+        if (!i18n && !initializing) {
+            initializing = true;
+            i18n = new VueI18n({
+                fallbackLocale: "en-US"
+            });
+            initializing = false;
+        }
+
+        return i18n;
+    };
+})();
 
 export class VueI18nModule implements IModule {
     readonly name = "vue-i18n";
     readonly dependencies = [VueModule];
     
+    initialize({ config }: IModuleInitializer): void {
+        config(IVueI18nConfiguration).register(({ services }: IModuleConfigurator) => ({
+            registerMessages: messages => {
+                services.get(IVueI18nService).registerLoader(options => Promise.resolve(messages[options.locale] || {}));
+            }
+        }));
+    }
+
     configureServices(registration: IServiceRegistration): void {
         registration.register(IVueI18nService, VueI18nService);
+    }
+
+    configure({ next, services, settings }: IModuleConfigurator): Promise<void> {
+        return next().then(() => services.get(IVueI18nService).setLocale(this.getLocale(settings)));
+    }
+
+    private getLocale(settings: IVueI18nSettings): string {
+        if (settings.locale) {
+            return settings.locale;
+        }
+
+        if (typeof document !== "undefined" && document.documentElement.lang) {
+            return document.documentElement.lang;
+        }
+
+        return "en-US";
     }
 }
 
 @Singleton
 class VueI18nService implements IVueI18nService {
     private readonly localeChanged = new EventEmitter("locale-changed");
+    private readonly i18n = getInstance();
     private loader?: (options: ILanguageLoaderOptions) => Promise<ILocaleMessages>;
 
     get currentLocale(): string {
-        return i18n.locale;
+        return this.i18n.locale;
     }
 
     get onLocaleChanged(): IEvent {
@@ -97,11 +153,12 @@ class VueI18nService implements IVueI18nService {
 
     async setLocale(locale: string, path?: string): Promise<void> {
         // TODO: cache loaded locale messages
-
-        const message = this.loader ? await this.loader({ locale, path }) : {};
-        i18n.setLocaleMessage(locale, message);
-        i18n.locale = locale;
-        this.localeChanged.emit();
+        if (this.i18n.locale !== locale) {
+            const message = this.loader ? await this.loader({ locale, path }) : {};
+            this.i18n.setLocaleMessage(locale, message);
+            this.i18n.locale = locale;
+            this.localeChanged.emit();
+        }
     }
 
     private mergeMessages(lhs: ILocaleMessages | IEsModuleLocalMessages, rhs: ILocaleMessages | IEsModuleLocalMessages): ILocaleMessages {

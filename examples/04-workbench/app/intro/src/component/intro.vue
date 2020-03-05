@@ -1,6 +1,6 @@
 <template>
     <div id="intro">
-        <div v-html="getCompiledMarkdown()"></div>
+        <div v-html="markdown"></div>
     </div>
 </template>
 

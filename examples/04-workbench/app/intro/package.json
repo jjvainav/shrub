@@ -7,12 +7,13 @@
     "scripts": {
         "build": "concurrently \"tsc -b\" \"yarn run copy-markdown\" \"yarn run copy-vue\"",
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
-        "copy-markdown": "copyfiles -u 1 ./src/intro.md dist",
+        "copy-markdown": "copyfiles -u 1 ./src/*.md dist",
         "copy-vue": "copyfiles -u 1 ./src/component/**/*.vue dist"
     },
     "dependencies": {
-        "@shrub/core": "^0.4.12",
-        "@shrub/vue": "^0.4.12",
+        "@shrub/core": "^0.4.28",
+        "@shrub/vue": "^0.4.28",
+        "@shrub/vue-i18n": "^0.4.28",
         "marked": "^0.7.0",
         "vue": "^2.6.10",
         "vue-class-component": "^7.1.0"
