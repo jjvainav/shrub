@@ -31,6 +31,8 @@ Vue.use({
 export const IVueI18nConfiguration = createConfig<IVueI18nConfiguration>();
 export const IVueI18nService = createService<IVueI18nService>("vue-i18n");
 
+export type TranslateValues = VueI18n.Values;
+
 export interface IVueI18nConfiguration {
     /** Registers a static set of locale messages. */
     registerMessages(messages: VueI18n.LocaleMessages): void;
@@ -48,6 +50,8 @@ export interface IVueI18nService {
     registerLoader(loader: ILanguageLoader): void;
     /** Sets and loads the current locale as a language/country code value (e.g. en-US). */
     setLocale(locale: string, path?: string): Promise<void>;
+    /** Localize the message with the provided key representing a path in the current locale messages. */
+    translate(key: string, values?: TranslateValues): string;
 }
 
 export interface IVueI18nSettings {
@@ -153,12 +157,19 @@ class VueI18nService implements IVueI18nService {
 
     async setLocale(locale: string, path?: string): Promise<void> {
         // TODO: cache loaded locale messages
-        if (this.i18n.locale !== locale) {
-            const message = this.loader ? await this.loader({ locale, path }) : {};
-            this.i18n.setLocaleMessage(locale, message);
-            this.i18n.locale = locale;
-            this.localeChanged.emit();
+        const message = this.loader ? await this.loader({ locale, path }) : {};
+        this.i18n.setLocaleMessage(locale, message);
+        this.i18n.locale = locale;
+        this.localeChanged.emit();
+    }
+
+    translate(key: string, values?: TranslateValues): string {
+        const result = this.i18n.t(key, values);
+        if (typeof result === "object") {
+            throw new Error(`Locale key (${key}) does not represent a string message.`);
         }
+
+        return result;
     }
 
     private mergeMessages(lhs: ILocaleMessages | IEsModuleLocalMessages, rhs: ILocaleMessages | IEsModuleLocalMessages): ILocaleMessages {

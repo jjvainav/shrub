@@ -1,6 +1,6 @@
 <template>
     <v-list-tile active-class="" :to="getLocation()">
-        <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+        <v-list-tile-title>{{ getTitle() }}</v-list-tile-title>
     </v-list-tile>
 </template>
 

@@ -11,7 +11,7 @@ export default class Intro extends Vue {
     }
 
     setCompiledMarkdown(): void {
-        import(/* webpackChunkName: "intro.[request].md" */ `../intro.${this.$i18n.locale}.md`)
+        import(/* webpackChunkName: "[request]" */ `../intro.${this.$i18n.locale}.md`)
             .then(value => this.markdown = marked(value.default));
     }
 }

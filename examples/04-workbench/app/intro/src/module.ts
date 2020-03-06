@@ -14,12 +14,12 @@ export class IntroModule implements IModule {
     configure({ config }: IModuleConfigurator): void {
         config.get(IWorkbenchConfiguration).registerExample({
             name: "intro",
-            title: "Intro",
+            title: context => context.translate("intro.title"),
             component: () => import(/* webpackChunkName: "intro" */ "./component"),
             locale: locale => import(/* webpackChunkName: "intro.locale.[request]" */ `./locale/${locale}`),
             menu: {
                 order: 1,
-                title: "Intro"
+                title: context => context.translate("intro.title"),
             }
         });
     }    

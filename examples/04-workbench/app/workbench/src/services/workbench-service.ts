@@ -1,6 +1,6 @@
 import { createService, Singleton } from "@shrub/core";
 import { IComponent } from "@shrub/vue";
-import { IEsModuleLocalMessages, ILocaleMessages, IVueI18nService } from "@shrub/vue-i18n";
+import { IEsModuleLocalMessages, ILocaleMessages, IVueI18nService, TranslateValues } from "@shrub/vue-i18n";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import { VueConstructor } from "vue";
 import Router, { RawLocation, Route, RouteConfig } from "vue-router";
@@ -12,13 +12,16 @@ export const IWorkbenchService = createService<IWorkbenchService>("workbench-ser
 export interface IWorkbenchService {
     readonly onRouteChanged: IEvent;
     readonly currentExample?: IWorkbenchExample;
+    readonly currentLocale: string;
     readonly currentRoute: IWorkbenchRoute;
     readonly router: Router;
     getExample(name: string): IWorkbenchExample | undefined;
     getExamples(): Iterable<IWorkbenchExample>;
+    getLocaleString(callback: ILocaleCallback): string;
     navigateTo(link: IWorkbenchLink): void;
     registerExample(example: IWorkbenchExample): void;
     registerRoute(route: IWorkbenchRouteConfig): void;
+    setLocale(locale: string): Promise<void>;
 }
 
 export interface IWorkbenchLink {
@@ -50,7 +53,7 @@ export interface IWorkbenchRouteConfig {
 
 export interface IWorkbenchExample {
     readonly name: string;
-    readonly title: string;
+    readonly title: string | ILocaleCallback;
     readonly component: () => Promise<IComponent | IEsModuleComponent>;
     readonly locale: (locale: string) => Promise<ILocaleMessages | IEsModuleLocalMessages>;
     readonly menu: IWorkbenchMenuItem;
@@ -58,8 +61,16 @@ export interface IWorkbenchExample {
 }
 
 export interface IWorkbenchMenuItem {
-    readonly title: string;
+    readonly title: string | ILocaleCallback;
     readonly order?: number;
+}
+
+export interface ILocaleContext {
+    translate(key: string, values?: TranslateValues): string;
+}
+
+export interface ILocaleCallback {
+    (context: ILocaleContext): string;
 }
 
 /** Needed for dynamic import support. */
@@ -80,11 +91,7 @@ export class WorkbenchBrowserService implements IWorkbenchService {
 
     constructor(@IVueI18nService private readonly i18nService: IVueI18nService) {
         this.router.beforeEach((to, from, next) => {
-            // TODO: determine current language/locale
-            console.log("fullPath", to.fullPath);
-            console.log("path", to.path);
-
-            i18nService.setLocale("en-US", to.path).then(() => next());
+            i18nService.setLocale(i18nService.currentLocale, to.path).then(() => next());
         });
 
         this.router.afterEach(() => this.routeChanged.emit());
@@ -102,6 +109,10 @@ export class WorkbenchBrowserService implements IWorkbenchService {
         return undefined;
     }
 
+    get currentLocale(): string {
+        return this.i18nService.currentLocale;
+    }
+
     get currentRoute(): IWorkbenchRoute {
         return this.asWorkbenchRoute(this.router.currentRoute);
     }
@@ -112,6 +123,10 @@ export class WorkbenchBrowserService implements IWorkbenchService {
 
     getExamples(): Iterable<IWorkbenchExample> {
         return this.examples.values();
+    }
+
+    getLocaleString(callback: ILocaleCallback): string {
+        return callback({ translate: (key, values) => this.i18nService.translate(key, values) });
     }
 
     navigateTo(link: IWorkbenchLink): void {
@@ -149,6 +164,14 @@ export class WorkbenchBrowserService implements IWorkbenchService {
 
     registerRoute(route: IWorkbenchRouteConfig): void {
         this.router.addRoutes([this.getRouteConfig(route)]);
+    }
+
+    setLocale(locale: string): Promise<void> {
+        if (typeof document !== "undefined") {
+            document.documentElement.lang = locale;
+        }
+
+        return this.i18nService.setLocale(locale, this.router.currentRoute.path);
     }
 
     private getRouteConfig(route: IWorkbenchRouteConfig): RouteConfig {

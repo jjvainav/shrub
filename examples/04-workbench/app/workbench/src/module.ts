@@ -7,7 +7,7 @@ import Router from "vue-router";
 import Vuetify from "vuetify";
 import { NotFoundComponent, WorkbenchComponent } from "./components";
 import { WorkbenchModel } from "./model";
-import { DisplayService, IDisplayService, IWorkbenchExample, IWorkbenchRouteConfig, IWorkbenchService, WorkbenchBrowserService } from "./services";
+import { DisplayService, IDisplayService, ILocaleService, IWorkbenchExample, IWorkbenchRouteConfig, IWorkbenchService, LocaleService, WorkbenchBrowserService } from "./services";
 import * as utils from "./utils";
 
 // import icons for Vuetify: https://vuetifyjs.com/en/framework/icons
@@ -52,6 +52,7 @@ export class WorkbenchModule implements IModule {
 
     configureServices(registration: IServiceRegistration): void {
         registration.register(IDisplayService, DisplayService);
+        registration.register(ILocaleService, LocaleService);
         registration.register(IWorkbenchService, WorkbenchBrowserService);
     }
 

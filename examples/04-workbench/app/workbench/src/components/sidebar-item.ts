@@ -3,7 +3,7 @@ import Component from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 import { RawLocation } from "vue-router";
 import { IWorkbenchModel } from "../model";
-import { IWorkbenchMenuItem } from "../services";
+import { IWorkbenchMenuItem, IWorkbenchService } from "../services";
 
 @Component
 export default class SidebarItem extends Vue {
@@ -13,5 +13,11 @@ export default class SidebarItem extends Vue {
 
     getLocation(): RawLocation {
         return { name: this.link };
+    }
+
+    getTitle(): string {
+        return typeof this.item.title === "function"
+            ? this.$services.get(IWorkbenchService).getLocaleString(this.item.title)
+            : this.item.title;
     }
 }

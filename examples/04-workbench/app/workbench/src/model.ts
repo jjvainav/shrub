@@ -29,7 +29,11 @@ export class WorkbenchModel implements IWorkbenchModel {
     getCurrentTitle(): string {
         if (this.current) {
             const example = this.workbenchService.getExample(this.current);
-            return example ? example.title : "";
+            if (example) {
+                return typeof example.title === "function"
+                    ? this.workbenchService.getLocaleString(example.title)
+                    : example.title;
+            }
         }
 
         return "";
