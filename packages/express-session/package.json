@@ -1,7 +1,7 @@
 {
     "name": "@shrub/express-session",
     "description": "Express module that provides simple session middleware.",
-    "version": "0.4.31",
+    "version": "0.4.32",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -28,9 +28,9 @@
         "@types/express": "^4.17.1"
     },
     "dependencies": {
-        "@shrub/core": "0.4.31",
-        "@shrub/express": "0.4.31",
-        "@shrub/express-cookies": "0.4.31",
+        "@shrub/core": "0.4.32",
+        "@shrub/express": "0.4.32",
+        "@shrub/express-cookies": "0.4.32",
         "express": "^4.17.1"
     }
 }
