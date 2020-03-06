@@ -59,8 +59,8 @@ export interface IVueI18nSettings {
     readonly locale?: string;
 }
 
-/** Defines a set of options for loading a language data. */
-export interface ILanguageLoaderOptions {
+/** Defines a set of options for loading locale data. */
+export interface ILocaleLoaderOptions {
     /** The locale to load. */
     readonly locale: string;
     /** An optional path identifying the current route being loaded. */
@@ -72,7 +72,7 @@ export interface ILanguageLoaderOptions {
  * or an es compatible module for async import support (e.g. import(./locales/en.js)).
  */
 export interface ILocaleLoader {
-    (options: ILanguageLoaderOptions): Promise<ILocaleMessageObject | IEsModuleLocalMessages>;
+    (options: ILocaleLoaderOptions): Promise<ILocaleMessageObject | IEsModuleLocalMessages>;
 }
 
 export interface ILocaleMessages extends VueI18n.LocaleMessages {
@@ -146,7 +146,7 @@ export class VueI18nModule implements IModule {
 class VueI18nService implements IVueI18nService {
     private readonly localeChanged = new EventEmitter("locale-changed");
     private readonly i18n = getInstance();
-    private loader?: (options: ILanguageLoaderOptions) => Promise<ILocaleMessageObject>;
+    private loader?: (options: ILocaleLoaderOptions) => Promise<ILocaleMessageObject>;
     private messages: VueI18n.LocaleMessages = {};
 
     get currentLocale(): string {
