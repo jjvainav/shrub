@@ -1,6 +1,6 @@
 import { createService, Singleton } from "@shrub/core";
 import { IComponent } from "@shrub/vue";
-import { IEsModuleLocalMessages, ILocaleMessages, IVueI18nService, TranslateValues } from "@shrub/vue-i18n";
+import { IEsModuleLocalMessages, ILocaleMessageObject, IVueI18nService, TranslateValues } from "@shrub/vue-i18n";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import { VueConstructor } from "vue";
 import Router, { RawLocation, Route, RouteConfig } from "vue-router";
@@ -56,13 +56,13 @@ export interface IWorkbenchExample {
     readonly title: string | ILocaleCallback;
     readonly content: IWorkbenchContent;
     readonly menu: IWorkbenchMenuItem;
-    readonly locale: (locale: string) => Promise<ILocaleMessages | IEsModuleLocalMessages>;
+    readonly locale: (locale: string) => Promise<ILocaleMessageObject | IEsModuleLocalMessages>;
     readonly props?: (route: IWorkbenchRoute) => Object;
 }
 
 export interface IWorkbenchContent {
     readonly component: () => Promise<IComponent | IEsModuleComponent>;
-    readonly locale?: (locale: string) => Promise<ILocaleMessages | IEsModuleLocalMessages>;
+    readonly locale?: (locale: string) => Promise<ILocaleMessageObject | IEsModuleLocalMessages>;
 }
 
 export interface IWorkbenchMenuItem {

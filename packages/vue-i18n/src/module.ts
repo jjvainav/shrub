@@ -34,8 +34,8 @@ export const IVueI18nService = createService<IVueI18nService>("vue-i18n");
 export type TranslateValues = VueI18n.Values;
 
 export interface IVueI18nConfiguration {
-    /** Registers a static set of locale messages. */
-    registerMessages(messages: VueI18n.LocaleMessages): void;
+    /** Registers a static set of locale messages or a loader that will load locale messages asynchronously. */
+    register(messagesOrLoader: ILocaleMessages | ILocaleLoader): void;
 }
 
 export interface IVueI18nService {
@@ -47,7 +47,7 @@ export interface IVueI18nService {
      * Register a callaback that will handle loading messages for a locale. 
      * Multiple loaders may be registered and the resulting messages will be merged together.
      */
-    registerLoader(loader: ILanguageLoader): void;
+    registerLoader(loader: ILocaleLoader): void;
     /** Sets and loads the current locale as a language/country code value (e.g. en-US). */
     setLocale(locale: string, path?: string): Promise<void>;
     /** Localize the message with the provided key representing a path in the current locale messages. */
@@ -71,16 +71,19 @@ export interface ILanguageLoaderOptions {
  * A callback that handles loading messages asynchronously for a given locale. The result can be a local messages object
  * or an es compatible module for async import support (e.g. import(./locales/en.js)).
  */
-export interface ILanguageLoader {
-    (options: ILanguageLoaderOptions): Promise<ILocaleMessages | IEsModuleLocalMessages>;
+export interface ILocaleLoader {
+    (options: ILanguageLoaderOptions): Promise<ILocaleMessageObject | IEsModuleLocalMessages>;
 }
 
-export interface ILocaleMessages extends VueI18n.LocaleMessageObject {
+export interface ILocaleMessages extends VueI18n.LocaleMessages {
+}
+
+export interface ILocaleMessageObject extends VueI18n.LocaleMessageObject {
 }
 
 /** Represents a set of locale messages loaded from an es compatible module. */
 export interface IEsModuleLocalMessages { 
-    readonly default: ILocaleMessages;
+    readonly default: ILocaleMessageObject;
 }
 
 /** Gets the global instance of the i18n object. */
@@ -107,8 +110,13 @@ export class VueI18nModule implements IModule {
     
     initialize({ config }: IModuleInitializer): void {
         config(IVueI18nConfiguration).register(({ services }: IModuleConfigurator) => ({
-            registerMessages: messages => {
-                services.get(IVueI18nService).registerLoader(options => Promise.resolve(messages[options.locale] || {}));
+            register: messagesOrLoader => {
+                if (typeof messagesOrLoader === "function") {
+                    services.get(IVueI18nService).registerLoader(messagesOrLoader);
+                }
+                else {
+                    services.get(IVueI18nService).registerLoader(options => Promise.resolve(messagesOrLoader[options.locale] || {}));
+                }
             }
         }));
     }
@@ -138,7 +146,7 @@ export class VueI18nModule implements IModule {
 class VueI18nService implements IVueI18nService {
     private readonly localeChanged = new EventEmitter("locale-changed");
     private readonly i18n = getInstance();
-    private loader?: (options: ILanguageLoaderOptions) => Promise<ILocaleMessages>;
+    private loader?: (options: ILanguageLoaderOptions) => Promise<ILocaleMessageObject>;
     private messages: VueI18n.LocaleMessages = {};
 
     get currentLocale(): string {
@@ -149,7 +157,7 @@ class VueI18nService implements IVueI18nService {
         return this.localeChanged.event;
     }
 
-    registerLoader(loader: ILanguageLoader): void {
+    registerLoader(loader: ILocaleLoader): void {
         const next = this.loader;
         this.loader = next
             ? options => loader(options).then(async result => this.mergeMessages(result, await next(options)))
@@ -174,13 +182,13 @@ class VueI18nService implements IVueI18nService {
         return result;
     }
 
-    private mergeMessages(lhs: ILocaleMessages | IEsModuleLocalMessages, rhs: ILocaleMessages | IEsModuleLocalMessages): ILocaleMessages {
+    private mergeMessages(lhs: ILocaleMessageObject | IEsModuleLocalMessages, rhs: ILocaleMessageObject | IEsModuleLocalMessages): ILocaleMessageObject {
         const m1 = this.isEsModule(lhs) ? lhs.default : lhs;
         const m2 = this.isEsModule(rhs) ? rhs.default : rhs;
         return merge({}, m1, m2);
     }
 
-    private isEsModule(obj: ILocaleMessages | IEsModuleLocalMessages): obj is IEsModuleLocalMessages {
+    private isEsModule(obj: ILocaleMessageObject | IEsModuleLocalMessages): obj is IEsModuleLocalMessages {
         return (<any>obj).default !== undefined;
     }
 }

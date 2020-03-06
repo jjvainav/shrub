@@ -15,7 +15,7 @@ describe("module", () => {
             name: "test",
             dependencies: [VueI18nModule],
             configure: ({ config }) => {
-                config.get(IVueI18nConfiguration).registerMessages({
+                config.get(IVueI18nConfiguration).register({
                     "en-US": { hi: "hi" },
                     "es": { hi: "hola" }
                 });
@@ -32,7 +32,7 @@ describe("module", () => {
                 name: "test",
                 dependencies: [VueI18nModule],
                 configure: ({ config }) => {
-                    config.get(IVueI18nConfiguration).registerMessages({
+                    config.get(IVueI18nConfiguration).register({
                         "en-US": { foo: "foo" }
                     });
                 }
@@ -41,7 +41,7 @@ describe("module", () => {
                 name: "test 2",
                 dependencies: [VueI18nModule],
                 configure: ({ config }) => {
-                    config.get(IVueI18nConfiguration).registerMessages({
+                    config.get(IVueI18nConfiguration).register({
                         "en-US": { bar: "bar" }
                     });
                 }

@@ -1,6 +1,6 @@
-import { ILocaleMessages } from "@shrub/vue-i18n";
+import { ILocaleMessageObject } from "@shrub/vue-i18n";
 
-export interface IIntroLocale extends ILocaleMessages {
+export interface IIntroLocale extends ILocaleMessageObject {
     readonly intro: {
         readonly title: string;
     };
