@@ -1,4 +1,4 @@
-import { IIntroLocale } from "./locale";
+import { IIntroLocale } from "./types";
 
 const messages: IIntroLocale = {
     intro: {

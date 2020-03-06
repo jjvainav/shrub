@@ -10,16 +10,17 @@ export class SettingsModule implements IModule {
     ];
 
     configure({ config }: IModuleConfigurator): void {
-        // TODO: need to use the locale/module values for the title and menu items
-        // TODO: load locale based on menu item and not the example (e.g. move locale into menu item)
         config.get(IWorkbenchConfiguration).registerExample({
             name: "settings",
-            title: context => context.translate("settings.title"),
-            component: () => import(/* webpackChunkName: "settings" */ "./component"),
-            locale: locale => import(/* webpackChunkName: "settings.locale.[request]" */ `./locale/${locale}`),
+            title: context => context.translate("settings.example.title"),
+            locale: locale => import(/* webpackChunkName: "settings.locale.[request]" */ `./locale/example/${locale}`),
+            content: {
+                component: () => import(/* webpackChunkName: "settings" */ "./component"),
+                locale: locale => import(/* webpackChunkName: "settings.content.locale.[request]" */ `./locale/content/${locale}`)
+            },
             menu: {
                 order: 99,
-                title: context => context.translate("settings.title"),
+                title: context => context.translate("settings.example.title"),
             }
         });
     }    

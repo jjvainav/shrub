@@ -19,15 +19,18 @@ export class TodoModule implements IModule {
     configure({ config, services }: IModuleConfigurator): void {
         config.get(IWorkbenchConfiguration).registerExample({
             name: "todo",
-            title: "Todo Example",
-            component: () => import(/* webpackChunkName: "todo" */ "./component"),
-            locale: locale => import(/* webpackChunkName: "todo.locale.[request]" */ `./locale/${locale}`),
+            title: context => context.translate("todo.example.title"),
+            locale: locale => import(/* webpackChunkName: "todo.locale.[request]" */ `./locale/example/${locale}`),
             props: () => ({
                 model: Vue.observable(services.get(IModelService).get("todo", TodoModel))
             }),
+            content: {
+                component: () => import(/* webpackChunkName: "todo" */ "./component"),
+                locale: locale => import(/* webpackChunkName: "todo.content.locale.[request]" */ `./locale/content/${locale}`)
+            },
             menu: {
                 order: 1,
-                title: "Todo"
+                title: context => context.translate("todo.example.title"),
             }
         });
     }

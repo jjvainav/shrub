@@ -8,8 +8,8 @@
                     class="new-todo"
                     autofocus
                     autocomplete="off"
-                    placeholder="What needs to be done?"
                     v-model="newTodo"
+                    :placeholder="$t('todo.content.newTodoPlaceholder')"
                     @keyup.enter="createTodo()"/>
             </header>
             <section class="main" v-show="model.hasItems()" v-cloak>
@@ -40,24 +40,28 @@
             <footer class="footer" v-show="model.hasItems()" v-cloak>
                 <span class="todo-count">
                     <strong>{{ model.activeItemCount() }}</strong>
-                    {{ model.activeItemCount() | pluralize }} left
+                    {{ $tc("todo.content.count", model.activeItemCount()) }}
                 </span>
                 <ul class="filters">
-                    <li><a href="#/all" :class="{ selected: model.filter === 'all' }">All</a></li>
-                    <li><a href="#/active" :class="{ selected: model.filter === 'active' }">Active</a></li>
-                    <li><a href="#/completed" :class="{ selected: model.filter === 'completed' }">Completed</a></li>
+                    <li><a href="#/all" :class="{ selected: model.filter === 'all' }">{{ $t("todo.content.filterAll") }}</a></li>
+                    <li><a href="#/active" :class="{ selected: model.filter === 'active' }">{{ $t("todo.content.filterActive") }}</a></li>
+                    <li><a href="#/completed" :class="{ selected: model.filter === 'completed' }">{{ $t("todo.content.filterCompleted") }}</a></li>
                 </ul>
                 <button
                     class="todo-button clear-completed"
                     @click="model.removeCompleted()"
                     v-show="model.items.length > model.activeItemCount()">
-                    Clear completed
+                    {{ $t("todo.content.clearCompleted") }}
                 </button>
             </footer>
         </section>
         <footer class="todo-info">
-            <p>Double-click to edit a todo</p>
-            <p>Based on the Vue <a href="https://vuejs.org/v2/examples/todomvc.html">TodoMVC</a> example</p>
+            <p>{{ $t("todo.content.footerInstructions") }}</p>
+            <i18n path="todo.content.footerInformation" tag="p">
+                <template v-slot:name>
+                    <a href="https://vuejs.org/v2/examples/todomvc.html">TodoMVC</a>
+                </template>
+            </i18n>
         </footer>
     </div>
 </template>

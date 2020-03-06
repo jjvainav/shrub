@@ -139,6 +139,7 @@ class VueI18nService implements IVueI18nService {
     private readonly localeChanged = new EventEmitter("locale-changed");
     private readonly i18n = getInstance();
     private loader?: (options: ILanguageLoaderOptions) => Promise<ILocaleMessages>;
+    private messages: VueI18n.LocaleMessages = {};
 
     get currentLocale(): string {
         return this.i18n.locale;
@@ -156,9 +157,10 @@ class VueI18nService implements IVueI18nService {
     }
 
     async setLocale(locale: string, path?: string): Promise<void> {
-        // TODO: cache loaded locale messages
         const message = this.loader ? await this.loader({ locale, path }) : {};
-        this.i18n.setLocaleMessage(locale, message);
+        this.messages[`${locale}`] = merge(this.messages[`${locale}`] || {}, message);
+
+        this.i18n.setLocaleMessage(locale, this.messages[`${locale}`]);
         this.i18n.locale = locale;
         this.localeChanged.emit();
     }

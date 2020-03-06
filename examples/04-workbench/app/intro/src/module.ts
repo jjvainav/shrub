@@ -15,8 +15,10 @@ export class IntroModule implements IModule {
         config.get(IWorkbenchConfiguration).registerExample({
             name: "intro",
             title: context => context.translate("intro.title"),
-            component: () => import(/* webpackChunkName: "intro" */ "./component"),
             locale: locale => import(/* webpackChunkName: "intro.locale.[request]" */ `./locale/${locale}`),
+            content: {
+                component: () => import(/* webpackChunkName: "intro" */ "./component")
+            },
             menu: {
                 order: 1,
                 title: context => context.translate("intro.title"),

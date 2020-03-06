@@ -54,10 +54,15 @@ export interface IWorkbenchRouteConfig {
 export interface IWorkbenchExample {
     readonly name: string;
     readonly title: string | ILocaleCallback;
-    readonly component: () => Promise<IComponent | IEsModuleComponent>;
-    readonly locale: (locale: string) => Promise<ILocaleMessages | IEsModuleLocalMessages>;
+    readonly content: IWorkbenchContent;
     readonly menu: IWorkbenchMenuItem;
+    readonly locale: (locale: string) => Promise<ILocaleMessages | IEsModuleLocalMessages>;
     readonly props?: (route: IWorkbenchRoute) => Object;
+}
+
+export interface IWorkbenchContent {
+    readonly component: () => Promise<IComponent | IEsModuleComponent>;
+    readonly locale?: (locale: string) => Promise<ILocaleMessages | IEsModuleLocalMessages>;
 }
 
 export interface IWorkbenchMenuItem {
@@ -147,17 +152,21 @@ export class WorkbenchBrowserService implements IWorkbenchService {
         this.registerRoute({
             path,
             name: example.name,
-            component: example.component,
+            component: example.content.component,
             props: example.props
         });
 
-        this.i18nService.registerLoader(options => {
-            if (options.path === path) {
-                return example.locale(options.locale);
-            }
+        this.i18nService.registerLoader(options => example.locale(options.locale));
 
-            return Promise.resolve({});
-        });
+        if (example.content.locale) {
+            this.i18nService.registerLoader(options => {
+                if (options.path === path) {
+                    return example.content.locale!(options.locale);
+                }
+
+                return Promise.resolve({});
+            });
+        }
 
         this.examples.set(example.name, example);
     }

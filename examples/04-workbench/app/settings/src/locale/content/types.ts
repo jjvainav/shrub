@@ -1,8 +1,8 @@
 import { ILocaleMessages } from "@shrub/vue-i18n";
 
-export interface ISettingsLocale extends ILocaleMessages {
+export interface IContentLocale extends ILocaleMessages {
     readonly settings: {
-        readonly locales: {
+        readonly content: {
             readonly englishUS: string;
             readonly spanish: string;
         }

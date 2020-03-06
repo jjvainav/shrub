@@ -10,11 +10,6 @@ import { TodoModel } from "../model";
               el.focus()
             }
         }
-    },
-    filters: {
-        pluralize: function (n: number) {
-            return n === 1 ? 'item' : 'items'
-        }
     }
 })
 export default class Todo extends Vue {

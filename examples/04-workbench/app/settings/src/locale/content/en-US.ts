@@ -1,8 +1,8 @@
-import { ISettingsLocale } from "./types";
+import { IContentLocale } from "./types";
 
-const messages: ISettingsLocale = {
+const messages: IContentLocale = {
     settings: {
-        locales: {
+        content: {
             englishUS: "English (US)",
             spanish: "Spanish"
         }

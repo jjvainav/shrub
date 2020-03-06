@@ -1,8 +1,8 @@
 import { ILocaleMessages } from "@shrub/vue-i18n";
 
-export interface IModuleLocale extends ILocaleMessages {
+export interface IExampleLocale extends ILocaleMessages {
     readonly settings: {
-        readonly module: {
+        readonly example: {
             readonly title: string;
         }
     };
