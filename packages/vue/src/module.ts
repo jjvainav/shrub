@@ -97,37 +97,58 @@ function createValueKeyProvider() {
 }
 
 export class VueModule implements IModule {
+    private mountData?: { component: VueConstructor, options?: IVueMountOptions };
+
     readonly name = "vue";
     readonly dependencies = [ModelModule]; 
 
     initialize({ config }: IModuleInitializer): void {
-        config(IVueConfiguration).register(({ settings, services }: IModuleConfigurator) => ({
+        config(IVueConfiguration).register(() => ({
             mount: (component, options) => {
-                const el = this.getElementId(settings);
-                if (!document.getElementById(el.substr(1))) {
-                    throw new Error(`Element with id (${el}) not found`);
+                if (this.mountData) {
+                    throw new Error("A component has already been mounted.");
                 }
 
-                const componentOptions = this.getComponentOptions(options);
-                const router = <IVueRouter>(<any>componentOptions).router;
-                const app = new Vue({
-                    services,
-                    render: h => h(component, this.getData(options)),
-                    ...componentOptions
-                });
-
-                if (router) {
-                    router.onReady(() =>  app.$mount(el));
-                }
-                else {
-                    app.$mount(el);
-                }
+                this.mountData = { component, options };
             }
         }));
     }
 
     configureServices(registration: IServiceRegistration): void {
         registration.register(IComponentService, ComponentService);
+    }
+
+    async configure({ settings, services, next }: IModuleConfigurator): Promise<void> {
+        // mount the element after all dependents have had a chance to configure
+        await next();
+
+        if (!this.mountData) {
+            // TODO: write a warning to the console
+            return Promise.resolve();
+        }
+
+        const { component, options } = this.mountData;
+        this.mountData = undefined;
+
+        const el = this.getElementId(settings);
+        if (!document.getElementById(el.substr(1))) {
+            throw new Error(`Element with id (${el}) not found`);
+        }
+
+        const componentOptions = this.getComponentOptions(options);
+        const router = <IVueRouter>(<any>componentOptions).router;
+        const app = new Vue({
+            services,
+            render: h => h(component, this.getData(options)),
+            ...componentOptions
+        });
+
+        if (router) {
+            router.onReady(() => app.$mount(el));
+        }
+        else {
+            app.$mount(el);
+        }
     }
 
     private getElementId(settings: IVueModuleSettings): string {

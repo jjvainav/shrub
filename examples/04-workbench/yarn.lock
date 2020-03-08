@@ -819,53 +819,53 @@
     once "^1.4.0"
     universal-user-agent "^4.0.0"
 
-"@shrub/core@0.4.33", "@shrub/core@^0.4.33":
-  version "0.4.33"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.4.33.tgz#41ea6bfb2a65fe1b325cf4849adaeb68e310d684"
-  integrity sha512-WU4ktssAcdkkkVDrL2lPqO8SAIo7Jd0qRAP9nkt7c80v5vLg/8JR6cisom8Zaj/wOf9huimB2YoB9tNvkQGY8w==
+"@shrub/core@0.4.35", "@shrub/core@^0.4.35":
+  version "0.4.35"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.4.35.tgz#00ebffece60b1d4da59463c211bd37c815db1a91"
+  integrity sha512-fK7qZcMVnhUlKrfZbmJQAKLL9WSWQ9l4ioq3h5tMRWA0Z3inKLfRRvJ0fhUCpCZjXaRcu/V4ZtFHwufDkKmLZg==
 
-"@shrub/express@^0.4.33":
-  version "0.4.33"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.4.33.tgz#d94dc6206f18a4ff4b303d9cd98143189228dcfd"
-  integrity sha512-SxqhK5wAyJ63T9FM3Tvrb+NJ6uQA6HB5wfzhi9R1xIa0VK3i1PF/8lTEPzDFz2QyPj3IfMoszSDdLOKyq34NKQ==
+"@shrub/express@^0.4.35":
+  version "0.4.35"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.4.35.tgz#c7b36e14efa701bf21c18c58b89bd2fa262361e9"
+  integrity sha512-U47v2oIwp7Rwlot+KV659jnWkGYsBmuoycJfNI1KhsZqAonLNUNwALDRgPc3YKQH6n131KkCK7EMK4nX7y+JbQ==
   dependencies:
-    "@shrub/core" "0.4.33"
-    "@shrub/http" "0.4.33"
+    "@shrub/core" "0.4.35"
+    "@shrub/http" "0.4.35"
     express "^4.17.1"
 
-"@shrub/http@0.4.33":
-  version "0.4.33"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.4.33.tgz#b136fd62f62a55da5658003e7fdc0cc71ec539b2"
-  integrity sha512-qAZxAsofeXlnYRh3UvdhGbsZJqDuZQDmq8m9Udyj8Bgt9AX6/yoJn7GjRHjl2++AgVOOQkkaLSqwneJVfRm55Q==
+"@shrub/http@0.4.35":
+  version "0.4.35"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.4.35.tgz#fd84e872391f962e621f0ff7507847e3cb139e7f"
+  integrity sha512-qDLssnBml5CLusDkj3J/d5khvZIXFI03KSKsDPViE0BdIr88q738VWWsyN3N3JtIopIpsjoD5t/OZSzK3sO/cA==
   dependencies:
-    "@shrub/core" "0.4.33"
+    "@shrub/core" "0.4.35"
 
-"@shrub/model@0.4.33", "@shrub/model@^0.4.33":
-  version "0.4.33"
-  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.4.33.tgz#1285d03385f10b2990acfeb9bd02e93c157d6dd3"
-  integrity sha512-JqEO0eZ2SX5P10XXFNZwX6Z5gW3NKPOgbTyFc4QwuIZqUaFqJXL/UyuHG3Z6x5FJqBLeHb7xuAoNRW9pPvdD4g==
+"@shrub/model@0.4.35", "@shrub/model@^0.4.35":
+  version "0.4.35"
+  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.4.35.tgz#e09333fc1e1e8bac60c383b1db8bab709b9d8f1a"
+  integrity sha512-/XoYgWQDyTeRFuW1KJI9cElPnn9ug7S8FfhI1teLBBvLb5xT5EbuSuIG/cGZxEZ2lJS59WYKyv8eBFrvLjva4w==
   dependencies:
-    "@shrub/core" "0.4.33"
+    "@shrub/core" "0.4.35"
     "@sprig/serialization" "0.1.12"
 
-"@shrub/vue-i18n@^0.4.33":
-  version "0.4.33"
-  resolved "https://registry.yarnpkg.com/@shrub/vue-i18n/-/vue-i18n-0.4.33.tgz#195caeb054fce1685b66eccb6facc7fea2c23f06"
-  integrity sha512-nWEKYJYGtqdPXkZzLfaOCVjYeUakglZeQrglQn8iNHofPRG3LeLgjwr8E3ZTW813oIchTL1YNoaxu75zX5dehQ==
+"@shrub/vue-i18n@^0.4.35":
+  version "0.4.35"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-i18n/-/vue-i18n-0.4.35.tgz#93f62f0fe1a82aa83e0452d6fe6bd22953bac905"
+  integrity sha512-NF18+HDQYrGJ+2J3qKhxlUSNC5doVXzqjnGFNKSwF+LbrDF5NDa6AuSZP7D+milrOtYK64ETsDrQxNshgjucGA==
   dependencies:
-    "@shrub/core" "0.4.33"
-    "@shrub/vue" "0.4.33"
+    "@shrub/core" "0.4.35"
+    "@shrub/vue" "0.4.35"
     "@sprig/event-emitter" "^0.1.12"
     lodash.merge "^4.6.2"
     vue-i18n "^8.15.4"
 
-"@shrub/vue@0.4.33", "@shrub/vue@^0.4.33":
-  version "0.4.33"
-  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.4.33.tgz#0250d6db0b38502a105db8cdd27dc6ecb5e913ce"
-  integrity sha512-iuimMoiivAfzNO+VfX6R4kAvURDq4AD/CkecIwV/4n8Qic2a2uAxbqiPHDAjykkNf7qwLUw5Va4BWIQSXkQvXA==
+"@shrub/vue@0.4.35", "@shrub/vue@^0.4.35":
+  version "0.4.35"
+  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.4.35.tgz#dd9fa790c54c8115ff69a042142c5fc7759f09be"
+  integrity sha512-HyA0gglryByhVcY/2KN/JLCj07gRVPX/YygjiB8sr065LujAcgT135tyJE7NOPBmTsKzJ9O/13tHzQYjsiwUNw==
   dependencies:
-    "@shrub/core" "0.4.33"
-    "@shrub/model" "0.4.33"
+    "@shrub/core" "0.4.35"
+    "@shrub/model" "0.4.35"
     "@sprig/serialization" "0.1.12"
     vue "^2.6.10"
     vue-class-component "^7.1.0"
