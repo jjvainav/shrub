@@ -4,6 +4,7 @@ const messages: IContentLocale = {
     settings: {
         content: {
             englishUS: "English (US)",
+            french: "Francés",
             spanish: "Español"
         }
     }

@@ -3,6 +3,12 @@ import { IServiceCollection, ModuleLoader } from "@shrub/core";
 import { IVueI18nConfiguration, IVueI18nService, VueI18nModule } from "../src";
 
 describe("module", () => {
+    beforeEach(() => {
+        // vue-i18n caches all the messages so clear them all out before each test
+        const instance = new Vue();
+        Object.keys(instance.$i18n.messages).forEach(key => instance.$i18n.setLocaleMessage(key, {}));
+    });
+
     test("verify vue-i18n installation", async () => {
         await ModuleLoader.load([VueI18nModule]);
 
@@ -53,7 +59,7 @@ describe("module", () => {
         expect(instance.$t("bar")).toBe("bar");
     });
 
-    test("changing the current locale", async () => {
+    test("change the current locale", async () => {
         let changed: boolean | undefined;
         let services: IServiceCollection | undefined;
         await ModuleLoader.load([{
@@ -76,5 +82,51 @@ describe("module", () => {
         const instance = new Vue();
         expect(instance.$i18n.locale).toBe("es");
         expect(instance.$t("foo")).toBe("es");
+    });
+
+    test("change the current locale for loader that does not support the new locale and use fallback", async () => {
+        let changed: boolean | undefined;
+        let services: IServiceCollection | undefined;
+        await ModuleLoader.load([{
+            name: "test",
+            dependencies: [VueI18nModule],
+            configure: config => {
+                services = config.services;
+                config.services.get(IVueI18nService).registerLoader(options => {
+                    if (options.locale !== "en-US") {
+                        return Promise.reject(new Error("Locale not supported."));
+                    }
+
+                    return Promise.resolve({
+                        foo: options.locale
+                    });
+                });
+            }
+        }]);
+
+        services!.get(IVueI18nService).onLocaleChanged(() => changed = true);
+        await services!.get(IVueI18nService).setLocale("es");
+
+        expect(services!.get(IVueI18nService).currentLocale).toBe("es");
+        expect(changed).toBe(true);
+
+        const instance = new Vue();
+        expect(instance.$i18n.locale).toBe("es");
+        expect(instance.$t("foo")).toBe("en-US");
+    });
+
+    test("change the current locale for loader that does not support the new locale or the fallback locale", async () => {
+        let services: IServiceCollection | undefined;
+        await ModuleLoader.load([{
+            name: "test",
+            dependencies: [VueI18nModule],
+            configure: config => {
+                services = config.services;
+                config.services.get(IVueI18nService).registerLoader(() => Promise.reject(new Error("Locale not supported.")));
+            }
+        }]);
+
+        // set the locale and make sure it doesn't fail
+        await services!.get(IVueI18nService).setLocale("es");
     });
 });

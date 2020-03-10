@@ -7,11 +7,12 @@ export default class Intro extends Vue {
     markdown: string | undefined = "";
 
     created(): void {
-        this.setCompiledMarkdown();
+        this.loadMarkdown(this.$i18n.locale);
     }
 
-    setCompiledMarkdown(): void {
-        import(/* webpackChunkName: "[request]" */ `../intro.${this.$i18n.locale}.md`)
-            .then(value => this.markdown = marked(value.default));
+    loadMarkdown(locale: string): void {
+        import(/* webpackChunkName: "[request]" */ `../intro.${locale}.md`)
+            .then(value => this.markdown = marked(value.default))
+            .catch(() => this.loadMarkdown("en-US"));
     }
 }

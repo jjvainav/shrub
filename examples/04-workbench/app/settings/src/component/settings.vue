@@ -9,6 +9,12 @@
             </li>
             <li class="language">
                 <div class="view">
+                    <input id="toggle-french" class="toggle" type="checkbox" :checked="isFrench" @click="setLocale('fr')" />
+                    <label for="toggle-french">{{ $t("settings.content.french") }}</label>                    
+                </div>
+            </li>
+            <li class="language">
+                <div class="view">
                     <input id="toggle-spanish" class="toggle" type="checkbox" :checked="isSpanish" @click="setLocale('es')" />
                     <label for="toggle-spanish">{{ $t("settings.content.spanish") }}</label>                    
                 </div>

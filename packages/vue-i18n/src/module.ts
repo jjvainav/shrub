@@ -1,7 +1,6 @@
 import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration, Singleton } from "@shrub/core";
 import { VueModule } from "@shrub/vue";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
-import merge from "lodash.merge";
 import Vue from "vue";
 import VueI18n, { IVueI18n } from "vue-i18n";
 
@@ -86,6 +85,10 @@ export interface IEsModuleLocalMessages {
     readonly default: ILocaleMessageObject;
 }
 
+interface ILocalLoaderInvoker {
+    (options: ILocaleLoaderOptions): Promise<void>;
+}
+
 /** Gets the global instance of the i18n object. */
 const getInstance = (function () {
     let i18n: VueI18n;
@@ -95,6 +98,7 @@ const getInstance = (function () {
         if (!i18n && !initializing) {
             initializing = true;
             i18n = new VueI18n({
+                // TODO: support module settings to control/define the fallback locale
                 fallbackLocale: "en-US"
             });
             initializing = false;
@@ -146,8 +150,7 @@ export class VueI18nModule implements IModule {
 class VueI18nService implements IVueI18nService {
     private readonly localeChanged = new EventEmitter("locale-changed");
     private readonly i18n = getInstance();
-    private loader?: (options: ILocaleLoaderOptions) => Promise<ILocaleMessageObject>;
-    private messages: VueI18n.LocaleMessages = {};
+    private invoker?: ILocalLoaderInvoker;
 
     get currentLocale(): string {
         return this.i18n.locale;
@@ -158,17 +161,18 @@ class VueI18nService implements IVueI18nService {
     }
 
     registerLoader(loader: ILocaleLoader): void {
-        const next = this.loader;
-        this.loader = next
-            ? options => loader(options).then(async result => this.mergeMessages(result, await next(options)))
-            : options => loader(options).then(result => this.isEsModule(result) ? result.default : result);
+        const invoker = this.createInvoker(loader);
+        const next = this.invoker;
+        this.invoker = next
+            ? options => invoker(options).then(() => next(options))
+            : invoker;
     }
 
     async setLocale(locale: string, path?: string): Promise<void> {
-        const message = this.loader ? await this.loader({ locale, path }) : {};
-        this.messages[`${locale}`] = merge(this.messages[`${locale}`] || {}, message);
+        if (this.invoker) {
+            await this.invoker({ locale, path });
+        }
 
-        this.i18n.setLocaleMessage(locale, this.messages[`${locale}`]);
         this.i18n.locale = locale;
         this.localeChanged.emit();
     }
@@ -182,10 +186,24 @@ class VueI18nService implements IVueI18nService {
         return result;
     }
 
-    private mergeMessages(lhs: ILocaleMessageObject | IEsModuleLocalMessages, rhs: ILocaleMessageObject | IEsModuleLocalMessages): ILocaleMessageObject {
-        const m1 = this.isEsModule(lhs) ? lhs.default : lhs;
-        const m2 = this.isEsModule(rhs) ? rhs.default : rhs;
-        return merge({}, m1, m2);
+    private createInvoker(loader: ILocaleLoader): ILocalLoaderInvoker {
+        // attempt's to load a locale and uses the specified fallback if the operation failed
+        const tryLoadWithFallback = (options: ILocaleLoaderOptions, fallbackLocale?: string): Promise<void> => {
+            return loader(options)
+                .then(result => this.isEsModule(result) ? result.default : result)
+                .then(message => this.i18n.mergeLocaleMessage(options.locale, message))
+                .catch(() => {
+                    if (fallbackLocale) {
+                        return tryLoadWithFallback({ ...options, locale: fallbackLocale });
+                    }
+
+                    // this means the locale and fallback failed to load so just return a resolved promise instead of throwing the error
+                    return Promise.resolve();
+                });
+        };
+
+        // only pass down the fallback locale if it is not the same as the locale being loaded
+        return options => tryLoadWithFallback(options, options.locale !== this.i18n.fallbackLocale ? this.i18n.fallbackLocale : undefined);
     }
 
     private isEsModule(obj: ILocaleMessageObject | IEsModuleLocalMessages): obj is IEsModuleLocalMessages {
