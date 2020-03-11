@@ -1,6 +1,6 @@
 ﻿import Vue, { ComponentOptions, VNodeData } from "vue";
 import Router from "vue-router";
-import { ILoadOptions, IModule, IModuleConfigurator, IModuleInitializer, IServiceCollection, IServiceRegistration, ModuleInstanceOrConstructor, ModuleLoader } from "@shrub/core";
+import { IModule, IModuleConfigurator, IModuleInitializer, IModuleSettingsCollection, IServiceCollection, IServiceRegistration, ModuleInstanceOrConstructor, ModuleLoader } from "@shrub/core";
 import { IModelService, ModelModule } from "@shrub/model";
 import { IVueConfiguration, IVueMountOptions, VueModule } from "@shrub/vue";
 import { ServerModelService } from "./model-service";
@@ -17,6 +17,8 @@ export interface IVueSSRContext {
     rendered?: (context: IVueSSRContext) => void;
     /** Optional set of models that will get injected before rendering server-side and also serialized and set as the state to pass to the client. */
     models?: { readonly [key: string]: any };
+    /** Optional module settings that will be passed down to the modules when rendering server-side. */
+    settings?: IModuleSettingsCollection;
     /** Opional url identifying the current request url and is needed when the main SSR component uses a vue-router. */
     url?: string;
     [key: string]: any;
@@ -47,19 +49,15 @@ export interface IVueSSRCreateResult {
  * Note: modules will be loaded/created for each request so it's important that module instances passed
  * into the bootstrap function not maintain state.
  */
-export function bootstrap(modules: ModuleInstanceOrConstructor[], builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler
-export function bootstrap(options: ILoadOptions, builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler;
-export function bootstrap(modulesOrOptions: ModuleInstanceOrConstructor[] | ILoadOptions, builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler {
-    let options = Array.isArray(modulesOrOptions) ? { modules: modulesOrOptions } : modulesOrOptions;
-    options = { ...options, modules: [...options.modules, VueServerModule] };
-
+export function bootstrap(modules: ModuleInstanceOrConstructor[], builder?: IVueSSRRenderHandlerBuilder): IVueSSRRenderHandler {
+    modules = [...modules, VueServerModule];
     return async context => {
         // modules are loaded asynchronously so wait for them to finish loading and grab the modules collection
-        const modules = await ModuleLoader.load(options);
+        const collection = await ModuleLoader.load({ modules, settings: context.settings });
 
         if (context.models) {
             // inject the model objects so that they are available when rendering server-side
-            const service = modules.services.get(IModelService);
+            const service = collection.services.get(IModelService);
             for (const key in context.models) {
                 service.set(key, context.models[key]);
             }
@@ -68,10 +66,10 @@ export function bootstrap(modulesOrOptions: ModuleInstanceOrConstructor[] | ILoa
         if (context.beginRender) {
             // this allows server components the ability to configure the service collection before rendering it server-side
             // the services collection captured/used by the current module is the same one passed into the component when rendered
-            await context.beginRender(modules.services);
+            await context.beginRender(collection.services);
         }
 
-        const instance = modules.getInstance(VueServerModule);
+        const instance = collection.getInstance(VueServerModule);
         let { app, router } = instance.createApp();
 
         context.rendered = () => {
