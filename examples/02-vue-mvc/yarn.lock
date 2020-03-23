@@ -2,41 +2,50 @@
 # yarn lockfile v1
 
 
-"@shrub/core@0.3.3", "@shrub/core@^0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.3.3.tgz#08007787339e4e703eb4d4661957beb611f4d032"
-  integrity sha512-BfkYiLQqhl/EtqqxbcXlrbqoTKIG/Gk3ShMmSKxeRwYlK3R3jiLCicRCp4a9xwW0r9xUKB+2gIlDGFnt98p+5Q==
+"@shrub/core@0.4.39", "@shrub/core@^0.4.38":
+  version "0.4.39"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.4.39.tgz#061aa1b4e733681d9ef9136b01f7769bd120fe8f"
+  integrity sha512-ZFI5GOlwlwHs6eUxy9eTmNICfB5sel4FayOBtO1X1bBAhxl5YLchTrU0FTSFlIJv9OOjQ6Z1ntE8K9i2zZpBQg==
 
-"@shrub/express@^0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.3.3.tgz#30752daf6f0b0000f22e99c2f9d8b287ef0406d8"
-  integrity sha512-Q9KssjgKCQu04zOrqMXG07RB51LnySIVwTT2JQYJxiRlCHdKkpRjPx6T5DqEE2xSAE8n+tneDTq1SwFOWmLAJQ==
+"@shrub/express@^0.4.38":
+  version "0.4.39"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.4.39.tgz#1a0bc1f676e3ea8f0b4011f1ce6b0b2f5cf43863"
+  integrity sha512-xyYNGU5jgTPf8inRrMfqvwmm2abwg6efeJa61hRDHFWeBPtr6hy30NTDykHU5vFzkycYP8R57ikFrFEeKsybbw==
   dependencies:
-    "@shrub/core" "0.3.3"
-    "@shrub/http" "0.3.3"
+    "@shrub/core" "0.4.39"
+    "@shrub/http" "0.4.39"
     express "^4.17.1"
 
-"@shrub/http@0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.3.3.tgz#f12e25fae35a4acc9cda437896aaa0159f0b71b2"
-  integrity sha512-ZWBDYrPV/BmKaTUcf86+GpAoUl1DabrtXn43g249V8K8DqWXwcGhxZ10g5bXVThDVK5ATjzchIMB+1bc2ZZ2RQ==
+"@shrub/http@0.4.39":
+  version "0.4.39"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.4.39.tgz#08f661a6a0d1330ac26b3f46576af52bdcd2bd04"
+  integrity sha512-q9OgqFpqJT+llD5PAgSOlZ7y0C1sGKSE67HtkumSxRBc3/A5CBZD+2Jq/fxgh1p3Van7ZF4kCdN1njZ39+6ATQ==
   dependencies:
-    "@shrub/core" "0.3.3"
+    "@shrub/core" "0.4.39"
 
-"@shrub/vue@^0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.3.3.tgz#42099e1158123f251610734837deec526a5b6aa7"
-  integrity sha512-fJTZ4DrhI0HufBr87lrB29JnpriHnBG3j1Qw7erfeqlBk2n5mCIAsujeBgHcFvmq8OzTVbUXq4W5drOFcLkNHQ==
+"@shrub/model@0.4.39":
+  version "0.4.39"
+  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.4.39.tgz#30fdb44ff95d061525c7a762204cd6a3653b9c8b"
+  integrity sha512-JMFC3F3dn4gTRzSap+Vgds0UYB9NdzcXffRPPqEBBJI7qPKK/nXwt9B+vhbufztLPok0E62VFs+0Kmd+4wevoQ==
   dependencies:
-    "@shrub/core" "0.3.3"
-    "@sprig/serialization" "0.1.1"
+    "@shrub/core" "0.4.39"
+    "@sprig/serialization" "0.1.12"
+
+"@shrub/vue@^0.4.38":
+  version "0.4.39"
+  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.4.39.tgz#96ab924bf034e12fd3e4291b3ecec71a5066419f"
+  integrity sha512-uMlOOr/zE21J2CrY0yUV0r5ITE1oWvD6bchYQc/h0v69PRrp/yp+C0I2lPVKhB7upyEA1Boz5AAkKBJz+fQ1Vw==
+  dependencies:
+    "@shrub/core" "0.4.39"
+    "@shrub/model" "0.4.39"
+    "@sprig/serialization" "0.1.12"
     vue "^2.6.10"
     vue-class-component "^7.1.0"
 
-"@sprig/serialization@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.1.tgz#0486f96db967d0d67717b2ab342e465250c00584"
-  integrity sha512-scDYkYFyw5hDlup15tNePgP2pSq6Perc91z1fYL/+n3Ed0nLbBXC6Js2ZcTToee9BdviG9M+nQiemZYsyA8umQ==
+"@sprig/serialization@0.1.12":
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.12.tgz#95b4fe924da7f8f054037b4a90278e73b5957a41"
+  integrity sha512-1RhtyOxSnUi7k/dV+E9pO28uz+4rXSmGPcGqUYBv1AHIj2ARLSSU5SmJwXZlssWPVjpsTwkaA73afkkO9QHPqA==
 
 "@types/body-parser@*":
   version "1.17.1"
@@ -278,9 +287,9 @@ accepts@~1.3.7:
     negotiator "0.6.2"
 
 acorn@^6.2.1:
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.3.0.tgz#0087509119ffa4fc0a0041d1e93a417e68cb856e"
-  integrity sha512-/czfa8BwS88b9gWQVhc8eknunSA2DoJpJyTQkhheIf5E48u1N0R4q/YxxsAeqRrmK9TQ/uYfgLDfZo91UlANIA==
+  version "6.4.1"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.4.1.tgz#531e58ba3f51b9dacb9a6646ca4debf5b14ca474"
+  integrity sha512-ZVA9k326Nwrj3Cj9jlh3wGFutC2ZornPNARZwsNYqQYgN0EsV2d53w5RN/co65Ohn4sUAUtb1rSUAOD6XN9idA==
 
 ajv-errors@^1.0.0:
   version "1.0.1"
