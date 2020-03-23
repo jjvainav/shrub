@@ -2,51 +2,51 @@
 # yarn lockfile v1
 
 
-"@shrub/core@0.4.36", "@shrub/core@^0.4.36":
-  version "0.4.36"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.4.36.tgz#6c1a7077620d0779e158ef728e85e4aa18af78ff"
-  integrity sha512-0rABffGIBbkY/RI0E/RTHPiXoty646LqUkIIUaddqnnoGDvkzaX8sfwyKK85BiqvdszRtPX/57rOmc06ygmUhw==
+"@shrub/core@0.4.39", "@shrub/core@^0.4.38":
+  version "0.4.39"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.4.39.tgz#061aa1b4e733681d9ef9136b01f7769bd120fe8f"
+  integrity sha512-ZFI5GOlwlwHs6eUxy9eTmNICfB5sel4FayOBtO1X1bBAhxl5YLchTrU0FTSFlIJv9OOjQ6Z1ntE8K9i2zZpBQg==
 
-"@shrub/express@^0.4.36":
-  version "0.4.36"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.4.36.tgz#3b6627435f9232d1828e45a2f3956ce3dca67392"
-  integrity sha512-4GgYpaHZSvBfL/wzUHvPz3QegPktaPB9pEZUpoa9WOJEKX/zUlmVCVb+aQjAsDcD5NTq+m4mh267Mtm9MK4CnA==
+"@shrub/express@^0.4.38":
+  version "0.4.39"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.4.39.tgz#1a0bc1f676e3ea8f0b4011f1ce6b0b2f5cf43863"
+  integrity sha512-xyYNGU5jgTPf8inRrMfqvwmm2abwg6efeJa61hRDHFWeBPtr6hy30NTDykHU5vFzkycYP8R57ikFrFEeKsybbw==
   dependencies:
-    "@shrub/core" "0.4.36"
-    "@shrub/http" "0.4.36"
+    "@shrub/core" "0.4.39"
+    "@shrub/http" "0.4.39"
     express "^4.17.1"
 
-"@shrub/http@0.4.36":
-  version "0.4.36"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.4.36.tgz#5620e0ce02515547152affaf106706617decc784"
-  integrity sha512-+SYpwAtqZrc0WjQ7NSKFC1KICgwLfS9hBBhpc2holSNRXVEA6DhKwEpLaUgLNMv8n5Yo24k90SsI4GpqEq7D3w==
+"@shrub/http@0.4.39":
+  version "0.4.39"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.4.39.tgz#08f661a6a0d1330ac26b3f46576af52bdcd2bd04"
+  integrity sha512-q9OgqFpqJT+llD5PAgSOlZ7y0C1sGKSE67HtkumSxRBc3/A5CBZD+2Jq/fxgh1p3Van7ZF4kCdN1njZ39+6ATQ==
   dependencies:
-    "@shrub/core" "0.4.36"
+    "@shrub/core" "0.4.39"
 
-"@shrub/model@0.4.36":
-  version "0.4.36"
-  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.4.36.tgz#5d08f5ff9f891f9240affc458c6a953053258ec0"
-  integrity sha512-q//Xsa1fwGLanu9IkUrqiGcKwqarzuAXLJxrVoIPiopXH2JtXRWoVDisvqTH8bl3bldxVP1yWJDL+583r/6gaA==
+"@shrub/model@0.4.39":
+  version "0.4.39"
+  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.4.39.tgz#30fdb44ff95d061525c7a762204cd6a3653b9c8b"
+  integrity sha512-JMFC3F3dn4gTRzSap+Vgds0UYB9NdzcXffRPPqEBBJI7qPKK/nXwt9B+vhbufztLPok0E62VFs+0Kmd+4wevoQ==
   dependencies:
-    "@shrub/core" "0.4.36"
+    "@shrub/core" "0.4.39"
     "@sprig/serialization" "0.1.12"
 
-"@shrub/vue-server@^0.4.36":
-  version "0.4.36"
-  resolved "https://registry.yarnpkg.com/@shrub/vue-server/-/vue-server-0.4.36.tgz#1cb99b659c191ebadbbe3bf3012dbedac2680f9c"
-  integrity sha512-ls8CSbpNWem00xc/5CqOO46pht//AQ2KzUd9LXnAF5lKofZP1x4v+txDgBr6Q1m1x5RByaj2smpUOp0j5MVAsw==
+"@shrub/vue-server@^0.4.38":
+  version "0.4.39"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-server/-/vue-server-0.4.39.tgz#edf58a82031926438e7d241cc28e0255032780d3"
+  integrity sha512-Pc9BVakSSJHyZRVF+RawszzRlCLk8492b/cBl5k9mamdHjL8Gv3fybL5WGwQ26lAn35KyOa/fzHOQS2FJbkRXQ==
   dependencies:
     vue "^2.6.10"
     vue-router "^3.1.3"
     vue-server-renderer "^2.6.10"
 
-"@shrub/vue@^0.4.36":
-  version "0.4.36"
-  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.4.36.tgz#4d165bca3b82ada85552ee4396067d63bc497c6c"
-  integrity sha512-rzNOFjQ6IyW0vnyU0ts3DdEfVNV8Ec0Vdqqn2GEyHFsq5Vnwg708deODrdIm6Mozj9IxBVvp47ZjiHdB5RxnRQ==
+"@shrub/vue@^0.4.38":
+  version "0.4.39"
+  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.4.39.tgz#96ab924bf034e12fd3e4291b3ecec71a5066419f"
+  integrity sha512-uMlOOr/zE21J2CrY0yUV0r5ITE1oWvD6bchYQc/h0v69PRrp/yp+C0I2lPVKhB7upyEA1Boz5AAkKBJz+fQ1Vw==
   dependencies:
-    "@shrub/core" "0.4.36"
-    "@shrub/model" "0.4.36"
+    "@shrub/core" "0.4.39"
+    "@shrub/model" "0.4.39"
     "@sprig/serialization" "0.1.12"
     vue "^2.6.10"
     vue-class-component "^7.1.0"
@@ -296,9 +296,9 @@ accepts@~1.3.7:
     negotiator "0.6.2"
 
 acorn@^6.2.1:
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.3.0.tgz#0087509119ffa4fc0a0041d1e93a417e68cb856e"
-  integrity sha512-/czfa8BwS88b9gWQVhc8eknunSA2DoJpJyTQkhheIf5E48u1N0R4q/YxxsAeqRrmK9TQ/uYfgLDfZo91UlANIA==
+  version "6.4.1"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.4.1.tgz#531e58ba3f51b9dacb9a6646ca4debf5b14ca474"
+  integrity sha512-ZVA9k326Nwrj3Cj9jlh3wGFutC2ZornPNARZwsNYqQYgN0EsV2d53w5RN/co65Ohn4sUAUtb1rSUAOD6XN9idA==
 
 ajv-errors@^1.0.0:
   version "1.0.1"
