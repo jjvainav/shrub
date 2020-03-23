@@ -170,7 +170,7 @@ class VueI18nService implements IVueI18nService {
 
     async setLocale(locale: string, path?: string): Promise<void> {
         if (this.invoker) {
-            await this.invoker({ locale, path });
+            await this.invoker({ locale, path: path && this.normalizePath(path) });
         }
 
         this.i18n.locale = locale;
@@ -208,5 +208,13 @@ class VueI18nService implements IVueI18nService {
 
     private isEsModule(obj: ILocaleMessageObject | IEsModuleLocalMessages): obj is IEsModuleLocalMessages {
         return (<any>obj).default !== undefined;
+    }
+
+    private normalizePath(path: string): string {
+        path = path.startsWith("/") ? path : "/" + path;
+        while (path.endsWith("/")) {
+            path = path.substr(0, path.length - 1);
+        }
+        return path;
     }
 }
