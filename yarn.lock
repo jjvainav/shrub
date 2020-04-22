@@ -1114,10 +1114,10 @@
     universal-user-agent "^3.0.0"
     url-template "^2.0.8"
 
-"@sprig/event-emitter@^0.1.13":
-  version "0.1.13"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.13.tgz#71d62a6a6544584e2f9c1b9c9c82a2da978402b6"
-  integrity sha512-jvuox527maA2kUq+uMKGykWVHKVMttI6mlg4+TGeSj4peFr4HhgXV2km/+YQMuzkWRehDYNlvmnBfo0i/c2cGg==
+"@sprig/event-emitter@^0.1.15":
+  version "0.1.15"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.15.tgz#5a3ec3e48f925d4ea934807417cb8b663862d3f2"
+  integrity sha512-0fuocyHBbqSETG64/85vOcbR9QN9/XyZ7FXovU+wRPo48PI4VtJEb4+WOKr1pI5qDIzw58mRJOSuKxoMxmWgSA==
 
 "@sprig/random-string@^0.1.2":
   version "0.1.2"
@@ -1126,17 +1126,17 @@
   dependencies:
     base62 "^2.0.1"
 
-"@sprig/request-client@^0.1.13":
-  version "0.1.13"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.13.tgz#2cf7d63e7e57f3bd4a4449c32434f63b34fac04c"
-  integrity sha512-0RpSmOiOwBL+IkjIMvgZpDbM3OML62LM3pd2Rd3Q+Y12VaoOxvEMgblVzk4K6QnEzl7TbOwVtRFoHEGDURkPXw==
+"@sprig/request-client@^0.1.15":
+  version "0.1.15"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.15.tgz#442955101289a5c552246d786c7204f102b33c83"
+  integrity sha512-QDDzVszJsOO8Jaqt3vONIipaoWfEtD35IkJA57/F8DiaEsqCWDUKG4UpaAwehzPh+gycugUOQzpoAKprDGr+Zg==
   dependencies:
     axios "^0.19.0"
 
-"@sprig/serialization@0.1.13":
-  version "0.1.13"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.13.tgz#ae7b4ef0f373a0ae3c1e2b835ac972c6adbadc62"
-  integrity sha512-Uu1IKYGMj1twjw/uKNkzY1SaD3XJfiYe9JKFfHs+zxzpH1KerLatG8OlbD57afhjyQa5UYVcynxxj9npkiBJYA==
+"@sprig/serialization@0.1.15":
+  version "0.1.15"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.15.tgz#9cb5193d2a586bc8469c2084bd0e380fd69a7f80"
+  integrity sha512-+LIu/GR65iphIieaemmIJva6Rr2zwqS255BDnsjM+OHLwGZB2zaBcexKegFDK5MXuGVGpbS7m4gvFriNCeNHHQ==
 
 "@types/babel__core@^7.1.0":
   version "7.1.2"
