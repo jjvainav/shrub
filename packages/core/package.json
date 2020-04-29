@@ -1,7 +1,7 @@
 {
     "name": "@shrub/core",
     "description": "A framework for modular server-side applications and front-end components.",
-    "version": "0.4.49",
+    "version": "0.4.50",
     "license": "MIT",
     "repository": {
         "type": "git",
