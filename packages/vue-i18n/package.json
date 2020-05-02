@@ -25,7 +25,7 @@
     "dependencies": {
         "@shrub/core": "0.4.54",
         "@shrub/vue": "0.4.54",
-        "@sprig/event-emitter": "^0.1.27",
+        "@sprig/event-emitter": "^0.1.28",
         "vue-i18n": "^8.15.4"
     }
 }
