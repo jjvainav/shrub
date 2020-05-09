@@ -1,7 +1,7 @@
 {
     "name": "@shrub/request-client-tracing",
     "description": "Provides functionality for integrating the request-client with the tracing module and service.",
-    "version": "0.4.58",
+    "version": "0.4.59",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -25,8 +25,8 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/core": "0.4.58",
-        "@shrub/tracing": "0.4.58",
+        "@shrub/core": "0.4.59",
+        "@shrub/tracing": "0.4.59",
         "@sprig/request-client": "^0.1.32"
     }
 }
