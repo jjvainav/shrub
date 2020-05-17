@@ -1,7 +1,7 @@
 {
     "name": "@shrub/socket.io",
     "description": "A module providing socket.io server support.",
-    "version": "0.4.62",
+    "version": "0.4.63",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -27,8 +27,8 @@
         "@types/socket.io": "^1.4.33"
     },
     "dependencies": {
-        "@shrub/core": "0.4.62",
-        "@shrub/http": "0.4.62",
+        "@shrub/core": "0.4.63",
+        "@shrub/http": "0.4.63",
         "socket.io": "^2.2.0"
     }
 }
