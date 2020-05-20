@@ -1114,10 +1114,10 @@
     universal-user-agent "^3.0.0"
     url-template "^2.0.8"
 
-"@sprig/event-emitter@^0.1.39":
-  version "0.1.39"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.39.tgz#8d9cdab4e1074abebd83fba012fb6e5d976942f2"
-  integrity sha512-9QbrV7WEASChnL0oQjAsizd+YtgZ7ogk5HieLnsEbKDdjl0NwKnFYwwLZtBliy61PnjjzHmYjnO1j7rrNTMKxw==
+"@sprig/event-emitter@^0.1.40":
+  version "0.1.40"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.40.tgz#d04b1f27bc405d31f61ba437ff8e3555e63bd5f4"
+  integrity sha512-k+9L7Xv3tM/VtUaME+HPWQKJbnp6dDSJ+gBKoUXRodltqjeounDJNJKQqjSf5cZj/bfVAyqTsNZoK95LvOqbpw==
 
 "@sprig/random-string@^0.1.2":
   version "0.1.2"
@@ -1126,18 +1126,18 @@
   dependencies:
     base62 "^2.0.1"
 
-"@sprig/request-client@^0.1.39":
-  version "0.1.39"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.39.tgz#2eb7322000c2634d4e001d6e05315af6e793cb8a"
-  integrity sha512-TMMNZ1V6MwCyu7Iq+6qHO0SkwzKcvos30GSpDBxKYj0hJymdEfHzk+HxbwhSGJMyk6iu7giCWT2sxQiwn37nIw==
+"@sprig/request-client@^0.1.40":
+  version "0.1.40"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.40.tgz#821fdc69a6b862535005c09472fe202685f84b8f"
+  integrity sha512-+UdmzN80vMmneX7cYa5yZksw8WteP0oRixrd5BsCRymmJ2AJhfpkvX2j5I/GrKgI2i3j7W23bI5Axn+dLtQW7A==
   dependencies:
     axios "^0.19.0"
     eventsource "^1.0.7"
 
-"@sprig/serialization@0.1.39":
-  version "0.1.39"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.39.tgz#9d9b63555a877fab316833add65249a99bc0a5c7"
-  integrity sha512-r/59VckwHoXUQtm75saaupAQilKd1ozVO2iK25E3sq1N4or4AMkkMFEjoAUvRmjnpTy4Hkknwzh49n4YgDu0ag==
+"@sprig/serialization@0.1.40":
+  version "0.1.40"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.40.tgz#deee4577dee8d763f3ad312b4169403eac804c3c"
+  integrity sha512-TzIQQo5FpcNskuMAltUzKnFgt/hzyRu7nZBoNExtPFF3NTEZNE7IQnVRkauBm9X2UIsJeFeeUle9k29HllQyRQ==
 
 "@types/babel__core@^7.1.0":
   version "7.1.2"

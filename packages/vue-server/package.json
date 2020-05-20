@@ -34,6 +34,6 @@
         "@shrub/core": "0.4.66",
         "@shrub/model": "0.4.66",
         "@shrub/vue": "0.4.66",
-        "@sprig/serialization": "0.1.39"
+        "@sprig/serialization": "0.1.40"
     }
 }
