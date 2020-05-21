@@ -23,6 +23,6 @@
     },
     "dependencies": {
         "@shrub/core": "0.4.67",
-        "@sprig/serialization": "0.1.40"
+        "@sprig/serialization": "0.1.41"
     }
 }
