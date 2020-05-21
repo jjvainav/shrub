@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { createService, Singleton } from "@shrub/core";
 import { IRequestContext } from "@shrub/express";
-import { ISpan, ITracerBuilder, ITracingService } from "@shrub/tracing";
+import { ISpan, ITags, ITracerBuilder, ITracingService } from "@shrub/tracing";
 
 export enum TraceHeaders {
     traceId = "X-Trace-ID",
@@ -43,11 +43,17 @@ export class ExpressTracingService implements IExpressTracingService {
             ? this.getExternalBuilder(req)
             : this.getInternalBuilder(req);
 
-        return builder.build(req).startSpan("http.request", {
-            "http.id": req.get("X-Request-ID"),
+        let tags: ITags = {
             "http.url": req.originalUrl,
             "http.method": req.method
-        });
+        };
+
+        const requestId = req.get("X-Request-ID");
+        if (requestId) {
+            tags = { ...tags, "http.id": requestId };
+        }
+
+        return builder.build(req).startSpan("http.request", tags);
     }
 
     private getExternalBuilder(req: Request): ITracerBuilder {

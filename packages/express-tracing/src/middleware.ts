@@ -21,6 +21,12 @@ export const useRequestTracing = (options?: IRequestTracingOptions): RequestHand
         const span = service.startSpan(req, options);
         (<any>req.context).span = span;
 
+        // if a request connection is 'keep-alive' the response will never finish
+        // instead, listen for the close event for when the connection has been closed
+
+        // https://nodejs.org/api/http.html#http_event_close_1
+        res.once("close", () => span.done(req.context.bag.__error));
+
         // https://nodejs.org/api/http.html#http_event_finish
         res.once("finish", () => {
             if (res.statusCode >= 300 && res.statusCode < 400) {

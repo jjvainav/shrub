@@ -236,11 +236,13 @@ function createSpan(name: string, options?: ICreateSpanOptions): ISpan {
         logs: [],
         tags: options && options.tags || {},
         done: function(err?: Error) {
-            if (err) {
-                this.logError(err);
+            if (!this.endTime) {
+                if (err) {
+                    this.logError(err);
+                }
+        
+                (<any>this).endTime = Date.now();
             }
-    
-            (<any>this).endTime = Date.now();
         },
         log: function(level, data) {
             if (typeof level !== "number") {
