@@ -1,7 +1,7 @@
 {
     "name": "@shrub/tracing-console",
     "description": "A module that provides a simple tracing observer that writes information to the console.",
-    "version": "0.4.68",
+    "version": "0.4.69",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -25,8 +25,8 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/core": "0.4.68",
-        "@shrub/tracing": "0.4.68",
+        "@shrub/core": "0.4.69",
+        "@shrub/tracing": "0.4.69",
         "chalk": "^2.4.2"
     }
 }
