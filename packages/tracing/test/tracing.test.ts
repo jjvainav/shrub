@@ -27,6 +27,26 @@ describe("tracing", () => {
         expect(Object.keys(span.tags)).toHaveLength(0);
     });
 
+    test("create root span with tags", () => {
+        const now = 1562602719878;
+        const unmock = mockDateNow(now);
+
+        const service = new TracingService();
+        const tracer = service.getTracer();
+        const span = tracer.startSpan("test", { tag: "foo" });
+
+        unmock();
+
+        expect(span.id).toHaveLength(8);
+        expect(span.traceId).toHaveLength(16);
+        expect(span.parentId).toBeUndefined();
+        expect(span.name).toBe("test");
+        expect(span.startTime).toBe(now);
+        expect(span.endTime).toBeUndefined();
+        expect(span.logs).toHaveLength(0);
+        expect(span.tags.tag).toBe("foo");
+    });
+
     test("create and finish root span", () => {
         const start = 1562602719878;
         const unmockStart = mockDateNow(start);

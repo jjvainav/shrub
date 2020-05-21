@@ -38,8 +38,8 @@ export interface ILog {
 
 /** Responsible for creating and writing spans. */
 export interface ITracer {
-    /** Starts a new span with the given name. */
-    startSpan(name: string): ISpan;     
+    /** Starts a new span with the given name and tags */
+    startSpan(name: string, tags?: ITags): ISpan;     
 }
 
 /** Responsible for building a tracer factory function. */
@@ -115,6 +115,11 @@ export interface ITracingService {
     getTracer(scope?: any): ITracer;
 }
 
+/** A set of key/value pairs for a span. */
+export interface ITags { 
+    readonly [key: string]: number | string | boolean | undefined;
+}
+
 /** Represents a logical unit of work for a trace record. */
 export interface ISpan {
     /** A 64 bit identifier for the span. */
@@ -132,7 +137,7 @@ export interface ISpan {
     /** A set of logs for the span. */
     readonly logs: ILog[];
     /** The set of tags for the span. */
-    readonly tags: { readonly [key: string]: number | string | boolean | undefined };
+    readonly tags: ITags;
     /** Finalizes the span and accepts an optional Error instance if the span resulted in an error. */
     done(err?: Error): void;
     /** Log additional information with the span. */
@@ -162,6 +167,8 @@ interface ICreateSpanOptions {
     readonly context?: ISpanContext;
     /** An optional serializer used to serialize json objects to log data objects. */
     readonly serializer?: ISerializer;
+    /** An optional set of tags for the span. */
+    readonly tags?: ITags;
 }
 
 export const ITracingService = createService<ITracingService>("tracing-service");
@@ -227,7 +234,7 @@ function createSpan(name: string, options?: ICreateSpanOptions): ISpan {
         name,
         startTime: Date.now(),
         logs: [],
-        tags: {},
+        tags: options && options.tags || {},
         done: function(err?: Error) {
             if (err) {
                 this.logError(err);
@@ -366,7 +373,7 @@ class TracerBuilder implements ITracerBuilder {
         });
 
         return {
-            startSpan: name => {
+            startSpan: (name, tags) => {
                 let context = scope && isSpanContext(scope)
                 // the scope is a span-context so pass that down
                 ? scope
@@ -384,7 +391,7 @@ class TracerBuilder implements ITracerBuilder {
                     }
                 }
 
-                let span = createSpan(name, { context, serializer });
+                let span = createSpan(name, { context, serializer, tags });
                 if (this.observers.length) {
                     const me = this;
                     const base = span;

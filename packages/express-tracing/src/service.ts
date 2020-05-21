@@ -43,18 +43,11 @@ export class ExpressTracingService implements IExpressTracingService {
             ? this.getExternalBuilder(req)
             : this.getInternalBuilder(req);
 
-        const tracer = builder.build(req);
-        const span = tracer.startSpan("http.request");
-        const requestId = req.get("X-Request-ID");
-
-        span.tag("http.url", req.originalUrl);
-        span.tag("http.method", req.method);
-
-        if (requestId) {
-            span.tag("http.id", requestId);
-        }
-
-        return span;
+        return builder.build(req).startSpan("http.request", {
+            "http.id": req.get("X-Request-ID"),
+            "http.url": req.originalUrl,
+            "http.method": req.method
+        });
     }
 
     private getExternalBuilder(req: Request): ITracerBuilder {
