@@ -86,23 +86,19 @@ function printStart(span: ISpan, filter?: IConsoleTraceFilter): void {
 
 function printLog(span: ISpan, log: ILog, filter?: IConsoleTraceFilter): void {
     if (!filter || !filter.printLog || filter.printLog(log)) {
-        const getText = (label: string) => `[${label}]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)}`;
+        const getText = (label: string) => `[${label}]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)} data=`;
 
         if (log.level < LogLevel.info) {
-            console.log(chalk.magenta(getText("debug")));
+            console.log(chalk.magenta(getText("debug")), log.data);
         }
         else if (log.level < LogLevel.warn) {
-            console.log(chalk.green(getText("info")));
+            console.log(chalk.green(getText("info")), log.data);
         }
         else if (log.level < LogLevel.error) {
-            console.log(chalk.yellow(getText("warn")));
+            console.log(chalk.yellow(getText("warn")), log.data);
         }
         else {
-            console.log(chalk.bgRed(getText("error")));
-        }
-
-        if (log.data) {
-            console.log("[data]:", log.data);
+            console.log(chalk.bgRed(getText("error")), log.data);
         }
     }
 }
