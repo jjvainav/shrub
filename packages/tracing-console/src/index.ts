@@ -76,17 +76,17 @@ export class TracingConsoleModule implements IModule {
 function printStart(span: ISpan, filter?: IConsoleTraceFilter): void {
     if (!filter || !filter.printSpan || filter.printSpan(span)) {
         if (span.parentId) {
-            console.log(chalk.cyan(`[start]: name=${span.name} id=${span.id} trace-id=${span.traceId} parent-id=${span.parentId} time=${span.startTime} tags=${JSON.stringify(span.tags)}`));
+            console.log(chalk.cyan(`[start]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)} parent-id=${span.parentId} time=${span.startTime} tags=${JSON.stringify(span.tags)}`));
         }
         else {
-            console.log(chalk.cyan(`[start]: name=${span.name} id=${span.id} trace-id=${span.traceId} time=${span.startTime} tags=${JSON.stringify(span.tags)}`));
+            console.log(chalk.cyan(`[start]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)} time=${span.startTime} tags=${JSON.stringify(span.tags)}`));
         }
     }
 }
 
 function printLog(span: ISpan, log: ILog, filter?: IConsoleTraceFilter): void {
     if (!filter || !filter.printLog || filter.printLog(log)) {
-        const getText = (label: string) => `[${label}]: name=${span.name} id=${span.id} trace-id=${getRandomColorString(span.traceId)}`;
+        const getText = (label: string) => `[${label}]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)}`;
 
         if (log.level < LogLevel.info) {
             console.log(chalk.magenta(getText("debug")));
@@ -109,12 +109,12 @@ function printLog(span: ISpan, log: ILog, filter?: IConsoleTraceFilter): void {
 
 function printEnd(span: ISpan, filter?: IConsoleTraceFilter): void {
     if (!filter || !filter.printSpan || filter.printSpan(span)) {
-        const text = `[end]: name=${span.name} id=${span.id} time=${span.endTime} tags=${JSON.stringify(span.tags)}`; 
+        const text = `[end]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)} time=${span.endTime} tags=${JSON.stringify(span.tags)}`; 
         console.log(span.tags.error ? chalk.red(text) : chalk.cyan(text));
     }
 }
 
-function getRandomColorString(text: string): string {
+function getColorString(text: string): string {
     const hash = hashCode(text);
     const index = Math.abs(Math.round(Math.sin(hash) * colors.length - 1));
     return chalk.hex(colors[index])(text);
