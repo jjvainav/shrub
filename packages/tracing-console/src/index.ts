@@ -116,7 +116,7 @@ function printEnd(span: ISpan, filter?: IConsoleTraceFilter): void {
 
 function getColorString(text: string): string {
     const hash = hashCode(text);
-    const index = Math.abs(Math.round(Math.sin(hash) * colors.length - 1));
+    const index = Math.abs(Math.round(Math.sin(hash) * (colors.length - 1)));
     return chalk.hex(colors[index])(text);
 }
 
