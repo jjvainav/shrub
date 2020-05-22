@@ -1,16 +1,13 @@
-import { Request } from "express";
+import { Request, Response } from "express";
 import { createService, Singleton } from "@shrub/core";
 import { IRequestContext } from "@shrub/express";
 import { ISpan, ITags, ITracerBuilder, ITracingService } from "@shrub/tracing";
 
-export enum TraceHeaders {
-    traceId = "X-Trace-ID",
-    spanId = "X-Span-ID"
-}
+type Mutable<T> = {-readonly[P in keyof T]: T[P]};
 
-export const IExpressTracingService = createService<IExpressTracingService>("express-tracing-service");
-
+/** Internal service used by the middleware for starting and ending spans. */
 export interface IExpressTracingService {
+    endSpan(span: ISpan, req: Request, res: Response): void;
     startSpan(req: Request, options?: IRequestTracingOptions): ISpan;
 }
 
@@ -21,6 +18,13 @@ export interface IRequestTracingOptions {
      */
     readonly external?: boolean;
 }
+
+export enum TraceHeaders {
+    traceId = "X-Trace-ID",
+    spanId = "X-Span-ID"
+}
+
+export const IExpressTracingService = createService<IExpressTracingService>("express-tracing-service");
 
 function isRequestContextScope(scope: any): scope is IRequestContext {
     return (<IRequestContext>scope).bag !== undefined && (<IRequestContext>scope).services !== undefined;
@@ -40,28 +44,29 @@ export class ExpressTracingService implements IExpressTracingService {
 
     startSpan(req: Request, options?: IRequestTracingOptions): ISpan {
         const builder = options && options.external
-            ? this.getExternalBuilder(req)
-            : this.getInternalBuilder(req);
+            ? this.getExternalBuilder()
+            : this.getInternalBuilder();
 
-        let tags: ITags = {
+        const tags: ITags = {
             "http.url": req.originalUrl,
             "http.method": req.method
         };
 
-        const requestId = req.get("X-Request-ID");
-        if (requestId) {
-            tags = { ...tags, "http.id": requestId };
-        }
-
+        this.addHeaderFieldTag(tags, req, "http.id", "X-Request-ID");
         return builder.build(req).startSpan("http.request", tags);
     }
 
-    private getExternalBuilder(req: Request): ITracerBuilder {
+    endSpan(span: ISpan, req: Request, res: Response): void {
+        span.tag("http.status", res.statusCode);
+        span.done(req.context.bag.__error);
+    }
+
+    private getExternalBuilder(): ITracerBuilder {
         this.externalBuilder = this.externalBuilder || this.tracingService.getBuilder();
         return this.externalBuilder;
     }
 
-    private getInternalBuilder(req: Request): ITracerBuilder {
+    private getInternalBuilder(): ITracerBuilder {
         this.internalBuilder = this.internalBuilder || this.tracingService.getBuilder().useContextProvider({
             getSpanContext: scope => {
                 if (isRequestScope(scope)) {
@@ -89,5 +94,12 @@ export class ExpressTracingService implements IExpressTracingService {
         });
 
         return this.internalBuilder;
+    }
+
+    private addHeaderFieldTag(tags: Mutable<ITags>, req: Request, tagName: string, headerName: string): void {
+        const value = req.get(headerName);
+        if (value !== undefined) {
+            tags[tagName] = value;
+        }
     }
 }

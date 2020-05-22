@@ -21,11 +21,11 @@ export const useRequestTracing = (options?: IRequestTracingOptions): RequestHand
         const span = service.startSpan(req, options);
         (<any>req.context).span = span;
 
-        // if a request connection is 'keep-alive' the response will never finish
-        // instead, listen for the close event for when the connection has been closed
+        // if a request connection is 'keep-alive' the response will never finish;
+        // so instead, listen for the close event for when the connection has been closed
 
         // https://nodejs.org/api/http.html#http_event_close_1
-        res.once("close", () => span.done(req.context.bag.__error));
+        res.once("close", () => service.endSpan(span, req, res));
 
         // https://nodejs.org/api/http.html#http_event_finish
         res.once("finish", () => {
@@ -36,8 +36,7 @@ export const useRequestTracing = (options?: IRequestTracingOptions): RequestHand
                 }
             }
 
-            span.tag("http.status", res.statusCode);
-            span.done(req.context.bag.__error);
+            service.endSpan(span, req, res);
         });
 
         next();
