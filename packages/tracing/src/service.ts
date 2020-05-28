@@ -1,5 +1,5 @@
 import { createService, Singleton } from "@shrub/core";
-import randomString from "@sprig/random-string";
+import createId from "@sprig/unique-id";
 
 // The tracing logic was motivated by the Google Dapper paper: 
 // https://static.googleusercontent.com/media/research.google.com/en//archive/papers/dapper-2010-1.pdf 
@@ -313,12 +313,12 @@ function getSpanContext(span: ISpan): ISpanContext {
 
 function newSpanId(): string {
     // 64 bit
-    return randomString(8);
+    return createId(8);
 }
 
 function newTraceId(): string {
     // 128 bit
-    return randomString(16);
+    return createId(16);
 }
 
 @Singleton

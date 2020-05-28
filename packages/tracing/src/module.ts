@@ -28,5 +28,5 @@ export class TracingModule implements IModule {
 
     configureServices(registration: IServiceRegistration): void {
         registration.register(ITracingService, TracingService);
-    }    
+    }
 }
