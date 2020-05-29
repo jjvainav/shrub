@@ -12,6 +12,8 @@ export interface IEventStreamInterceptors {
 /** Options for the event stream channel consumer. */
 /** @internal */
 export interface IEventStreamChannelConsumerOptions {
+    /** The channel name pattern the consumer is subscribing to. */
+    readonly channelNamePattern: string;
     /** The url endpoint for the event-stream. */
     readonly url: string;
     /** Optional interceptors that get passed to the underlying RequestEventStream. */
@@ -27,7 +29,7 @@ export class EventStreamChannelConsumer implements IMessageChannelConsumer {
 
     subscribe(subscriberId: string, handler: MessageHandler): ISubscription {
         const stream = new RequestEventStream<IMessage>({
-            url: urlJoin(this.options.url, "?subscriberId=" + subscriberId),
+            url: urlJoin(this.options.url, "?subscriberId=" + encodeURIComponent(subscriberId) + "&channel=" + encodeURIComponent(this.options.channelNamePattern)),
             beforeRequest: this.options.interceptors && this.options.interceptors.beforeRequest,
             afterRequest: this.options.interceptors && this.options.interceptors.afterRequest,
             validate: (data, resolve, reject) => jsonValidator(

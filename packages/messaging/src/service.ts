@@ -6,28 +6,19 @@ export type MessageHandler = (message: IMessage) => void | Promise<void>;
 
 /** @internal */
 export interface IMessageService {
-    getChannelConsumer(channelName: string): IMessageChannelConsumer;
+    getChannelConsumer(channelNamePattern: string): IMessageChannelConsumer;
     getChannelProducer(channelName: string): IMessageChannelProducer;
-    registerBroker(adapter: IMessageBrokerAdapter, options?: IMessageBrokerAdapterOptions): void;
+    registerBroker(adapter: IMessageBrokerAdapter): void;
 }
 
 // TODO: a channel may be pub/sub or it maybe persistent - will it be necessary to know this?
 
 /** An adapter to an external message broker system for handling the control of messages. */
 export interface IMessageBrokerAdapter {
-    /** Gets a consumer for the specified channel or undefined if a consumer is not available for the channel. */
-    getChannelConsumer(channelName: string): IMessageChannelConsumer | undefined;
+    /** Gets a consumer for the specified channel name pattern or undefined if a consumer is not available for the channel. */
+    getChannelConsumer(channelNamePattern: string): IMessageChannelConsumer | undefined;
     /** Gets a producer for the specified channel or undefined if a producer is not available for the channel. */
     getChannelProducer(channelName: string): IMessageChannelProducer | undefined;
-}
-
-/** Defines options for a message broker adapter. */
-export interface IMessageBrokerAdapterOptions {
-    /** 
-     * Defines a set of known channels for the broker; each name supports optional wildcards (*). 
-     * If no channels are provided the broker is then assumed to handle all requests.
-     */
-    readonly channelNames?: string[];
 }
 
 /** Defines a consumer for a specific channel. */
@@ -52,8 +43,8 @@ export interface IMessageConsumer {
 export interface IMessageConsumerOptions {
     /** Identifies the subscriber; multiple subscriptions with the same subscriber id will be treated as competing consumers (i.e. only one subscription will handle a message). */
     readonly subscriberId: string;
-    /** The name of the channel to subscribe to; note, a channel name supports basic pattern matching using the * as a wildcard. */
-    readonly channelName: string;
+    /** A name pattern for the channel(s) to subscribe to; a name pattern currently supports basic pattern matching using the * as a wildcard. */
+    readonly channelNamePattern: string;
     /** A callback to handle the message. */
     readonly handler: MessageHandler;
 }
@@ -76,7 +67,7 @@ export const IMessageService = createService<IMessageService>("message-service")
 /** A decorator for injecting message consumers. */
 export const IMessageConsumer = createInjectable<IMessageConsumer>({
     key: "message-consumer",
-    factory: services => ({ subscribe: options => services.get(IMessageService).getChannelConsumer(options.channelName).subscribe(options.subscriberId, options.handler) })
+    factory: services => ({ subscribe: options => services.get(IMessageService).getChannelConsumer(options.channelNamePattern).subscribe(options.subscriberId, options.handler) })
 });
 
 /** A decorator for injecting message producers. */
@@ -85,68 +76,60 @@ export const IMessageProducer = createInjectable<IMessageProducer>({
     factory: services => ({ send: (channelName, message) => services.get(IMessageService).getChannelProducer(channelName).send(message) })
 });
 
+/** 
+ * A utility to validate if a channel name matches the specified channel name pattern. 
+ * Currently, channel name patterns only support wildcard (*).
+ */
+export function isChannelNameMatch(channelNamePattern: string, channelName: string): boolean {
+    const regex = toRegExp(channelNamePattern);
+    return regex.test(channelName);
+}
+
+/** Returns true if the provided channel name is a pattern containing one or more wildcards. */
+export function isChannelNamePattern(channelName: string): boolean {
+    for (let i = 0; i < channelName.length; i++) {
+        if (channelName[i] === "*") {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function toRegExp(pattern: string): RegExp {
+    const escapeRegex = (str: string) => str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    pattern = "^" + pattern.split("*").map(escapeRegex).join(".*") + "$";
+    return new RegExp(pattern);
+}
+
 /** @internal */
 @Singleton
 export class MessageService implements IMessageService {
-    private readonly adapters: [IMessageBrokerAdapter, string[]][] = [];
-    private defaultAdapter?: IMessageBrokerAdapter;
+    private readonly adapters: IMessageBrokerAdapter[] = [];
 
-    getChannelConsumer(channelName: string): IMessageChannelConsumer {
-        return this.getChannelComponent(channelName, adapter => adapter.getChannelConsumer(channelName));
+    getChannelConsumer(channelNamePattern: string): IMessageChannelConsumer {
+        for (const adapter of this.adapters) {
+            const consumer = adapter.getChannelConsumer(channelNamePattern);
+            if (consumer) {
+                return consumer;
+            }
+        }
+
+        throw new Error(`No registered message brokers to handle channel consumer with pattern (${channelNamePattern}).`);
     }
 
     getChannelProducer(channelName: string): IMessageChannelProducer {
-        return this.getChannelComponent(channelName, adapter => adapter.getChannelProducer(channelName));
-    }
-
-    registerBroker(adapter: IMessageBrokerAdapter, options?: IMessageBrokerAdapterOptions): void {        
-        if (!options || !options.channelNames || !options.channelNames.length) {
-            if (!this.defaultAdapter) {
-                // TODO: log a warning and return instead of throwing?
-                throw new Error("A default broker adapter is already registered, must provide one or more channel names.");
-            }
-
-            this.defaultAdapter = adapter;
-            return;
-        }
-
-        this.adapters.push([adapter, options.channelNames]);
-    }
-
-    private getChannelComponent<T>(channelName: string, get: (adapter: IMessageBrokerAdapter) => T | undefined): T {
-        for (const adapter of this.getMatchingAdapters(channelName)) {
-            const component = get(adapter);
-            if (component) {
-                return component;
+        for (const adapter of this.adapters) {
+            const producer = adapter.getChannelProducer(channelName);
+            if (producer) {
+                return producer;
             }
         }
 
-        throw new Error(`No registered message brokers to handle channel (${channelName}).`);
+        throw new Error(`No registered message brokers to handle channel producer (${channelName}).`);
     }
 
-    private getMatchingAdapters(channelName: string): IMessageBrokerAdapter[] {
-        const adapters = this.defaultAdapter ? [this.defaultAdapter] : [];
-
-        for (const item of this.adapters) {
-            for (const pattern of item[1]) {
-                if (this.match(pattern, channelName)) {
-                    // keep the default adapter at the end of the list
-                    adapters.unshift(item[0]);
-                }
-            }
-        }
-
-        return adapters;
-    }
-
-    private match(pattern: string, value: string): boolean {
-        const regex = this.toRegExp(pattern);
-        return regex.test(value);
-    }
-    
-    private toRegExp(pattern: string): RegExp {
-        const escapeRegex = (str: string) => str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-        pattern = "^" + pattern.split("*").map(escapeRegex).join(".*") + "$";
-        return new RegExp(pattern);
+    registerBroker(adapter: IMessageBrokerAdapter): void {        
+        this.adapters.push(adapter);
     }
 }

@@ -3,7 +3,6 @@ import { ExpressModule, IExpressApplication } from "./module";
 
 /** A factory class for registering modules within an Express application context. */
 export class ExpressFactory {
-    //private readonly loader = new ModuleLoader().useModules([ExpressModule]);
     private readonly modules: ModuleInstanceOrConstructor[] = [ExpressModule];
     private readonly settings: IModuleSettingsCollection[] = [];
     private configureCallback: (registration: IServiceRegistration) => void = () => {};

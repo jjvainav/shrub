@@ -1,10 +1,10 @@
 import { createConfig, IModule, IModuleInitializer, IServiceRegistration } from "@shrub/core";
-import { IMessageBrokerAdapter, IMessageBrokerAdapterOptions, IMessageService, MessageService } from "./service";
+import { IMessageBrokerAdapter, IMessageService, MessageService } from "./service";
 
 export const IMessagingConfiguration = createConfig<IMessagingConfiguration>();
 export interface IMessagingConfiguration {
     /** Registers a message broker adapter. */
-    useMessageBroker(adapter: IMessageBrokerAdapter, options?: IMessageBrokerAdapterOptions): void;
+    useMessageBroker(adapter: IMessageBrokerAdapter): void;
 }
 
 export class MessagingModule implements IModule {
@@ -12,7 +12,7 @@ export class MessagingModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(IMessagingConfiguration).register(({ services }) => ({
-            useMessageBroker: (adapter, options) => services.get(IMessageService).registerBroker(adapter, options)
+            useMessageBroker: adapter => services.get(IMessageService).registerBroker(adapter)
         }));
     }
 

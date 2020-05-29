@@ -93,7 +93,7 @@ class Cookie implements ICookie {
             isDelete ? this.getCookieOptionsForDelete() : this.getCookieOptions());
     }
 
-    private getCookieOptionsForDelete():  Cookies.SetOption {
+    private getCookieOptionsForDelete(): Cookies.SetOption {
         // The Cookies library doesn't seem to handle deletion properly if the cookie with the same name
         // was already set for the same request so it needs to be done manually to get around the issue.
         // - set expires to the epoch

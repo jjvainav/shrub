@@ -1,6 +1,5 @@
 import { createConfig, IModule, IModuleInitializer } from "@shrub/core";
-import { IMessagingConfiguration } from "@shrub/messaging";
-import urlJoin from "url-join";
+import { IMessagingConfiguration, isChannelNameMatch } from "@shrub/messaging";
 import { EventStreamChannelConsumer, IEventStreamInterceptors } from "./consumer";
 
 export const IMessagingEventStreamConfiguration = createConfig<IMessagingEventStreamConfiguration>();
@@ -9,29 +8,37 @@ export interface IMessagingEventStreamConfiguration {
     useEventStreamConsumer(options: IEventStreamConsumerOptions): void;
 }
 
-/** Converts a channel name into a url. */
-export interface IChannelNameUrlConverter {
-    (channelName: string): string;
-}
-
 /** Defines options for event-stream consumers. */
 export interface IEventStreamConsumerOptions {
-    /** A set of channel names and patterns expected by the consumer. */
-    readonly channels: string[];
-    /** A callback for converting a channel name into a url. */
-    readonly channelNameConverter: IChannelNameUrlConverter;
+    /** A set of endpoints for the consumer to connect to. */
+    readonly endpoints: IEventStreamEndpoint[];
     /** Optional interceptors that get passed to the underlying RequestEventStream. */
     readonly interceptors?: IEventStreamInterceptors;
 }
 
-/** 
- * Default channel converter that builds a url from a channel name. An optional delimiter is used to identify url parts; for example, 
- * the default delimiter is a colon (:) so a channel name of foo:bar:1 will be converted to baseUrl/foo/bar/1.
- */
-export const channelConverter: (baseUrl: string, delimiter?: string) => IChannelNameUrlConverter = (baseUrl, delimiter) => channelName => {
-    delimiter = delimiter !== undefined ? delimiter : ":";
-    return urlJoin(baseUrl, channelName.replace(delimiter, "/"));
-};
+/** Represents an endpoint and channel mapping for a consumer to connect to. */
+export interface IEventStreamEndpoint {
+    /** A set of patterns the endpoint supports; the default is '*' to represent 'all'.  */
+    readonly channelNamePatterns?: string[];
+    /** A url to connect to. */
+    readonly url: string;
+}
+
+function findEndpoint(endpoints: IEventStreamEndpoint[], channelNamePattern: string): IEventStreamEndpoint | undefined {
+    for (const endpoint of endpoints) {
+        if (!endpoint.channelNamePatterns) {
+            return endpoint;
+        }
+
+        for (const pattern of endpoint.channelNamePatterns) {
+            if (isChannelNameMatch(pattern, channelNamePattern)) {
+                return endpoint;
+            }
+        }
+    }
+
+    return undefined;
+}
 
 /** 
  * Core module for using event-streams for brokerless messaging. 
@@ -44,13 +51,19 @@ export class MessagingEventStreamModule implements IModule {
     initialize(init: IModuleInitializer): void {
         init.config(IMessagingEventStreamConfiguration).register(({ config }) => ({
             useEventStreamConsumer: options => config.get(IMessagingConfiguration).useMessageBroker({
-                getChannelConsumer: channelName => new EventStreamChannelConsumer({
-                    url: options.channelNameConverter(channelName),
-                    interceptors: options.interceptors
-                }),
+                getChannelConsumer: channelNamePattern => {
+                    const endpoint = findEndpoint(options.endpoints, channelNamePattern);
+                    if (!endpoint) {
+                        return undefined;
+                    }
+
+                    return new EventStreamChannelConsumer({
+                        channelNamePattern,
+                        url: endpoint.url,
+                        interceptors: options.interceptors
+                    });
+                },
                 getChannelProducer: () => undefined
-            }, {
-                channelNames: options.channels
             })
         }));
     }
