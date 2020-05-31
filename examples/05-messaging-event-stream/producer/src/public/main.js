@@ -17,7 +17,7 @@ form.addEventListener("submit", event => {
 
         submit.disabled = true;
         client.request({ 
-            url: "/messages", 
+            url: "/api/messages", 
             method: "POST", 
             data: { 
                 channel: channel.value,
@@ -32,12 +32,12 @@ form.addEventListener("submit", event => {
     event.preventDefault();
 });
 
-client.request({ url: "/consumers", method: "GET" }).invoke().then(result => {
+client.request({ url: "/api/consumers", method: "GET" }).invoke().then(result => {
     header.innerText = "Connected Consumers";
     setConsumers(result.data.consumers);
 });
 
-const stream = new RequestEventStream({ method: "GET", url: "/consumers/bind" });
+const stream = new RequestEventStream({ method: "GET", url: "/api/consumers/bind" });
 stream.onMessage(event => setConsumers(event.data.consumers));
 
 function setConsumers(values) {

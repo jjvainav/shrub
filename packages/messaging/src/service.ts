@@ -24,7 +24,7 @@ export interface IMessageBrokerAdapter {
 /** Defines a consumer for a specific channel. */
 export interface IMessageChannelConsumer {
     /** Subscribes to the message consumer. */
-    subscribe(subscriberId: string, handler: MessageHandler): Promise<ISubscription>;
+    subscribe(subscriptionId: string, handler: MessageHandler): Promise<ISubscription>;
 }
 
 /** Responsible for sending a message over a specific channel. */
@@ -42,7 +42,7 @@ export interface IMessageConsumer {
 /** Options for subscribing to a consumer. */
 export interface IMessageConsumerOptions {
     /** Identifies the subscriber; multiple subscriptions with the same subscriber id will be treated as competing consumers (i.e. only one subscription will handle a message). */
-    readonly subscriberId: string;
+    readonly subscriptionId: string;
     /** A name pattern for the channel(s) to subscribe to; a name pattern currently supports basic pattern matching using the * as a wildcard. */
     readonly channelNamePattern: string;
     /** A callback to handle the message. */
@@ -67,7 +67,7 @@ export const IMessageService = createService<IMessageService>("message-service")
 /** A decorator for injecting message consumers. */
 export const IMessageConsumer = createInjectable<IMessageConsumer>({
     key: "message-consumer",
-    factory: services => ({ subscribe: options => services.get(IMessageService).getChannelConsumer(options.channelNamePattern).subscribe(options.subscriberId, options.handler) })
+    factory: services => ({ subscribe: options => services.get(IMessageService).getChannelConsumer(options.channelNamePattern).subscribe(options.subscriptionId, options.handler) })
 });
 
 /** A decorator for injecting message producers. */

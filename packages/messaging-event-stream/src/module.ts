@@ -1,5 +1,5 @@
 import { createConfig, IModule, IModuleInitializer } from "@shrub/core";
-import { IMessagingConfiguration, isChannelNameMatch } from "@shrub/messaging";
+import { IMessagingConfiguration, isChannelNameMatch, MessagingModule } from "@shrub/messaging";
 import { EventStreamChannelConsumer, IEventStreamInterceptors } from "./consumer";
 
 export const IMessagingEventStreamConfiguration = createConfig<IMessagingEventStreamConfiguration>();
@@ -47,6 +47,7 @@ function findEndpoint(endpoints: IEventStreamEndpoint[], channelNamePattern: str
  */
 export class MessagingEventStreamModule implements IModule {
     readonly name = "messaging-event-stream";
+    readonly dependencies = [MessagingModule];
 
     initialize(init: IModuleInitializer): void {
         init.config(IMessagingEventStreamConfiguration).register(({ config }) => ({

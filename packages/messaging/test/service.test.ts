@@ -100,7 +100,7 @@ class TestConsumer implements IMessageChannelConsumer {
         this.handlers.forEach(handler => handler(message));
     }
 
-    subscribe(subscriberId: string, handler: MessageHandler): Promise<ISubscription> {
+    subscribe(subscriptionId: string, handler: MessageHandler): Promise<ISubscription> {
         this.handlers.push(handler);
         return Promise.resolve({
             unsubscribe: () => {}

@@ -25,10 +25,10 @@ export class EventStreamChannelConsumer implements IMessageChannelConsumer {
     constructor(private readonly options: IEventStreamChannelConsumerOptions) {
     }
 
-    subscribe(subscriberId: string, handler: MessageHandler): Promise<ISubscription> {
+    subscribe(subscriptionId: string, handler: MessageHandler): Promise<ISubscription> {
         return new Promise((resolve, reject) => {
             let current = Promise.resolve();
-            const url = urlJoin(this.options.url, "?subscriberId=" + encodeURIComponent(subscriberId) + "&channel=" + encodeURIComponent(this.options.channelNamePattern));
+            const url = urlJoin(this.options.url, "?subscriptionId=" + encodeURIComponent(subscriptionId) + "&channel=" + encodeURIComponent(this.options.channelNamePattern));
             const stream = new RequestEventStream<IMessage>({
                 url,
                 beforeRequest: this.options.interceptors && this.options.interceptors.beforeRequest,
@@ -48,8 +48,12 @@ export class EventStreamChannelConsumer implements IMessageChannelConsumer {
             });
 
             // TODO: telemetry - track open and onClose
+            // TODO: telemetry - track error 
+
             stream.onOpen(() => resolve({ unsubscribe: () => stream.close() }));
-            stream.onError(event => reject(new Error(`[${event.type}]: Failed to subscribe to '${url}' with response '${event.message}'`)));
+            stream.onError(event => {
+                reject(new Error(`[${event.type}]: Failed to subscribe to '${url}' with response '${event.message}'`));
+            });
 
             // TODO: telemetry - send invalid data
             //stream.onInvalidData

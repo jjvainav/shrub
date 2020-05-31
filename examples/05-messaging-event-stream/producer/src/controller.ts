@@ -3,9 +3,6 @@ import { EventStream, IEventStreamMetrics, IEventStreamMetricsService } from "@s
 import { IMessageProducer } from "@shrub/messaging";
 import { NextFunction, Request, Response } from "express";
 
-// TODO: build out the consumer package
-// TODO: remove the tests from express-messaging-event-stream
-
 interface IBrowserClient {
     readonly id: number;
     send(metrics: IEventStreamMetrics): void;
@@ -14,7 +11,7 @@ interface IBrowserClient {
 let clientId = 1;
 const clients = new Map<number, IBrowserClient>();
 
-@Route()
+@Route("/api")
 export class Controller {
     constructor(
         @IEventStreamMetricsService private readonly metrics: IEventStreamMetricsService,

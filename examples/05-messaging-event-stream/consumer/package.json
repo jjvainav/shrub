@@ -1,5 +1,5 @@
 {
-    "name": "05-messaging-event-stream-producer",
+    "name": "05-messaging-event-stream-consumer",
     "version": "1.0.0",
     "private": true,
     "scripts": {
@@ -12,10 +12,11 @@
     "dependencies": {
         "@shrub/core": "^0.4.75",
         "@shrub/express": "^0.4.75",
-        "@shrub/express-messaging-event-stream": "^0.4.75",
         "@shrub/messaging": "^0.4.75",
+        "@shrub/messaging-event-stream": "^0.4.75",
         "@sprig/request-client": "^0.1.47",
         "@sprig/request-client-events": "^0.1.47",
+        "@sprig/unique-id": "^0.1.47",
         "express": "^4.16.4"
     },
     "devDependencies": {
