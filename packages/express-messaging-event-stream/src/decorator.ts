@@ -33,6 +33,6 @@ const eventStream: (channelNamePattern: string) => RequestHandler = channelNameP
         return;
     }
 
-    req.context.services.get(IEventStreamService).openStream(channelNamePattern, subscriptionId, req, res);
+    req.context.services.get(IEventStreamService).openStream(channel, subscriptionId, req, res);
     next();
 };

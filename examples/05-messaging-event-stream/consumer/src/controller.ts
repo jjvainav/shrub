@@ -23,6 +23,8 @@ export class Controller {
             }
         });
 
+        console.log(`Consumer connected: subscriptionId=${subscriptionId} channel=${channel}`);
+
         res.status(200).set({
             "connection": "keep-alive",
             "cache-control": "no-cache",
@@ -32,7 +34,10 @@ export class Controller {
         req.socket.setKeepAlive(true);
         req.socket.setNoDelay(true);
         req.socket.setTimeout(0);
-        req.on("close", () => subscription.unsubscribe());
+        req.on("close", () => {
+            subscription.unsubscribe();
+            console.log(`Consumer disconnected: subscriptionId=${subscriptionId} channel=${channel}`);
+        });
     
         res.write(":go\n\n");
     }

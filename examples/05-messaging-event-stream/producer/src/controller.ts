@@ -36,14 +36,14 @@ export class Controller {
         };
     
         clients.set(client.id, client);
-        console.log("browser connected:", client.id);
+        console.log("Browser connected:", client.id);
     
         req.socket.setKeepAlive(true);
         req.socket.setNoDelay(true);
         req.socket.setTimeout(0);
         req.on("close", () => {
             clients.delete(client.id);
-            console.log("browser disconnected:", client.id);
+            console.log("Browser disconnected:", client.id);
         });
     
         res.write(":go\n\n");
@@ -51,12 +51,21 @@ export class Controller {
 
     @EventStream("/messages/bind", "*")
     openMessageStream(req: Request, res: Response, next: NextFunction): void {
+        // consumers from the consumer service will connect/subscribe via this endpoint
         // if desired, authorize the request now and skip invoking next if the request is not authorized     
         next();
 
+        const subscriptionId = <string>req.query.subscriptionId;
+        const channel = <string>req.query.channel;
+
+        console.log(`Consumer connected: subscriptionId=${subscriptionId} channel=${channel}`);
+
         // send metrics to browsers whenever a consumer has connected or disconnected
         this.sendMetricsToBrowserClients();
-        req.on("close", () => this.sendMetricsToBrowserClients());
+        req.on("close", () => {
+            console.log(`Consumer disconnected: subscriptionId=${subscriptionId} channel=${channel}`);
+            this.sendMetricsToBrowserClients();
+        });
     }
 
     @Get("/consumers")

@@ -23,6 +23,8 @@ async function start() {
                 });
 
                 const app = config.get(IExpressConfiguration);
+
+                app.use(express.json());
                 app.use(useController(Controller));
 
                 app.get("/", (_, res) => res.sendFile(path.join(__dirname, "public", "index.html")));

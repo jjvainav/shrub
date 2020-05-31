@@ -1,9 +1,6 @@
 import client from "@sprig/request-client";
 import { RequestEventStream } from "@sprig/request-client-events";
 
-const header = document.getElementById("header");
-header.innerText = "Loading...";
-
 const form = document.getElementById("form");
 form.addEventListener("submit", event => {
     const channel = document.getElementById("channel");
@@ -33,7 +30,6 @@ form.addEventListener("submit", event => {
 });
 
 client.request({ url: "/api/consumers", method: "GET" }).invoke().then(result => {
-    header.innerText = "Connected Consumers";
     setConsumers(result.data.consumers);
 });
 

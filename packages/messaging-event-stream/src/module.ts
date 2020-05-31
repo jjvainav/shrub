@@ -14,6 +14,8 @@ export interface IEventStreamConsumerOptions {
     readonly endpoints: IEventStreamEndpoint[];
     /** Optional interceptors that get passed to the underlying RequestEventStream. */
     readonly interceptors?: IEventStreamInterceptors;
+    /** The reconnection time (in milliseconds) when trying to connect to the event-stream endpoint. */
+    readonly retry?: number;
 }
 
 /** Represents an endpoint and channel mapping for a consumer to connect to. */
@@ -61,7 +63,8 @@ export class MessagingEventStreamModule implements IModule {
                     return new EventStreamChannelConsumer({
                         channelNamePattern,
                         url: endpoint.url,
-                        interceptors: options.interceptors
+                        interceptors: options.interceptors,
+                        retry: options.retry
                     });
                 },
                 getChannelProducer: () => undefined
