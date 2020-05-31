@@ -1,6 +1,7 @@
-import { createConfig, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration } from "@shrub/core";
-import { IMessagingConfiguration } from "@shrub/messaging";
-import { EventStreamService, IEventStreamService } from "./service";
+import { createConfig, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration, SingletonServiceFactory } from "@shrub/core";
+import { ExpressModule } from "@shrub/express";
+import { IMessagingConfiguration, MessagingModule } from "@shrub/messaging";
+import { EventStreamService, IEventStreamMetricsService, IEventStreamService } from "./service";
 
 export const IExpressMessagingEventStreamConfiguration = createConfig<IExpressMessagingEventStreamConfiguration>();
 export interface IExpressMessagingEventStreamConfiguration {
@@ -10,6 +11,10 @@ export interface IExpressMessagingEventStreamConfiguration {
 
 export class ExpressMessagingEventStreamModule implements IModule {
     readonly name = "express-messaging-event-stream";
+    readonly dependencies = [
+        ExpressModule,
+        MessagingModule
+    ];
 
     initialize(init: IModuleInitializer): void {
         init.config(IExpressMessagingEventStreamConfiguration).register(({ services }) => ({
@@ -18,7 +23,9 @@ export class ExpressMessagingEventStreamModule implements IModule {
     }
     
     configureServices(registration: IServiceRegistration): void {
-        registration.register(IEventStreamService, EventStreamService);
+        const factory = new SingletonServiceFactory(EventStreamService);
+        registration.registerSingleton(IEventStreamService, factory);
+        registration.registerSingleton(IEventStreamMetricsService, factory);
     }
 
     configure({ config, services }: IModuleConfigurator): void {

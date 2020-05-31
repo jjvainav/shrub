@@ -1,5 +1,6 @@
 import { createService, Singleton } from "@shrub/core";
-import { IMessage, IMessageChannelProducer, isChannelNameMatch, isChannelNamePattern } from "@shrub/messaging";
+import { IMessage, IMessageChannelProducer, IMessageDetails, isChannelNameMatch, isChannelNamePattern } from "@shrub/messaging";
+import createId from "@sprig/unique-id";
 import { Request, Response } from "express";
 
 /** Manages connected event-stream clients and producers for the module. */
@@ -14,6 +15,21 @@ export interface IEventStreamService {
     whitelistChannel(channelNamePattern: string): void;
 }
 
+/** Provides metrics for the event stream service. */
+export interface IEventStreamMetricsService {
+    getMetrics(): IEventStreamMetrics;
+}
+
+export interface IEventStreamMetrics {
+    readonly consumers: IEventStreamConsumer[];
+}
+
+export interface IEventStreamConsumer {
+    readonly id: number;
+    readonly channel: string;
+    readonly subscriptionId: string;
+}
+
 interface IEventStream {
     readonly id: number;
     readonly subscriptionId: string;
@@ -22,9 +38,10 @@ interface IEventStream {
 }
 
 export const IEventStreamService = createService<IEventStreamService>("express-messaging-event-stream-service");
+export const IEventStreamMetricsService = createService<IEventStreamMetricsService>("express-messaging-event-stream-metrics-service");
 
 @Singleton
-export class EventStreamService implements IEventStreamService {
+export class EventStreamService implements IEventStreamService, IEventStreamMetricsService {
     private readonly patterns = new Map<number, [string, IEventStream]>();
     private readonly streams = new Map<string, Map<number, IEventStream>>();
     private readonly whitelist = new ChannelWhitelist();
@@ -34,6 +51,30 @@ export class EventStreamService implements IEventStreamService {
         return this.whitelist.isChannelSupported(channelName) 
             ? { send: message => this.sendMessage(channelName, message) }
             : undefined;
+    }
+
+    getMetrics(): IEventStreamMetrics {
+        const consumers: IEventStreamConsumer[] = [];
+
+        for (const item of this.patterns) {
+            consumers.push({
+                id: item[0],
+                channel: item[1][0],
+                subscriptionId: item[1][1].subscriptionId
+            });
+        }
+
+        for (const item of this.streams) {
+            for (const consumer of item[1]) {
+                consumers.push({
+                    id: consumer[0],
+                    channel: item[0],
+                    subscriptionId: consumer[1].subscriptionId
+                });
+            }
+        }
+
+        return { consumers };
     }
 
     isChannelSupported(channelName: string): boolean {
@@ -60,7 +101,12 @@ export class EventStreamService implements IEventStreamService {
         this.whitelist.add(channelNamePattern);
     }
 
-    private sendMessage(channelName: string, message: IMessage): void {
+    private sendMessage(channelName: string, details: IMessageDetails): void {
+        const message: IMessage = {
+            id: createId(),
+            headers: details.headers || {},
+            body: details.body
+        };
         const subscriptions = new Map<string, IEventStream[]>();
         const add = (stream: IEventStream) => {
             const streams = subscriptions.get(stream.subscriptionId) || [];

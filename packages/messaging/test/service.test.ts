@@ -28,7 +28,7 @@ describe("message service", () => {
         expect(isChannelNameMatch("*", "foo")).toBe(true);
     });
 
-    test("send message to consumer from producer", () => {
+    test("send message to consumer from producer", async () => {
         const service = new MessageService();
 
         service.registerBroker(new TestBroker());
@@ -37,15 +37,13 @@ describe("message service", () => {
         const producer = service.getChannelProducer("foo");
 
         let message: IMessage | undefined;
-        consumer.subscribe("", m => { message = m });
+        await consumer.subscribe("", m => { message = m });
         producer.send({ 
-            id: "123",
-            headers: {},
-            data: {}
-         });
+            body: { foo: "bar" } 
+        });
 
          expect(message).toBeDefined();
-         expect(message!.id).toBe("123");
+         expect(message!.body.foo).toBe("bar");
     });
 
     test("inject consumer and producer", () => {
@@ -65,6 +63,7 @@ describe("message service", () => {
 
 class TestBroker implements IMessageBrokerAdapter {
     private readonly consumers: [string, TestConsumer][] = [];
+    private nextId = 1;
 
     getChannelConsumer(channelNamePattern: string): IMessageChannelConsumer | undefined {
         const consumer = new TestConsumer();
@@ -74,7 +73,16 @@ class TestBroker implements IMessageBrokerAdapter {
 
     getChannelProducer(channelName: string): IMessageChannelProducer | undefined {
         return {
-            send: message => {
+            send: details => {
+                const id = this.nextId.toString();
+                this.nextId++;
+
+                const message: IMessage = {
+                    id,
+                    headers: details.headers || {},
+                    body: details.body
+                };
+
                 for (const item of this.consumers) {
                     if (isChannelNameMatch(item[0], channelName)) {
                         item[1].send(message);
@@ -92,11 +100,11 @@ class TestConsumer implements IMessageChannelConsumer {
         this.handlers.forEach(handler => handler(message));
     }
 
-    subscribe(subscriberId: string, handler: MessageHandler): ISubscription {
+    subscribe(subscriberId: string, handler: MessageHandler): Promise<ISubscription> {
         this.handlers.push(handler);
-        return {
+        return Promise.resolve({
             unsubscribe: () => {}
-        };
+        });
     }
 }
 

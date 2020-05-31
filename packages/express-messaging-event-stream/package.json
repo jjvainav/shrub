@@ -22,11 +22,13 @@
     "scripts": {
         "build": "tsc -b .",
         "build:esm": "tsc -p tsconfig.esm.json",
-        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "test": "jest"
     },
     "dependencies": {
         "@shrub/core": "0.4.75",
         "@shrub/express": "0.4.75",
-        "@shrub/messaging": "0.4.75"
+        "@shrub/messaging": "0.4.75",
+        "@sprig/unique-id": "^0.1.46"
     }
 }

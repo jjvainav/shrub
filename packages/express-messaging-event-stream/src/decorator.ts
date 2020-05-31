@@ -18,17 +18,17 @@ const eventStream: (channelNamePattern: string) => RequestHandler = channelNameP
     const channel = req.query.channel;
     const subscriptionId = req.query.subscriptionId;
 
-    if (!channel) {
-        res.status(400).json({ message: "Missing channel parameter." });
+    if (typeof channel !== "string") {
+        res.status(400).json({ message: "Missing or invalid channel parameter." });
         return;
     }
 
-    if (!subscriptionId) {
-        res.status(400).json({ message: "Missing subscriptionId parameter." });
+    if (typeof subscriptionId !== "string") {
+        res.status(400).json({ message: "Missing or invalid subscriptionId parameter." });
         return;
     }
 
-    if (!isChannelNameMatch(channel, channelNamePattern)) {
+    if (!isChannelNameMatch(channelNamePattern, channel)) {
         res.status(400).json({ message: "Invalid channel name." });
         return;
     }

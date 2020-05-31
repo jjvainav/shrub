@@ -27,6 +27,6 @@
     "dependencies": {
         "@shrub/core": "0.4.75",
         "@shrub/tracing": "0.4.75",
-        "@sprig/request-client": "^0.1.43"
+        "@sprig/request-client": "^0.1.46"
     }
 }

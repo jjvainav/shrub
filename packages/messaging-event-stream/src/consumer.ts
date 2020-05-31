@@ -22,40 +22,40 @@ export interface IEventStreamChannelConsumerOptions {
 
 /** @internal */
 export class EventStreamChannelConsumer implements IMessageChannelConsumer {
-    private current = Promise.resolve();
-
     constructor(private readonly options: IEventStreamChannelConsumerOptions) {
     }
 
-    subscribe(subscriberId: string, handler: MessageHandler): ISubscription {
-        const stream = new RequestEventStream<IMessage>({
-            url: urlJoin(this.options.url, "?subscriberId=" + encodeURIComponent(subscriberId) + "&channel=" + encodeURIComponent(this.options.channelNamePattern)),
-            beforeRequest: this.options.interceptors && this.options.interceptors.beforeRequest,
-            afterRequest: this.options.interceptors && this.options.interceptors.afterRequest,
-            validate: (data, resolve, reject) => jsonValidator(
-                data,
-                obj => { 
-                    if (Message.isMessage(obj)) {
-                        resolve(obj);
-                    }
-                    else {
-                        // TODO: what happens on reject?? tie into error reporting mentioned below
-                        reject("Invalid data received.");
-                    }
-                },
-                message => reject(message))
-        });
+    subscribe(subscriberId: string, handler: MessageHandler): Promise<ISubscription> {
+        return new Promise((resolve, reject) => {
+            let current = Promise.resolve();
+            const url = urlJoin(this.options.url, "?subscriberId=" + encodeURIComponent(subscriberId) + "&channel=" + encodeURIComponent(this.options.channelNamePattern));
+            const stream = new RequestEventStream<IMessage>({
+                url,
+                beforeRequest: this.options.interceptors && this.options.interceptors.beforeRequest,
+                afterRequest: this.options.interceptors && this.options.interceptors.afterRequest,
+                validate: (data, resolve, reject) => jsonValidator(
+                    data,
+                    obj => { 
+                        if (Message.isMessage(obj)) {
+                            resolve(obj);
+                        }
+                        else {
+                            // rejecting will cause the onInvalidData event to be raised
+                            reject("Invalid data received.");
+                        }
+                    },
+                    message => reject(message))
+            });
 
-        // TODO: handle if a connection failed
-        //stream.onError
-        
-        stream.onMessage(event => {
+            // TODO: telemetry - track open and onClose
+            stream.onOpen(() => resolve({ unsubscribe: () => stream.close() }));
+            stream.onError(event => reject(new Error(`[${event.type}]: Failed to subscribe to '${url}' with response '${event.message}'`)));
 
-            // TODO: suport for handling invalid messages? pass in an Invalid Message channel/producer into the constructor?
+            // TODO: telemetry - send invalid data
+            //stream.onInvalidData
+            
             // the 'current' promise will block handling the next message until the previous handler returns
-            this.current = this.current.then(() => handler(event.data));
+            stream.onMessage(event => current = current.then(() => handler(event.data)));
         });
-
-        return { unsubscribe: () => stream.close() };
     }
 }

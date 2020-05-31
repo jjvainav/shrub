@@ -1,5 +1,5 @@
 import { createInjectable, createService, Singleton } from "@shrub/core";
-import { IMessage } from "./message";
+import { IMessage, IMessageDetails } from "./message";
 
 /** Handles a message and optionally returns a promise to support async message handling and prevent the next message from being processed until this handler finishes. */
 export type MessageHandler = (message: IMessage) => void | Promise<void>;
@@ -24,19 +24,19 @@ export interface IMessageBrokerAdapter {
 /** Defines a consumer for a specific channel. */
 export interface IMessageChannelConsumer {
     /** Subscribes to the message consumer. */
-    subscribe(subscriberId: string, handler: MessageHandler): ISubscription;
+    subscribe(subscriberId: string, handler: MessageHandler): Promise<ISubscription>;
 }
 
 /** Responsible for sending a message over a specific channel. */
 export interface IMessageChannelProducer {
     /** Sends a message on the channel. */
-    send(message: IMessage): void;
+    send(message: IMessageDetails): void;
 }
 
 /** Defines a consumer for a message broker. */
 export interface IMessageConsumer {
     /** Subscribes to the message consumer. */
-    subscribe(options: IMessageConsumerOptions): ISubscription;
+    subscribe(options: IMessageConsumerOptions): Promise<ISubscription>;
 }
 
 /** Options for subscribing to a consumer. */
@@ -58,7 +58,7 @@ export interface ISubscription {
 /** Handles sending messages. */
 export interface IMessageProducer {
     /** Sends a message to the specified channel. */
-    send(channelName: string, message: IMessage): void;
+    send(channelName: string, message: IMessageDetails): void;
 }
 
 /** @internal */
