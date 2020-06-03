@@ -1,6 +1,6 @@
 import { IModuleConfigurator } from "@shrub/core";
 import { ExpressFactory, ExpressModule, IExpressConfiguration, useController } from "@shrub/express";
-import { ExpressMessagingEventStreamModule } from "@shrub/express-messaging-event-stream";
+import { ExpressEventStreamModule, IExpressEventStreamConfiguration } from "@shrub/express-event-stream";
 import { ExpressTracingModule, useRequestTracing } from "@shrub/express-tracing";
 import { TracingConsoleModule } from "@shrub/tracing-console";
 import * as express from "express";
@@ -10,14 +10,22 @@ import { Controller } from "./controller";
 async function start() {
     const app = await ExpressFactory
         .useModules([{
-            name: "producer",
+            name: "consumer",
             dependencies: [
                 ExpressModule,
-                ExpressMessagingEventStreamModule,
+                ExpressEventStreamModule,
                 ExpressTracingModule,
                 TracingConsoleModule
             ],
             configure: ({ config }: IModuleConfigurator) => {
+                config.get(IExpressEventStreamConfiguration).addConsumer({
+                    endpoints: [{
+                        // this indicates the endpoint will handle all channel names
+                        channelNamePatterns: ["*"],
+                        url: "http://localhost:3000/api/messages/bind"
+                    }]
+                });
+
                 const app = config.get(IExpressConfiguration);
 
                 app.get("/", (_, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
@@ -30,10 +38,10 @@ async function start() {
         }])
         .create();
 
-    app.set("port", process.env.PORT || 3000);
+    app.set("port", process.env.PORT || 3001);
     app.listen(app.get("port"), () => {
-        console.log("  Producer started at http://localhost:%d", app.get("port"));
-        console.log("  Producer running");
+        console.log("  Consumer started at http://localhost:%d", app.get("port"));
+        console.log("  Consumer running");
         console.log("  Press CTRL-C to stop\n");
     });           
 }

@@ -6,10 +6,13 @@ import { EventStreamProducerService, IEventStreamProducerService } from "./servi
 
 export const IExpressEventStreamConfiguration = createConfig<IExpressEventStreamConfiguration>();
 export interface IExpressEventStreamConfiguration {
-    /** Registers an event-stream consumer with the messaging message broker. */
-    useConsumer(options: IEventStreamConsumerOptions): void;
-    /** Registers an event-stream producer with the messaging message broker. */
-    useProducer(options?: IEventStreamProducerOptions): void;
+    /** Adds an event-stream consumer with the messaging message broker. */
+    addConsumer(options: IEventStreamConsumerOptions): void;
+    /** 
+     * Enables the event-stream producer with the messaging message broker and
+     * is required when using the EventStreamChannel controller decorator.
+     */
+    enableProducer(options?: IEventStreamProducerOptions): void;
 }
 
 /** Defines options for the event-stream producer. */
@@ -29,8 +32,8 @@ export class ExpressEventStreamModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(IExpressEventStreamConfiguration).register(({ services }) => ({
-            useConsumer: options => this.appendConsumer(services.get(IEventStreamConsumerService), options),
-            useProducer: options => this.enableProducer(services.get(IEventStreamProducerService), options)
+            addConsumer: options => this.appendConsumer(services.get(IEventStreamConsumerService), options),
+            enableProducer: options => this.enableProducer(services.get(IEventStreamProducerService), options)
         }));
     }
     

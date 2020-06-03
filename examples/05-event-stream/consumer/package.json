@@ -1,5 +1,5 @@
 {
-    "name": "05-messaging-event-stream-consumer",
+    "name": "05-event-stream-consumer",
     "version": "1.0.0",
     "private": true,
     "scripts": {
@@ -12,9 +12,9 @@
     "dependencies": {
         "@shrub/core": "^0.4.75",
         "@shrub/express": "^0.4.75",
+        "@shrub/express-event-stream": "^0.4.75",
         "@shrub/express-tracing": "^0.4.75",
         "@shrub/messaging": "^0.4.75",
-        "@shrub/messaging-event-stream": "^0.4.75",
         "@shrub/tracing-console": "^0.4.75",
         "@sprig/request-client": "^0.1.48",
         "@sprig/request-client-events": "^0.1.48",

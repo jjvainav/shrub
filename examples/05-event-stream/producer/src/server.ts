@@ -1,7 +1,7 @@
 import { IModuleConfigurator } from "@shrub/core";
 import { ExpressFactory, ExpressModule, IExpressConfiguration, useController } from "@shrub/express";
+import { ExpressEventStreamModule, IExpressEventStreamConfiguration } from "@shrub/express-event-stream";
 import { ExpressTracingModule, useRequestTracing } from "@shrub/express-tracing";
-import { IMessagingEventStreamConfiguration, MessagingEventStreamModule } from "@shrub/messaging-event-stream";
 import { TracingConsoleModule } from "@shrub/tracing-console";
 import * as express from "express";
 import * as path from "path";
@@ -10,21 +10,15 @@ import { Controller } from "./controller";
 async function start() {
     const app = await ExpressFactory
         .useModules([{
-            name: "consumer",
+            name: "producer",
             dependencies: [
                 ExpressModule,
+                ExpressEventStreamModule,
                 ExpressTracingModule,
-                MessagingEventStreamModule,
                 TracingConsoleModule
             ],
             configure: ({ config }: IModuleConfigurator) => {
-                config.get(IMessagingEventStreamConfiguration).useEventStreamConsumer({
-                    endpoints: [{
-                        // this indicates the endpoint will handle all channel names
-                        channelNamePatterns: ["*"],
-                        url: "http://localhost:3000/api/messages/bind"
-                    }]
-                });
+                config.get(IExpressEventStreamConfiguration).enableProducer();
 
                 const app = config.get(IExpressConfiguration);
 
@@ -38,10 +32,10 @@ async function start() {
         }])
         .create();
 
-    app.set("port", process.env.PORT || 3001);
+    app.set("port", process.env.PORT || 3000);
     app.listen(app.get("port"), () => {
-        console.log("  Consumer started at http://localhost:%d", app.get("port"));
-        console.log("  Consumer running");
+        console.log("  Producer started at http://localhost:%d", app.get("port"));
+        console.log("  Producer running");
         console.log("  Press CTRL-C to stop\n");
     });           
 }

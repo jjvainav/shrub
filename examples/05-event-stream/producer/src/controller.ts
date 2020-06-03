@@ -1,5 +1,5 @@
 import { Get, Post, Route } from "@shrub/express";
-import { EventStream, IEventStreamMetrics, IEventStreamMetricsService } from "@shrub/express-messaging-event-stream";
+import { EventStream, EventStreamChannel, IEventStreamMetrics, IEventStreamMetricsService } from "@shrub/express-event-stream";
 import { IMessageProducer } from "@shrub/messaging";
 import { NextFunction, Request, Response } from "express";
 
@@ -56,8 +56,8 @@ export class Controller {
         res.write(":go\n\n");
     }
 
-    @EventStream("/messages/bind", "*")
-    openMessageStream(req: Request, res: Response, next: NextFunction): void {
+    @EventStreamChannel("/messages/bind", "*")
+    openMessageStreamChannel(req: Request, res: Response, next: NextFunction): void {
         // consumers from the consumer service will connect/subscribe via this endpoint
         // if desired, authorize the request now and skip invoking next if the request is not authorized     
         next();
