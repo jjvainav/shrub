@@ -1,0 +1,42 @@
+{
+    "name": "@shrub/express-event-stream",
+    "description": "Express module that provides support for event-stream endpoints and event-stream brokerless messaging.",
+    "version": "0.4.75",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "module": "dist/esm/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.0.0"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "build:esm": "tsc -p tsconfig.esm.json",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
+    },
+    "dependencies": {
+        "@shrub/core": "0.4.75",
+        "@shrub/express": "0.4.75",
+        "@shrub/messaging": "0.4.75",
+        "@shrub/tracing": "0.4.75",
+        "@sprig/event-emitter": "^0.1.48",
+        "@sprig/request-client": "^0.1.48",
+        "@sprig/request-client-events": "^0.1.48",
+        "@sprig/request-client-mock": "^0.1.48",
+        "@sprig/unique-id": "^0.1.48",
+        "url-join": "^4.0.1"
+    },
+    "devDependencies": {
+        "@types/url-join": "^0.8.2"
+    }
+}

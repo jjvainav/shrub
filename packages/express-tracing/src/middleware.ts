@@ -32,7 +32,7 @@ export const useRequestTracing = (options?: IRequestTracingOptions): RequestHand
             if (res.statusCode >= 300 && res.statusCode < 400) {
                 const location = res.getHeader("location");
                 if (location) {
-                    span.tag("http.location", location);
+                    span.tag("http.location", <string>location);
                 }
             }
 

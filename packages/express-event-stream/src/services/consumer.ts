@@ -1,7 +1,16 @@
-import { IMessage, IMessageChannelConsumer, ISubscription, Message, MessageHandler } from "@shrub/messaging";
+import { createService, Transient } from "@shrub/core";
+import { IMessage, IMessageChannelConsumer, isChannelNameMatch, ISubscription, Message, MessageHandler } from "@shrub/messaging";
 import { IRequest, IRequestPromise } from "@sprig/request-client";
 import { IRequestEventStream, jsonValidator, RequestEventStream } from "@sprig/request-client-events";
 import urlJoin from "url-join";
+
+/** Represents an endpoint and channel mapping for a consumer to connect to. */
+export interface IEventStreamEndpoint {
+    /** A set of patterns the endpoint supports; the default is '*' to represent 'all'.  */
+    readonly channelNamePatterns?: string[];
+    /** A url to connect to. */
+    readonly url: string;
+}
 
 /** Interceptors that get passed to the underlying RequestEventStream. */
 export interface IEventStreamInterceptors {
@@ -9,8 +18,17 @@ export interface IEventStreamInterceptors {
     readonly afterRequest?: (promise: IRequestPromise) => IRequestPromise;
 }
 
-/** Options for the event stream channel consumer. */
-/** @internal */
+/** Defines options for event-stream consumers. */
+export interface IEventStreamConsumerOptions {
+    /** A set of endpoints for the consumer to connect to. */
+    readonly endpoints: IEventStreamEndpoint[];
+    /** Optional interceptors that get passed to the underlying RequestEventStream. */
+    readonly interceptors?: IEventStreamInterceptors;
+    /** The reconnection time (in milliseconds) when trying to connect to the event-stream endpoint. */
+    readonly retry?: number;
+}
+
+/** @internal Options for the event stream channel consumer. */
 export interface IEventStreamChannelConsumerOptions {
     /** The channel name pattern the consumer is subscribing to. */
     readonly channelNamePattern: string;
@@ -22,10 +40,51 @@ export interface IEventStreamChannelConsumerOptions {
     readonly retry?: number;
 }
 
+/** @internal Manages event-stream consumers for the module. */
+export interface IEventStreamConsumerService {
+    /** Gets a consumer with the specified channel name pattern and options. */
+    getMessageChannelConsumer(channelNamePattern: string, options: IEventStreamConsumerOptions): IMessageChannelConsumer | undefined;
+}
+
+/** @internal */
+export const IEventStreamConsumerService = createService<IEventStreamConsumerService>("express-event-stream-consumer-service");
 const defaultRetry = 2000;
 
 /** @internal */
-export class EventStreamChannelConsumer implements IMessageChannelConsumer {
+@Transient
+export class EventStreamConsumerService implements IEventStreamConsumerService {
+    getMessageChannelConsumer(channelNamePattern: string, options: IEventStreamConsumerOptions): IMessageChannelConsumer | undefined {
+        const endpoint = this.findEndpoint(options.endpoints, channelNamePattern);
+        if (!endpoint) {
+            return undefined;
+        }
+
+        return new EventStreamChannelConsumer({
+            channelNamePattern,
+            url: endpoint.url,
+            interceptors: options.interceptors,
+            retry: options.retry
+        });
+    }
+
+    private findEndpoint(endpoints: IEventStreamEndpoint[], channelNamePattern: string): IEventStreamEndpoint | undefined {
+        for (const endpoint of endpoints) {
+            if (!endpoint.channelNamePatterns) {
+                return endpoint;
+            }
+    
+            for (const pattern of endpoint.channelNamePatterns) {
+                if (isChannelNameMatch(pattern, channelNamePattern)) {
+                    return endpoint;
+                }
+            }
+        }
+    
+        return undefined;
+    }
+}
+
+class EventStreamChannelConsumer implements IMessageChannelConsumer {
     constructor(private readonly options: IEventStreamChannelConsumerOptions) {
     }
 

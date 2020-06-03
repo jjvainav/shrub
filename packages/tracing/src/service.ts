@@ -105,6 +105,8 @@ export interface ITraceObserver {
     readonly start?: (scope: any, span: ISpan) => void;
     /** Occurs when a log has been added to a span. */
     readonly log?: (span: ISpan, log: ILog) => void;
+    /** Occurs when a tag has been set for the span. */
+    readonly tag?: (span: ISpan, key: string, value: string | number | boolean) => void;
     /** Occurs when the specified span is done. */
     readonly done?: (scope: any, span: ISpan) => void;
 }
@@ -153,7 +155,7 @@ export interface ISpan {
     /** Log warning data with the span. */
     logWarn(data: any): void;    
     /** Adds a tag to the span. */
-    tag(key: string, value: any): void;
+    tag(key: string, value: string | number | boolean): void;
 }
 
 /** Represents the distributed context for an existing span. */
@@ -404,6 +406,11 @@ class TracerBuilder implements ITracerBuilder {
                     },        
                     tag: function (key: string, value: any) {
                         (<any>this.tags)[key] = value;
+                        observers.forEach(observer => {
+                            if (observer.tag) {
+                                observer.tag(this, key, value);
+                            }
+                        });
                     }
                 };
             

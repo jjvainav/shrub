@@ -16,9 +16,9 @@ export interface IMessageService {
 /** An adapter to an external message broker system for handling the control of messages. */
 export interface IMessageBrokerAdapter {
     /** Gets a consumer for the specified channel name pattern or undefined if a consumer is not available for the channel. */
-    getChannelConsumer(channelNamePattern: string): IMessageChannelConsumer | undefined;
+    getChannelConsumer?(channelNamePattern: string): IMessageChannelConsumer | undefined;
     /** Gets a producer for the specified channel or undefined if a producer is not available for the channel. */
-    getChannelProducer(channelName: string): IMessageChannelProducer | undefined;
+    getChannelProducer?(channelName: string): IMessageChannelProducer | undefined;
 }
 
 /** Defines a consumer for a specific channel. */
@@ -109,9 +109,11 @@ export class MessageService implements IMessageService {
 
     getChannelConsumer(channelNamePattern: string): IMessageChannelConsumer {
         for (const adapter of this.adapters) {
-            const consumer = adapter.getChannelConsumer(channelNamePattern);
-            if (consumer) {
-                return consumer;
+            if (adapter.getChannelConsumer) {
+                const consumer = adapter.getChannelConsumer(channelNamePattern);
+                if (consumer) {
+                    return consumer;
+                }
             }
         }
 
@@ -120,9 +122,11 @@ export class MessageService implements IMessageService {
 
     getChannelProducer(channelName: string): IMessageChannelProducer {
         for (const adapter of this.adapters) {
-            const producer = adapter.getChannelProducer(channelName);
-            if (producer) {
-                return producer;
+            if (adapter.getChannelProducer) {
+                const producer = adapter.getChannelProducer(channelName);
+                if (producer) {
+                    return producer;
+                }
             }
         }
 
