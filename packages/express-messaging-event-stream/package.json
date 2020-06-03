@@ -28,6 +28,6 @@
         "@shrub/core": "0.4.75",
         "@shrub/express": "0.4.75",
         "@shrub/messaging": "0.4.75",
-        "@sprig/unique-id": "^0.1.47"
+        "@sprig/unique-id": "^0.1.48"
     }
 }

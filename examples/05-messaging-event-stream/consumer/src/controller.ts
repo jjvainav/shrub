@@ -23,7 +23,10 @@ export class Controller {
             }
         });
 
-        console.log(`Consumer connected: subscriptionId=${subscriptionId} channel=${channel}`);
+        req.context.span!.logInfo({
+            name: "connection-open",
+            props: { channel, subscriptionId } 
+        });
 
         res.status(200).set({
             "connection": "keep-alive",
@@ -36,7 +39,10 @@ export class Controller {
         req.socket.setTimeout(0);
         req.on("close", () => {
             subscription.unsubscribe();
-            console.log(`Consumer disconnected: subscriptionId=${subscriptionId} channel=${channel}`);
+            req.context.span!.logInfo({
+                name: "connection-closed",
+                props: { channel, subscriptionId } 
+            });
         });
     
         res.write(":go\n\n");

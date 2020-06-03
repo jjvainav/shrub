@@ -37,13 +37,20 @@ export class Controller {
     
         clients.set(client.id, client);
         console.log("Browser connected:", client.id);
+        req.context.span!.logInfo({
+            name: "browser-connected",
+            props: { clientId: client.id } 
+        });
     
         req.socket.setKeepAlive(true);
         req.socket.setNoDelay(true);
         req.socket.setTimeout(0);
         req.on("close", () => {
             clients.delete(client.id);
-            console.log("Browser disconnected:", client.id);
+            req.context.span!.logInfo({
+                name: "browser-disconnected",
+                props: { clientId: client.id }
+            });
         });
     
         res.write(":go\n\n");
@@ -58,13 +65,19 @@ export class Controller {
         const subscriptionId = <string>req.query.subscriptionId;
         const channel = <string>req.query.channel;
 
-        console.log(`Consumer connected: subscriptionId=${subscriptionId} channel=${channel}`);
+        req.context.span!.logInfo({
+            name: "consumer-connected",
+            props: { channel, subscriptionId } 
+        });
 
         // send metrics to browsers whenever a consumer has connected or disconnected
         this.sendMetricsToBrowserClients();
         req.on("close", () => {
-            console.log(`Consumer disconnected: subscriptionId=${subscriptionId} channel=${channel}`);
             this.sendMetricsToBrowserClients();
+            req.context.span!.logInfo({
+                name: "consumer-disconnected",
+                props: { channel, subscriptionId } 
+            });
         });
     }
 

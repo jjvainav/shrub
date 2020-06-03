@@ -202,8 +202,31 @@ class VueI18nService implements IVueI18nService {
                 });
         };
 
-        // only pass down the fallback locale if it is not the same as the locale being loaded
-        return options => tryLoadWithFallback(options, options.locale !== this.i18n.fallbackLocale ? this.i18n.fallbackLocale : undefined);
+        return options => {
+            // only pass down the fallback locale if it is not the same as the locale being loaded
+            const fallback = this.getFallbackLocale();
+            return tryLoadWithFallback(options, options.locale !== fallback ? fallback : undefined);
+        }
+    }
+
+    private getFallbackLocale(): string | undefined {
+        if (typeof this.i18n.fallbackLocale === "string") {
+            return this.i18n.fallbackLocale;
+        }
+
+        if (Array.isArray(this.i18n.fallbackLocale)) {
+            return this.i18n.fallbackLocale.length ? this.i18n.fallbackLocale[0] : undefined;
+        }
+
+        if (typeof this.i18n.fallbackLocale === "object") {
+            for (const key of Object.keys(this.i18n.fallbackLocale)) {
+                if (this.i18n.fallbackLocale[key].length) {
+                    return this.i18n.fallbackLocale[key][0];
+                }
+            }
+        }
+
+        return undefined;
     }
 
     private isEsModule(obj: ILocaleMessageObject | IEsModuleLocalMessages): obj is IEsModuleLocalMessages {

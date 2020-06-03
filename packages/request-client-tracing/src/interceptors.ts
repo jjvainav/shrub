@@ -1,4 +1,4 @@
-import { ISpan } from "@shrub/tracing";
+import { IEventLogData, ISpan } from "@shrub/tracing";
 import { IRequestInterceptor, IResponseInterceptor, IResponseInterceptorContext, isExpectedStatus } from "@sprig/request-client";
 
 // Note: the interceptors support an undefined span; if one is provided a 'noOp' interceptor is returned.
@@ -8,13 +8,18 @@ const noOp = (context: any) => context.next();
 /** Creates a new request interceptor that will log request info to the provided span. */
 export function logRequest(span?: ISpan): IRequestInterceptor {
     return !span ? noOp : context => {
-        span.logInfo({
-            name: "request",
+        const props: { [key: string]: string } = {
             url: context.request.options.url,
-            method: context.request.options.method,
-            headers: context.request.options.headers
-        });
+            method: <string>context.request.options.method
+        };
 
+        if (context.request.options.headers) {
+            for (const key of Object.keys(context.request.options.headers)) {
+                props["header." + key] = context.request.options.headers[key];
+            }
+        }
+
+        span.logInfo(<IEventLogData>({ type: "event", name: "request", props }));
         context.next();
     };
 }
@@ -27,15 +32,16 @@ export function logRequest(span?: ISpan): IRequestInterceptor {
 export function logResponse(span?: ISpan): IResponseInterceptor {
     return !span ? noOp : context => {
         if (context.response) {
-            let data: any = {
-                name: "response",
+            const props: { [key: string]: string } = {
                 request_id: context.request.id,
-                status: context.response.status
+                status: context.response.status.toString()
             };
+
+            const data: IEventLogData = { type: "event", name: "response", props };
 
             if (shouldLogResponseWarning(context)) {
                 // only log the response body for unexpected responses and also log it as a warning
-                data = { ...data, body: context.response.data };
+                props.body = JSON.stringify(context.response.data);
                 span.logWarn(data);
             }
             else {

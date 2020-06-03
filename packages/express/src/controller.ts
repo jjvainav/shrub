@@ -94,7 +94,6 @@ export function Post(path?: PathParams, interceptors?: any): (target: any, prope
 }
 
 /** A function decorator identifying a request handler on a controller for a specific path and HTTP PUT method.*/        
-//export function Put(path?: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void 
 export function Put(path?: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void;
 export function Put(path?: PathParams, interceptors?: IRouteInterceptors): (target: any, propertyKey: string) => void; 
 export function Put(path?: PathParams, interceptors?: any): (target: any, propertyKey: string) => void {

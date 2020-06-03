@@ -1,35 +1,47 @@
 import { IModule, IModuleConfigurator } from "@shrub/core";
-import { ISerializer, ITracingConfiguration, TracingModule } from "@shrub/tracing";
+import { IErrorLogData, ILogDataConverter, ITracingConfiguration, TracingModule } from "@shrub/tracing";
 import { RequestError } from "@sprig/request-client";
 
-const requestErrorSerializer: ISerializer = (obj, data, serialize) => {
-    if (RequestError.isRequestError(obj)) {
-        data = { 
-            ...data, 
-            code: obj.code,
-            inner: obj.data && serialize(obj.data),
+const requestErrorConverter: ILogDataConverter = (obj, context) => {
+    const err = <any>obj;
+    if (RequestError.isRequestError(err)) {
+        const props: { [key: string]: string } = { code: err.code };
+        const data: IErrorLogData = {
+            type: "error",
+            name: "RequestError",
+            props,
+            message: err.message,
+            stack: err.stack
         };
 
-        if (obj.response && obj.response.data) {
-            data = {
-                ...data,
-                response: {
-                    status: obj.response.status,
-                    body: serialize(obj.response.data)
+        if (err.data) {
+            for (const key of Object.keys(data)) {
+                if (err.data[key] != undefined) {
+                    props["data." + key] = context.toString(err.data[key]);
                 }
-            };
-        }            
+            }
+        }
+
+        if (err.response) {
+            props["response.status"] = err.response.status.toString();
+            if (err.response.data) {
+                props["response.body"] = context.toString(err.response.data);
+            }
+
+        }
+        
+        return data;
     }
 
-    return data;
+    return undefined;
 };
 
-/** Module that injects a tracing serializer for request client errors; this is useful when a module uses the request-client to make API calls. */
+/** Module that injects a tracing log data converter for request client errors; this is useful when a module uses the request-client to make API calls. */
 export class RequestClientTracingModule implements IModule {
     readonly name = "request-client-tracing";
     readonly dependencies = [TracingModule];
 
     configure({ config }: IModuleConfigurator): void {
-        config.get(ITracingConfiguration).useSerializer(requestErrorSerializer);
+        config.get(ITracingConfiguration).useLogDataConverter(requestErrorConverter);
     }
 }

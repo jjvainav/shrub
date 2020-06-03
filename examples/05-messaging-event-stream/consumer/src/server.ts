@@ -1,6 +1,8 @@
 import { IModuleConfigurator } from "@shrub/core";
 import { ExpressFactory, ExpressModule, IExpressConfiguration, useController } from "@shrub/express";
+import { ExpressTracingModule, useRequestTracing } from "@shrub/express-tracing";
 import { IMessagingEventStreamConfiguration, MessagingEventStreamModule } from "@shrub/messaging-event-stream";
+import { TracingConsoleModule } from "@shrub/tracing-console";
 import * as express from "express";
 import * as path from "path";
 import { Controller } from "./controller";
@@ -11,7 +13,9 @@ async function start() {
             name: "consumer",
             dependencies: [
                 ExpressModule,
-                MessagingEventStreamModule
+                ExpressTracingModule,
+                MessagingEventStreamModule,
+                TracingConsoleModule
             ],
             configure: ({ config }: IModuleConfigurator) => {
                 config.get(IMessagingEventStreamConfiguration).useEventStreamConsumer({
@@ -24,11 +28,12 @@ async function start() {
 
                 const app = config.get(IExpressConfiguration);
 
-                app.use(express.json());
-                app.use(useController(Controller));
-
                 app.get("/", (_, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
                 app.get(/\/public(.*)/, express.static(__dirname, { fallthrough: false }));
+
+                app.use(express.json());
+                app.use(useRequestTracing());
+                app.use(useController(Controller));
             }
         }])
         .create();

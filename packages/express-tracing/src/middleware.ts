@@ -39,6 +39,16 @@ export const useRequestTracing = (options?: IRequestTracingOptions): RequestHand
             service.endSpan(span, req, res);
         });
 
+        const ref = res.writeHead;
+        res.writeHead = function writeHead() {
+            // gets invoked just before writing headers
+            if (res.getHeader("connection") === "keep-alive") {
+                span.tag("http.keepAlive", true);
+            }
+
+            return ref.apply(res, arguments as any);
+        };
+
         next();
     };
 };

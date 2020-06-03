@@ -9,18 +9,38 @@ type WarnLogLevel = 30;
 type InfoLogLevel = 20;
 type DebugLogLevel = 10;
 
+/** Defines the data types for a log. */
+export type LogDataType = "error" | "event" | "message";
+/** Defines a properties dictionary for log data. */
+export type LogDataProps = { readonly [key: string]: string };
+
 /** Represents the data for a log. */
 export interface ILogData {
-    readonly [key: string]: any;
+    readonly type: LogDataType;
+    readonly props?: LogDataProps;
 }
 
+/** Represents log data for an Error object. */
 export interface IErrorLogData extends ILogData {
+    readonly type: "error";
     readonly name: string;
     readonly message: string;
-    readonly stack: string | undefined;
+    readonly stack?: string | undefined;
 }
 
-/** Represents additional log information for a span. */
+/** Represents log data for an event. */
+export interface IEventLogData extends ILogData {
+    readonly type: "event";
+    readonly name: string;
+}
+
+/** Represents log data for a standard string message. */
+export interface IMessageLogData extends ILogData {
+    readonly type: "message";
+    readonly message: string;
+}
+
+/** Represents additional information for a span. */
 export interface ILog {
     /** 
      * Identifies the severity level for the log; the higher the number the more severe. 
@@ -56,39 +76,21 @@ export interface ITracerBuilder {
     build(scope?: any): ITracer;
     /** Registers a span context provider with the builder. */
     useContextProvider(provider: ISpanContextProvider): ITracerBuilder;
-    /** 
-     * Registers a serializer with the builder. A serializer gets invoked for every json object logged
-     * so it is the responsibility of the serializer to check the object type and handle when necessary
-     * and simply return the provided log data object if the serializer wants to skip handling the object.
-     */
-    useSerializer(serializer: ISerializer): ITracerBuilder;
+    /** Registers a log data converter with the builder. The log data converter handles converting logged data into ILogData objects. */
+    useLogDataConverter(converter: ILogDataConverter): ITracerBuilder;
     /** Registers an observer with the builder. */
     useObserver(observer: ITraceObserver): ITracerBuilder; 
 }
 
-/** 
- * Serializes a json object into a log data object to be logged with a span.
- * 
- * The obj parameter is the original json object passed to the span and the
- * data parameter is the current object to be logged. By default the properties
- * from the obj are copied to the log data object.
- *  
- * The tracing service chains multiple serializers and the serialize parameter is
- * a reference to the root/head of the chain. This is useful if a serializer
- * wants to explicitly serializer the object's children.
- * 
- *     return {
- *         ...data,
- *         inner: serialize(obj.object)
- *     };
- */
-export interface ISerializer {
-    (obj: any, data: ILogData, serialize: IChildSerializer): ILogData;
+/** Converts a standard object into a log data json object to be logged with a span. */
+export interface ILogDataConverter {
+    /** The callback should return a new log data object or undefined if it cannot process the object. */
+    (obj: object, context: ILogDataConverterContext): ILogData | undefined;
 }
 
-/** A serializer used to serialize children of an object being logged. */
-export interface IChildSerializer {
-    (child: any): any;
+export interface ILogDataConverterContext {
+    /** Converts a value to be logged as a string property for a log. */
+    toString(value: any): string;
 }
 
 /** Responsible for providing a span context for a given trace scope. */
@@ -141,7 +143,7 @@ export interface ISpan {
     /** Finalizes the span and accepts an optional Error instance if the span resulted in an error. */
     done(err?: Error): void;
     /** Log additional information with the span. */
-    log(level: number, data: any): ILog;
+    log(level: number, data: any): void;
     /** Log debug data with the span. */
     logDebug(data: any): void;
     /** Log error data with the span. */
@@ -162,15 +164,6 @@ export interface ISpanContext {
     getTraceId(): string;
 }
 
-interface ICreateSpanOptions {
-    /** Represents a parent span in which the new span will be created as a child of.  */
-    readonly context?: ISpanContext;
-    /** An optional serializer used to serialize json objects to log data objects. */
-    readonly serializer?: ISerializer;
-    /** An optional set of tags for the span. */
-    readonly tags?: ITags;
-}
-
 export const ITracingService = createService<ITracingService>("tracing-service");
 
 /** Defines standard levels for span logs. */
@@ -186,106 +179,45 @@ export const LogLevel: {
     debug: 10
 };
 
-const baseSerializer: ISerializer = (obj, _, serialize) => {
-    // the base serializer is expected to be invoked first with an empty log data object so ignore it
+const defaultLogDataConverter: ILogDataConverter = (obj, context) => {
+    if (isLogData(obj)) {
+        return obj;
+    }
 
     if (isError(obj)) {
-        return {
+        return <IErrorLogData>({
+            type: "error",
             name: obj.name,
             message: obj.message,
             stack: obj.stack
-        };
+        });
     }
 
-    if (Array.isArray(obj)) {
-        // TODO: is this the best way to handle array?
-        let data = {};
-        for (let i = 0; i < obj.length; i++) {
-            data = { 
-                ...data,
-                [`${i}`]: serialize(obj[i])
-            };
+    const name = (<any>obj).name || "";
+    const props: any = {};
+
+    // check if the event object is in the format: { name, data } or { name, props }
+    // otherwise use the props for the object as the log data props
+    if ((<any>obj).props || (<any>obj).data) {
+        const data = (<any>obj).props || (<any>obj).data;
+        for(const key of Object.keys(data)) {
+            // include null in the condition
+            if ((<any>data)[key] != undefined) {
+                props[key] = context.toString((<any>data)[key]);
+            }
         }
-
-        return data;
+    }
+    else {
+        for(const key of Object.keys(obj)) {
+            // include null in the condition
+            if (key !== "name" && (<any>obj)[key] != undefined) {
+                props[key] = context.toString((<any>obj)[key]);
+            }
+        }
     }
 
-    // object.keys would be the same behavior as the spread operator (e.g. { ...obj })
-    // which Typescript compiles to Object.assign({}, obj)
-
-    let data: any = {};
-    for(const key of Object.keys(obj)) {
-        data[key] = typeof obj[key] === "object" ? serialize(obj[key]) : obj[key];
-    }
-
-    return data;
+    return <IEventLogData>({ type: "event", name, props });
 };
-
-function createSpan(name: string, options?: ICreateSpanOptions): ISpan {
-    const context = options && options.context;
-    // note: if a custom serializer is used the base serializer is automatically injected
-    // so there is no need to worry about that here; use it if no serializer has been specified
-    const serializer = (options && options.serializer) || baseSerializer;
-
-    return {
-        id: newSpanId(),
-        parentId: context && context.getParentSpanId(),
-        traceId: (context && context.getTraceId()) || newTraceId(),
-        name,
-        startTime: Date.now(),
-        logs: [],
-        tags: options && options.tags || {},
-        done: function(err?: Error) {
-            if (!this.endTime) {
-                if (err) {
-                    this.logError(err);
-                }
-        
-                (<any>this).endTime = Date.now();
-            }
-        },
-        log: function(level, data) {
-            if (typeof level !== "number") {
-                throw new Error(`Invalid level (${level}), must be a number.`);
-            }
-
-            if (level >= LogLevel.error) {
-                // automatically tag the span as an error if an error has been logged
-                this.tag("error", true);
-            }
-
-            if (typeof data === "object") {
-                const childSerializer: IChildSerializer = child => serializer(child, {}, childSerializer);
-                data = serializer(data, {}, childSerializer);
-            }
-
-            const log = {
-                level,
-                data,
-                timestamp: Date.now()
-            };
-
-            this.logs.push(log);
-
-            return log;
-        },
-        logDebug: function(data) {
-            this.log(LogLevel.debug, data);
-        },
-        logError: function(data) {
-            this.log(LogLevel.error, data);
-        },
-        logInfo: function(data) {
-            this.log(LogLevel.info, data);
-        },
-        logWarn: function(data) {
-            this.log(LogLevel.warn, data);
-        },        
-        tag: function(key: string, value: any) {
-            (<any>this.tags)[key] = value;
-        }
-    };
-}
 
 function isError(obj: any): obj is Error {
     // instanceof only works if sub-classes extend Error properly (prototype gets set to Error);
@@ -294,6 +226,10 @@ function isError(obj: any): obj is Error {
         (<Error>obj).name !== undefined &&
         (<Error>obj).message !== undefined &&
         (<Error>obj).stack !== undefined);
+}
+
+function isLogData(obj: any): obj is ILogData {
+    return obj.type !== undefined;
 }
 
 function isSpan(scope: any): scope is ISpan {
@@ -312,27 +248,25 @@ function getSpanContext(span: ISpan): ISpanContext {
 }
 
 function newSpanId(): string {
-    // 64 bit
-    return createId(8);
+    return createId(16);
 }
 
 function newTraceId(): string {
-    // 128 bit
-    return createId(16);
+    return createId();
 }
 
 @Singleton
 export class TracingService implements ITracingService {
     private readonly providers: ISpanContextProvider[] = [];
-    private readonly serializers: ISerializer[] = [];
+    private readonly converters: ILogDataConverter[] = [];
     private readonly observers: ITraceObserver[] = [];
-    private defaultBuilder = new TracerBuilder(this.providers, this.serializers, this.observers);
+    private defaultBuilder = new TracerBuilder(this.providers, this.converters, this.observers);
 
     getBuilder(): ITracerBuilder {
         // the builder is immutable so pass new arrays for the global items
         return new TracerBuilder(
             [...this.providers], 
-            [...this.serializers], 
+            [...this.converters], 
             [...this.observers]);
     }
 
@@ -346,9 +280,9 @@ export class TracingService implements ITracingService {
         }
     }
     
-    useSerializer(serializer: ISerializer): void {
-        if (!this.serializers.includes(serializer)) {
-            this.serializers.push(serializer);
+    useLogDataConverter(converter: ILogDataConverter): void {
+        if (!this.converters.includes(converter)) {
+            this.converters.push(converter);
         }
     }
 
@@ -362,17 +296,28 @@ export class TracingService implements ITracingService {
 class TracerBuilder implements ITracerBuilder {
     constructor(
         private readonly providers: ISpanContextProvider[] = [],
-        private readonly serializers: ISerializer[] = [],
+        private readonly converters: ILogDataConverter[] = [],
         private readonly observers: ITraceObserver[] = []) {
     }
 
+
     /** Builds a tracer for the given scope. */
     build(scope?: any): ITracer {
-        let serializer = baseSerializer;
-        this.serializers.forEach(s => {
-            const current = serializer;
-            serializer = (obj, data, serialize) => s(obj, current(obj, data, serialize), serialize);
-        });
+        const convertLogData: (obj: any) => ILogData = obj => {
+            const context = { 
+                toString: (value: any) => typeof value === "object" ? JSON.stringify(value) : value.toString()
+            };
+
+            for (const converter of this.converters) {
+                const data = converter(obj, context);
+
+                if (data) {
+                    return data;
+                }
+            }
+
+            return defaultLogDataConverter(obj, context)!;
+        };
 
         return {
             startSpan: (name, tags) => {
@@ -393,39 +338,81 @@ class TracerBuilder implements ITracerBuilder {
                     }
                 }
 
-                let span = createSpan(name, { context, serializer, tags });
-                if (this.observers.length) {
-                    const me = this;
-                    const base = span;
-                    span = {
-                        ...span,
-                        log: function(level, data) {
-                            const result = base.log.call(this, level, data);
-                            me.observers.forEach(observer => {
-                                if (observer.log) {
-                                    observer.log(this, result);
-                                }
-                            });
-       
-                            return result;
-                        },                            
-                        done: function(err?) {
-                            base.done.call(this, err);
-                            me.observers.forEach(observer => {
+                const observers = this.observers;
+                const span: ISpan = {
+                    id: newSpanId(),
+                    parentId: context && context.getParentSpanId(),
+                    traceId: (context && context.getTraceId()) || newTraceId(),
+                    name,
+                    startTime: Date.now(),
+                    logs: [],
+                    tags: tags || {},
+                    done: function(err?: Error) {
+                        if (!this.endTime) {
+                            if (err) {
+                                this.logError(err);
+                            }
+                    
+                            (<any>this).endTime = Date.now();
+            
+                            observers.forEach(observer => {
                                 if (observer.done) {
                                     observer.done(scope, this);
                                 }
                             });
                         }
-                    };
-    
-                    this.observers.forEach(observer => {
-                        if (observer.start) {
-                            observer.start(scope, span);
+                    },
+                    log: function (level, data) {
+                        if (typeof level !== "number") {
+                            throw new Error(`Invalid level (${level}), must be a number.`);
                         }
-                    });                    
-                }
 
+                        if (level >= LogLevel.error) {
+                            // automatically tag the span as an error if an error has been logged
+                            this.tag("error", true);
+                        }
+            
+                        const log = {
+                            level,
+                            data: typeof data !== "object" 
+                                ? <ILogData>({ type: "message", message: data.toString() })
+                                : isLogData(data) ? data : convertLogData(data),
+                            timestamp: Date.now()
+                        };
+            
+                        this.logs.push(log);
+            
+                        observers.forEach(observer => {
+                            if (observer.log) {
+                                observer.log(this, log);
+                            }
+                        });
+            
+                        return log;
+                    },
+                    logDebug: function (data) {
+                        this.log(LogLevel.debug, data);
+                    },
+                    logError: function (data) {
+                        this.log(LogLevel.error, data);
+                    },
+                    logInfo: function (data) {
+                        this.log(LogLevel.info, data);
+                    },
+                    logWarn: function (data) {
+                        this.log(LogLevel.warn, data);
+                    },        
+                    tag: function (key: string, value: any) {
+                        (<any>this.tags)[key] = value;
+                    }
+                };
+            
+                observers.forEach(observer => {
+                    if (observer.start) {
+                        observer.start(scope, span);
+                    }
+                });
+            
                 return span;
             }
         };
@@ -435,19 +422,17 @@ class TracerBuilder implements ITracerBuilder {
     useContextProvider(provider: ISpanContextProvider): ITracerBuilder {
         return new TracerBuilder(
             [...this.providers, provider],
-            this.serializers,
+            this.converters,
             this.observers);
     }
 
-    /** 
-     * Registers a serializer with the builder. A serializer gets invoked for every json object logged
-     * so it is the responsibility of the serializer to check the object type and handle when necessary
-     * and simply return the provided log data object if the serializer wants to skip handling the object.
-     */
-    useSerializer(serializer: ISerializer): ITracerBuilder {
+    /** Registers a log data converter with the builder. The log data converter handles converting logged data into ILogData objects. */
+    useLogDataConverter(converter: ILogDataConverter): ITracerBuilder {
+        
+    
         return new TracerBuilder(
             this.providers,
-            [...this.serializers, serializer],
+            [...this.converters, converter],
             this.observers);
     }
 
@@ -455,7 +440,7 @@ class TracerBuilder implements ITracerBuilder {
     useObserver(observer: ITraceObserver): ITracerBuilder {
         return new TracerBuilder(
             this.providers,
-            this.serializers,
+            this.converters,
             [...this.observers, observer]);
     }
 }

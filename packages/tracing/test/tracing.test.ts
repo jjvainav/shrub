@@ -1,4 +1,4 @@
-import { ILog, ISpan, TracingService } from "../src";
+import { IErrorLogData, IEventLogData, ILog, IMessageLogData, ISpan, TracingService } from "../src";
 
 function mockDateNow(now: number): () => void {
     const nowfn = Date.now;
@@ -86,24 +86,31 @@ describe("tracing", () => {
         expect(span.endTime).toBeDefined();
         
         expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].data.name).toBe("Error");
-        expect(span.logs[0].data.message).toBe("An error occurred.");
-        expect(span.logs[0].data.stack).toBeDefined();
+        expect(span.logs[0].data.type).toBe("error");
+        expect((<IErrorLogData>span.logs[0].data).name).toBe("Error");
+        expect((<IErrorLogData>span.logs[0].data).message).toBe("An error occurred.");
+        expect((<IErrorLogData>span.logs[0].data).stack).toBeDefined();
         
         expect(Object.keys(span.tags)).toHaveLength(1);
         expect(span.tags.error).toBe(true);
     });
     
-    test("create and finish root span with error using custom serializer", () => {
+    test("create and finish root span with error using custom converter", () => {
         const service = new TracingService();
 
-        // the serializer needs to be injected before getting a tracer and creating a span
-        service.useSerializer((obj, data) => {
+        // the converter needs to be injected before getting a tracer and creating a span
+        service.useLogDataConverter(obj => {
             if (obj instanceof Error) {
-                return { ...data, foo: "foo" };
+                return <IErrorLogData>({
+                    type: "error",
+                    name: "FooError",
+                    message: obj.message,
+                    props: { foo: "foo" },
+                    stack: obj.stack
+                });
             }
 
-            return data;
+            return undefined;
         });
 
         const tracer = service.getTracer();
@@ -113,10 +120,10 @@ describe("tracing", () => {
         span.done(err);
 
         expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].data.name).toBe("Error");
-        expect(span.logs[0].data.message).toBe("An error occurred.");
-        expect(span.logs[0].data.stack).toBeDefined();
-        expect(span.logs[0].data.foo).toBe("foo");
+        expect((<IErrorLogData>span.logs[0].data).name).toBe("FooError");
+        expect((<IErrorLogData>span.logs[0].data).message).toBe("An error occurred.");
+        expect((<IErrorLogData>span.logs[0].data).stack).toBeDefined();
+        expect((<IErrorLogData>span.logs[0].data).props!.foo).toBe("foo");
     });  
 
     test("create multiple root spans", () => {
@@ -248,7 +255,55 @@ describe("tracing", () => {
         expect(child.parentId).toBe("a");
     });
 
-    test("add info log to span", () => {
+    test("add event object info log to span", () => {
+        const now = 1562602719878;
+        const unmock = mockDateNow(now);
+
+        const service = new TracingService();
+        const tracer = service.getTracer();
+        const span = tracer.startSpan("test");
+
+        span.logInfo({ 
+            name: "foo-event",
+            foo: "foo" 
+        });
+
+        unmock();
+
+        expect(span.logs).toHaveLength(1);
+        expect(span.logs[0].level).toBe(20);
+        expect((<IEventLogData>span.logs[0].data).type).toBe("event");
+        expect((<IEventLogData>span.logs[0].data).name).toBe("foo-event");
+        expect((<IEventLogData>span.logs[0].data).props!.foo).toBe("foo");
+        expect(span.logs[0].timestamp).toBe(now);
+    });
+
+    test("add event object info log to span with custom data prop", () => {
+        const now = 1562602719878;
+        const unmock = mockDateNow(now);
+
+        const service = new TracingService();
+        const tracer = service.getTracer();
+        const span = tracer.startSpan("test");
+
+        span.logInfo({ 
+            name: "foo-event",
+            data: {
+                foo: "foo"
+            } 
+        });
+
+        unmock();
+
+        expect(span.logs).toHaveLength(1);
+        expect(span.logs[0].level).toBe(20);
+        expect((<IEventLogData>span.logs[0].data).type).toBe("event");
+        expect((<IEventLogData>span.logs[0].data).name).toBe("foo-event");
+        expect((<IEventLogData>span.logs[0].data).props!.foo).toBe("foo");
+        expect(span.logs[0].timestamp).toBe(now);
+    });
+
+    test("add plain JSON object info log to span", () => {
         const now = 1562602719878;
         const unmock = mockDateNow(now);
 
@@ -262,11 +317,13 @@ describe("tracing", () => {
 
         expect(span.logs).toHaveLength(1);
         expect(span.logs[0].level).toBe(20);
-        expect(span.logs[0].data.foo).toBe("foo");
+        expect((<IEventLogData>span.logs[0].data).type).toBe("event");
+        expect((<IEventLogData>span.logs[0].data).name).toBe("");
+        expect((<IEventLogData>span.logs[0].data).props!.foo).toBe("foo");
         expect(span.logs[0].timestamp).toBe(now);
     });
 
-    test("add info log to span with log observer", () => {
+    test("add plain JSON object info log to span with log observer", () => {
         const service = new TracingService();
         const logs: [ISpan, ILog][] = [];
 
@@ -282,16 +339,20 @@ describe("tracing", () => {
 
         expect(logs).toHaveLength(2);
         expect(logs[0][0]).toBe(span);
-        expect(logs[0][1].data.foo).toBe("foo");
+        expect((<IEventLogData>logs[0][1].data).props!.foo).toBe("foo");
         expect(logs[1][0]).toBe(span);
-        expect(logs[1][1].data.bar).toBe("bar");
+        expect((<IEventLogData>logs[1][1].data).props!.bar).toBe("bar");
     });    
 
-    test("add info log to span with serializer", () => {
+    test("add plain JSON object info log to span with custom log data converter", () => {
         const service = new TracingService();
 
-        // the serializer needs to be injected before getting a tracer and creating a span
-        service.useSerializer((obj, data) => ({ ...data, bar: "bar" }));
+        // the converter needs to be injected before getting a tracer and creating a span
+        service.useLogDataConverter(obj => <IEventLogData>({ 
+            type: "event", 
+            name: "my-event",
+            props: { ...obj, bar: "bar" }
+        }));
 
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
@@ -300,40 +361,19 @@ describe("tracing", () => {
 
         expect(span.logs).toHaveLength(1);
         expect(span.logs[0].level).toBe(20);
-        expect(span.logs[0].data.foo).toBe("foo");
-        expect(span.logs[0].data.bar).toBe("bar");
-    });
-
-    test("add info log to span with serializer for object with children", () => {
-        const service = new TracingService();
-
-        // the serializer needs to be injected before getting a tracer and creating a span
-        service.useSerializer((obj, data) => ({ ...data, bar: "bar" }));
-
-        const tracer = service.getTracer();
-        const span = tracer.startSpan("test");
-
-        span.logInfo({
-            outter: { 
-                inner: { foo: "foo" }
-            }
-         });
-
-        expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].level).toBe(20);
-        expect(span.logs[0].data.bar).toBe("bar");
-        expect(span.logs[0].data.outter.bar).toBe("bar");
-        expect(span.logs[0].data.outter.inner.foo).toBe("foo");
-        expect(span.logs[0].data.outter.inner.bar).toBe("bar");
-    });    
+        expect((<IEventLogData>span.logs[0].data).props!.foo).toBe("foo");
+        expect((<IEventLogData>span.logs[0].data).props!.bar).toBe("bar");
+    });   
     
-    test("add info log to span with multiple serializers", () => {
+    test("add info log to span with multiple log data converters", () => {
         const service = new TracingService();
 
-        // the serializer needs to be injected before getting a tracer and creating a span
-        service.useSerializer((obj, data) => ({ ...data, bar: "bar" }));
-        // the second serializer should overwrite the first one
-        service.useSerializer((obj, data) => ({ ...data, bar: "bar!!" }));
+        service.useLogDataConverter(() => undefined);
+        service.useLogDataConverter(obj => <IEventLogData>({ 
+            type: "event", 
+            name: "my-event",
+            props: obj
+        }));        
 
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
@@ -342,35 +382,8 @@ describe("tracing", () => {
 
         expect(span.logs).toHaveLength(1);
         expect(span.logs[0].level).toBe(20);
-        expect(span.logs[0].data.foo).toBe("foo");
-        expect(span.logs[0].data.bar).toBe("bar!!");
-    });
-    
-    test("add info log to span with multi-level serialization", () => {
-        const service = new TracingService();
-
-        // the serializer needs to be injected before getting a tracer and creating a span
-        service.useSerializer((obj, data) => ({ ...data, bar: "bar" }));
-        service.useSerializer((obj, data, serialize) => {
-            // isChild prop is used to prevent infinite recursion
-            // by invoking serialize the serializer chain should be invoked on the child
-            return !data.isChild
-                ? { ...data, child: serialize({ isChild: true }) }
-                : data;
-        });
-
-        const tracer = service.getTracer();
-        const span = tracer.startSpan("test");
-
-        span.logInfo({ foo: "foo" });
-
-        expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].level).toBe(20);
-        expect(span.logs[0].data.foo).toBe("foo");
-        expect(span.logs[0].data.bar).toBe("bar");
-        expect(span.logs[0].data.child).toBeDefined();
-        expect(span.logs[0].data.child.isChild).toBe(true);
-        expect(span.logs[0].data.child.bar).toBe("bar");
+        expect((<IEventLogData>span.logs[0].data).name).toBe("my-event");
+        expect((<IEventLogData>span.logs[0].data).props!.foo).toBe("foo");
     });
     
     test("add error log to span", () => {
@@ -382,9 +395,9 @@ describe("tracing", () => {
 
         expect(span.logs).toHaveLength(1);
         expect(span.logs[0].level).toBe(40);
-        expect(span.logs[0].data.name).toBe("Error");
-        expect(span.logs[0].data.message).toBe("Error test.");
-        expect(span.logs[0].data.stack).toBeDefined();
+        expect((<IErrorLogData>span.logs[0].data).name).toBe("Error");
+        expect((<IErrorLogData>span.logs[0].data).message).toBe("Error test.");
+        expect((<IErrorLogData>span.logs[0].data).stack).toBeDefined();
 
         expect(Object.keys(span.tags)).toHaveLength(1);
         expect(span.tags.error).toBe(true);        
@@ -405,12 +418,12 @@ describe("tracing", () => {
 
         expect(span.logs).toHaveLength(1);
         expect(span.logs[0].level).toBe(40);
-        expect(span.logs[0].data.name).toBe("Error");
-        expect(span.logs[0].data.message).toBe("Foo");
-        expect(span.logs[0].data.stack).toBeDefined();
+        expect((<IErrorLogData>span.logs[0].data).name).toBe("Error");
+        expect((<IErrorLogData>span.logs[0].data).message).toBe("Foo");
+        expect((<IErrorLogData>span.logs[0].data).stack).toBeDefined();
 
         expect(Object.keys(span.tags)).toHaveLength(1);
-        expect(span.tags.error).toBe(true);        
+        expect(span.tags.error).toBe(true);     
     });  
 
     test("add log to span with custom level", () => {
@@ -422,29 +435,20 @@ describe("tracing", () => {
 
         expect(span.logs).toHaveLength(1);
         expect(span.logs[0].level).toBe(11);
-        expect(span.logs[0].data.foo).toBe("foo");
+        expect((<IEventLogData>span.logs[0].data).props!.foo).toBe("foo");
     });
 
     test("add log to span with string data", () => {
         const service = new TracingService();
-
-        let flag = false;
-        service.useSerializer((obj, data) => {
-            flag = true;
-            return data;
-        });        
-
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
 
         span.logInfo("foo");
 
-        // serializers should only be invoked when json objects are being logged
-        expect(flag).toBeFalsy();
-
         expect(span.logs).toHaveLength(1);
         expect(span.logs[0].level).toBe(20);
-        expect(span.logs[0].data).toBe("foo");
+        expect((<IMessageLogData>span.logs[0].data).type).toBe("message");
+        expect((<IMessageLogData>span.logs[0].data).message).toBe("foo");
     });  
     
     test("extend tracer with custom builder and observer", () => {

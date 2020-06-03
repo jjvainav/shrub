@@ -52,7 +52,9 @@ export function tokenAuthentication(options: ITokenAuthenticationOptions): IAuth
                         return result.error(invalidRequest("Multiple access tokens found."));
                     }
         
-                    token = req.query[key];
+                    if (typeof req.query[key] === "string") {
+                        token = <string>req.query[key];
+                    }
                 }
             }
     

@@ -13,9 +13,11 @@
         "@shrub/core": "^0.4.75",
         "@shrub/express": "^0.4.75",
         "@shrub/express-messaging-event-stream": "^0.4.75",
+        "@shrub/express-tracing": "^0.4.75",
         "@shrub/messaging": "^0.4.75",
-        "@sprig/request-client": "^0.1.47",
-        "@sprig/request-client-events": "^0.1.47",
+        "@shrub/tracing-console": "^0.4.75",
+        "@sprig/request-client": "^0.1.48",
+        "@sprig/request-client-events": "^0.1.48",
         "express": "^4.16.4"
     },
     "devDependencies": {

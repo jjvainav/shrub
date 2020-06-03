@@ -84,6 +84,8 @@ class Subscription implements ISubscription {
         });
 
         // TODO: telemetry - track open and onClose
+        // TODO: the 'telemetry' stuff should be written to a span...
+        // TODO: bug - connect consumer start/stop producer (consumer will re-connect multiple times)
 
         //this.stream.onOpen(() => {});
         this.stream.onError(event => {

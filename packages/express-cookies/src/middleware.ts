@@ -86,11 +86,12 @@ class Cookie implements ICookie {
         this._value = value;
 
         // if the value is empty delete the cookie
-        const isDelete = !this._value;
-        (<Cookies>this.request.cookies).set(
-            this.name, 
-            isDelete ? undefined : this._value, 
-            isDelete ? this.getCookieOptionsForDelete() : this.getCookieOptions());
+        if (!this._value) {
+            (<Cookies>this.request.cookies).set(this.name, this.getCookieOptionsForDelete());    
+        }
+        else {
+            (<Cookies>this.request.cookies).set(this.name, this._value, this.getCookieOptions()); 
+        }
     }
 
     private getCookieOptionsForDelete(): Cookies.SetOption {
