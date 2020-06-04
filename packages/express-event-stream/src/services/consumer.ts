@@ -1,4 +1,4 @@
-import { createService, Transient } from "@shrub/core";
+import { createService, Singleton } from "@shrub/core";
 import { IMessage, IMessageChannelConsumer, isChannelNameMatch, ISubscription, Message, MessageHandler } from "@shrub/messaging";
 import { IRequest, IRequestPromise } from "@sprig/request-client";
 import { IRequestEventStream, jsonValidator, RequestEventStream } from "@sprig/request-client-events";
@@ -18,8 +18,8 @@ export interface IEventStreamInterceptors {
     readonly afterRequest?: (promise: IRequestPromise) => IRequestPromise;
 }
 
-/** Defines options for event-stream consumers. */
-export interface IEventStreamConsumerOptions {
+/** Defines configuration for an event-stream consumer. */
+export interface IEventStreamConsumerConfiguration {
     /** A set of endpoints for the consumer to connect to. */
     readonly endpoints: IEventStreamEndpoint[];
     /** Optional interceptors that get passed to the underlying RequestEventStream. */
@@ -42,8 +42,10 @@ export interface IEventStreamChannelConsumerOptions {
 
 /** @internal Manages event-stream consumers for the module. */
 export interface IEventStreamConsumerService {
-    /** Gets a consumer with the specified channel name pattern and options. */
-    getMessageChannelConsumer(channelNamePattern: string, options: IEventStreamConsumerOptions): IMessageChannelConsumer | undefined;
+    /** Adds a consumer using the specified config. */
+    addConsumer(config: IEventStreamConsumerConfiguration): void;
+    /** Gets a consumer with the specified channel name pattern. */
+    getMessageChannelConsumer(channelNamePattern: string): IMessageChannelConsumer | undefined;
 }
 
 /** @internal */
@@ -51,36 +53,39 @@ export const IEventStreamConsumerService = createService<IEventStreamConsumerSer
 const defaultRetry = 2000;
 
 /** @internal */
-@Transient
+@Singleton
 export class EventStreamConsumerService implements IEventStreamConsumerService {
-    getMessageChannelConsumer(channelNamePattern: string, options: IEventStreamConsumerOptions): IMessageChannelConsumer | undefined {
-        const endpoint = this.findEndpoint(options.endpoints, channelNamePattern);
-        if (!endpoint) {
-            return undefined;
-        }
+    private configs: IEventStreamConsumerConfiguration[] = [];
 
-        return new EventStreamChannelConsumer({
-            channelNamePattern,
-            url: endpoint.url,
-            interceptors: options.interceptors,
-            retry: options.retry
-        });
+    addConsumer(config: IEventStreamConsumerConfiguration): void {
+        this.configs.push(config);
     }
 
-    private findEndpoint(endpoints: IEventStreamEndpoint[], channelNamePattern: string): IEventStreamEndpoint | undefined {
-        for (const endpoint of endpoints) {
-            if (!endpoint.channelNamePatterns) {
-                return endpoint;
-            }
-    
-            for (const pattern of endpoint.channelNamePatterns) {
-                if (isChannelNameMatch(pattern, channelNamePattern)) {
-                    return endpoint;
+    getMessageChannelConsumer(channelNamePattern: string): IMessageChannelConsumer | undefined {
+        for (const config of this.configs) {
+            for (const endpoint of config.endpoints) {
+                if (!endpoint.channelNamePatterns) {
+                    return this.createChannelConsumer(channelNamePattern, endpoint, config);
+                }
+        
+                for (const pattern of endpoint.channelNamePatterns) {
+                    if (isChannelNameMatch(pattern, channelNamePattern)) {
+                        return this.createChannelConsumer(channelNamePattern, endpoint, config);
+                    }
                 }
             }
         }
-    
+
         return undefined;
+    }
+
+    private createChannelConsumer(channelNamePattern: string, endpoint: IEventStreamEndpoint, config: IEventStreamConsumerConfiguration): IMessageChannelConsumer {
+        return new EventStreamChannelConsumer({
+            channelNamePattern,
+            url: endpoint.url,
+            interceptors: config.interceptors,
+            retry: config.retry
+        });
     }
 }
 

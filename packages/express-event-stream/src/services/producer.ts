@@ -142,16 +142,20 @@ class ChannelWhitelist {
     private allowAll = false;
 
     add(channelNamePattern: string): void {
-        channelNamePattern = this.normalizePattern(channelNamePattern);
-        if (isChannelNamePattern(channelNamePattern)) {
-            if (channelNamePattern === "*") {
-                this.allowAll = true;
-            }
+        if (!this.allowAll) {
+            channelNamePattern = this.normalizePattern(channelNamePattern);
+            if (isChannelNamePattern(channelNamePattern)) {
+                if (channelNamePattern === "*") {
+                    this.allowAll = true;
+                    this.patterns.splice(0);
+                    this.channels.clear();
+                }
 
-            this.patterns.push(channelNamePattern);
-        }
-        else {
-            this.channels.add(channelNamePattern);
+                this.patterns.push(channelNamePattern);
+            }
+            else {
+                this.channels.add(channelNamePattern);
+            }
         }
     }
 

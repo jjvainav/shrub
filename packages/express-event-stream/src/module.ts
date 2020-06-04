@@ -1,13 +1,13 @@
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration } from "@shrub/core";
 import { ExpressModule } from "@shrub/express";
 import { IMessageBrokerAdapter, IMessagingConfiguration, MessagingModule } from "@shrub/messaging";
-import { EventStreamConsumerService, IEventStreamConsumerOptions, IEventStreamConsumerService } from "./services/consumer";
+import { EventStreamConsumerService, IEventStreamConsumerConfiguration, IEventStreamConsumerService } from "./services/consumer";
 import { EventStreamProducerService, IEventStreamProducerService } from "./services/producer";
 
 export const IExpressEventStreamConfiguration = createConfig<IExpressEventStreamConfiguration>();
 export interface IExpressEventStreamConfiguration {
     /** Adds an event-stream consumer with the messaging message broker. */
-    addConsumer(options: IEventStreamConsumerOptions): void;
+    addConsumer(config: IEventStreamConsumerConfiguration): void;
     /** 
      * Enables the event-stream producer with the messaging message broker and
      * is required when using the EventStreamChannel controller decorator.
@@ -32,7 +32,10 @@ export class ExpressEventStreamModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(IExpressEventStreamConfiguration).register(({ services }) => ({
-            addConsumer: options => this.appendConsumer(services.get(IEventStreamConsumerService), options),
+            addConsumer: config => {
+                services.get(IEventStreamConsumerService).addConsumer(config);
+                this.enableConsumer(services.get(IEventStreamConsumerService));
+            },
             enableProducer: options => this.enableProducer(services.get(IEventStreamProducerService), options)
         }));
     }
@@ -42,22 +45,22 @@ export class ExpressEventStreamModule implements IModule {
         registration.register(IEventStreamProducerService, EventStreamProducerService);
     }
 
-    configure({ config }: IModuleConfigurator): void {
-        if (this.broker) {
-            config.get(IMessagingConfiguration).useMessageBroker(this.broker);
-        }
+    configure({ config, next }: IModuleConfigurator): void {
+        next().then(() => {
+            if (this.broker) {
+                config.get(IMessagingConfiguration).useMessageBroker(this.broker);
+            }
+        });
     }
 
-    private appendConsumer(service: IEventStreamConsumerService, options: IEventStreamConsumerOptions): void {
+    private enableConsumer(service: IEventStreamConsumerService): void {
         this.broker = this.broker || {};
-
-        const previous = this.broker.getChannelConsumer;
-        const next = (channelNamePattern: string) => service.getMessageChannelConsumer(channelNamePattern, options);
-
-        this.broker = {
-            getChannelProducer: this.broker.getChannelProducer,
-            getChannelConsumer: !previous ? next : channelNamePattern => previous(channelNamePattern) || next(channelNamePattern)
-        };
+        if (!this.broker.getChannelConsumer) {
+            this.broker = {
+                getChannelConsumer: channelNamePattern => service.getMessageChannelConsumer(channelNamePattern),
+                getChannelProducer: this.broker.getChannelProducer
+            };
+        }
     }
 
     private enableProducer(service: IEventStreamProducerService, options?: IEventStreamProducerOptions): void {
@@ -70,8 +73,7 @@ export class ExpressEventStreamModule implements IModule {
             };
         }
 
-        if (options && options.whitelist) {
-            options.whitelist.forEach(entry => service.whitelistChannel(entry));
-        }
+        const whitelist = options && options.whitelist || ["*"];
+        whitelist.forEach(entry => service.whitelistChannel(entry));
     }
 }
