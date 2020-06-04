@@ -1,4 +1,5 @@
 import { createInjectable, createService, Singleton } from "@shrub/core";
+import { ISpan } from "@shrub/tracing";
 import { IMessage, IMessageDetails } from "./message";
 
 /** Handles a message and optionally returns a promise to support async message handling and prevent the next message from being processed until this handler finishes. */
@@ -51,6 +52,8 @@ export interface IMessageConsumerOptions {
 
 /** Represents a message consumer subscription. */
 export interface ISubscription {
+    /** Enables tracing with the consumer. */
+    enableTracing(span: ISpan): void;
     /** Unsubscribes from the consumer. */
     unsubscribe(): void;
 }

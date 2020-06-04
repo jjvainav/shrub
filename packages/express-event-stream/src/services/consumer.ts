@@ -1,5 +1,6 @@
 import { createService, Singleton } from "@shrub/core";
 import { IMessage, IMessageChannelConsumer, isChannelNameMatch, ISubscription, Message, MessageHandler } from "@shrub/messaging";
+import { ISpan } from "@shrub/tracing";
 import { IRequest, IRequestPromise } from "@sprig/request-client";
 import { IRequestEventStream, jsonValidator, RequestEventStream } from "@sprig/request-client-events";
 import urlJoin from "url-join";
@@ -109,6 +110,7 @@ class EventStreamChannelConsumer implements IMessageChannelConsumer {
 
 class Subscription implements ISubscription {
     private stream?: IRequestEventStream<IMessage>;
+    private span?: ISpan;
     private closed = false;
 
     constructor(
@@ -117,6 +119,10 @@ class Subscription implements ISubscription {
         private readonly retry: number,
         private readonly interceptors?: IEventStreamInterceptors) {
         this.connect();
+    }
+
+    enableTracing(span: ISpan): void {
+        this.span = span;
     }
 
     unsubscribe(): void {
@@ -149,6 +155,7 @@ class Subscription implements ISubscription {
 
         // TODO: telemetry - track open and onClose
         // TODO: the 'telemetry' stuff should be written to a span...
+        // change 'enableTracing' to 'enableLogging'?
 
 
         //this.stream.onOpen(() => {});

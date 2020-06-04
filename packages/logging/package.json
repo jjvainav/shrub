@@ -1,6 +1,6 @@
 {
-    "name": "@shrub/messaging",
-    "description": "Provides basic support for synchronous and asynchronous server-to-server messaging.",
+    "name": "@shrub/logging",
+    "description": "A module that provides basic logging support.",
     "version": "0.4.75",
     "license": "MIT",
     "repository": {
@@ -16,17 +16,11 @@
     "publishConfig": {
         "access": "public"
     },
-    "engines": {
-        "node": ">=10.0.0"
-    },
     "scripts": {
         "build": "tsc -b .",
-        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
-        "test": "jest"
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.4.75",
-        "@shrub/tracing": "0.4.75",
-        "@sprig/unique-id": "^0.1.48"
+        "@shrub/core": "0.4.75"
     }
 }

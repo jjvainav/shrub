@@ -59,6 +59,7 @@ interface ISingletonService {
 }
 
 interface ITestService extends IDisposable {
+    readonly name: string;
     readonly isDisposed: boolean;
 }
 
@@ -149,6 +150,16 @@ class SingletonService implements ISingletonService {
 }
 
 class TestService implements ITestService {
+    name = "test-service";
+    isDisposed = false;
+
+    dispose(): void {
+        this.isDisposed = true;
+    }
+}
+
+class TestService2 implements ITestService {
+    name = "test-service2";
     isDisposed = false;
 
     dispose(): void {
@@ -251,6 +262,22 @@ describe("service lifetime", () => {
 
         expect(instance1).toBeInstanceOf(TestService);
         expect(instance1).not.toBe(instance2);
+    });
+
+    test("register service that overrides an existing service", () => {
+        const services = new ServiceMap();
+
+        services.registerSingleton(ITestService, TestService);
+        services.registerTransient(ITestService, TestService2);
+
+        const instance1 = services.get(ITestService);
+        const instance2 = services.get(ITestService);
+
+        // make sure the override is transient
+        expect(instance1).toBeInstanceOf(TestService2);
+        expect(instance1).not.toBe(instance2);
+
+        expect(instance1.name).toBe("test-service2");
     });
 });
 
