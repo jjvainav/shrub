@@ -65,9 +65,9 @@ export interface ILogEntry {
     readonly timestamp: number;
 }
 
-/** Responsible for writing a log entry. */
-export interface ILogEntryWritter {
-    (entry: ILogEntry): void;
+/** Handles writing log entries. */
+export interface ILogWriter {
+    writeLog(entry: ILogEntry): void;
 }
 
 /** Handles log data. */
@@ -89,25 +89,25 @@ export interface ILoggerOptions {
     /** If defined, a set of converters to use instead of the global converters. */
     readonly converters?: ILogDataConverter[];
     /** If defined, a set of writers to use instead of the global writers. */
-    readonly writers?: ILogEntryWritter[];
+    readonly writers?: ILogWriter[];
 }
 
 /** Log service responsible for creating loggers. */
-export interface ILogService {
+export interface ILoggingService {
     /** Creates a logger instance using the specified options or use the globally registered data converters and writers. */
     createLogger(options?: ILoggerOptions): ILogger;
     /** Registers a log data converter that will be available to loggers created by the service. */
-    registerLogDataConverter(converter: ILogDataConverter): void;
-    /** Registers a log entry writer with the service. */
-    registerLogEntryWritter(writer: ILogEntryWritter): void;
+    useLogDataConverter(converter: ILogDataConverter): void;
+    /** Registers a log writer with the service. */
+    useLogWriter(writer: ILogWriter): void;
 }
 
-export const ILogService = createService<ILogService>("log-service");
+export const ILoggingService = createService<ILoggingService>("logging-service");
 
 /** A decorator for injecting a global logger. */
 export const ILogger = createInjectable<ILogger>({
     key: "logger",
-    factory: services => services.get(ILogService).createLogger()
+    factory: services => services.get(ILoggingService).createLogger()
 });
 
 /** Defines standard levels for log entries. */
@@ -177,18 +177,17 @@ function isLogData(obj: any): obj is ILogData {
     return obj.type !== undefined;
 }
 
-/** @internal */
 @Singleton
-export class LogService implements ILogService {
+export class LoggingService implements ILoggingService {
     private readonly converters: ILogDataConverter[] = [];
-    private readonly writers: ILogEntryWritter[] = [];
+    private readonly writers: ILogWriter[] = [];
 
     /** Creates a logger instance using the specified options or use the globally registered data converters and writers. */
     createLogger(options?: ILoggerOptions): ILogger {
         const global = this;
         return new class Logger implements ILogger {
             private readonly converters: ILogDataConverter[];
-            private readonly writers: ILogEntryWritter[];
+            private readonly writers: ILogWriter[];
 
             constructor() {
                 this.converters = options && options.converters || global.converters;
@@ -197,9 +196,6 @@ export class LogService implements ILogService {
 
             /** Creates a log entry with the specified log level. */
             log(level: number, data: any): void {
-                // TODO: tracing will extend logging -- ISpan will extend logger
-                // TODO: change messaging to enableLogging instead of enableTracing
-        
                 if (typeof level !== "number") {
                     throw new Error(`Invalid level (${level}), must be a number.`);
                 }
@@ -236,7 +232,7 @@ export class LogService implements ILogService {
             }
         
             private write(entry: ILogEntry): void {
-                this.writers.forEach(writer => writer(entry));
+                this.writers.forEach(writer => writer.writeLog(entry));
             }
         
             private convertLogData(obj: any): ILogData {
@@ -258,12 +254,12 @@ export class LogService implements ILogService {
     }
 
     /** Registers a log data converter that will be available to loggers created by the service. */
-    registerLogDataConverter(converter: ILogDataConverter): void {
+    useLogDataConverter(converter: ILogDataConverter): void {
         this.converters.push(converter);
     }
 
-    /** Registers a log entry writer with the service. */
-    registerLogEntryWritter(writer: ILogEntryWritter): void {
+    /** Registers a log writer with the service. */
+    useLogWriter(writer: ILogWriter): void {
         this.writers.push(writer);
     }
 }

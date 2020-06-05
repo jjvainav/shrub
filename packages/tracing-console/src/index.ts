@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
-import { ILog, ISpan, ITracingConfiguration, LogLevel, TracingModule } from "@shrub/tracing";
+import { ILogEntry, LogLevel } from "@shrub/logging";
+import { ISpan, ITracingConfiguration, TagValue, TracingModule } from "@shrub/tracing";
 
 export interface ITracingConsoleConfiguration {
     /** Adds a set of callbacks that define what should or should not be printed to the console; by default, everything gets printed. */
@@ -10,9 +11,15 @@ export interface ITracingConsoleConfiguration {
 /** Options defining what to print to the console; by default all spans and logs are printed. */
 export interface IConsoleTraceFilter {
     /** Determines whether or not the specified log information should be printed. */
-    readonly printLog?: (log: ILog) => boolean;
+    readonly printLog?: (span: ISpan, log: ILogEntry) => boolean;
+    /** Determines whether or not the specified tag information should be printed. */
+    readonly printTag?: (span: ISpan, key: string, value: TagValue) => boolean;
     /** Determines if the specified start/end information for a span should be printed. */
     readonly printSpan?: (span: ISpan) => boolean;
+}
+
+interface ISpanInfo {
+    readonly isError: boolean;
 }
 
 export const ITracingConsoleConfiguration = createConfig<ITracingConsoleConfiguration>();
@@ -24,6 +31,8 @@ const colors = [
     "#FAFAD2", "#FFB6C1", "#20B2AA", "#87CEFA", "#FAF0E6", "#800000", "#BA55D3", "#C71585",
     "#000080", "#FFA500", "#98FB98", "#BC8F8F", "#A0522D", "#EE82EE", "#9ACD32", "#F5DEB3"
 ];
+
+const spans = new Map<ISpan, ISpanInfo>();
 
 export class TracingConsoleModule implements IModule {
     private filter?: IConsoleTraceFilter;
@@ -37,12 +46,12 @@ export class TracingConsoleModule implements IModule {
                 const base = this.filter;
                 this.filter = !base ? filter : {
                     ...base,
-                    printLog: log => {
-                        if (base.printLog && !base.printLog(log)) {
+                    printLog: (span, log) => {
+                        if (base.printLog && !base.printLog(span, log)) {
                             return false;
                         }
 
-                        if (filter.printLog && !filter.printLog(log)) {
+                        if (filter.printLog && !filter.printLog(span, log)) {
                             return false;
                         }
 
@@ -65,10 +74,29 @@ export class TracingConsoleModule implements IModule {
     }
 
     configure({ config }: IModuleConfigurator): void {
-        config.get(ITracingConfiguration).useObserver({
-            start: (_, span) => printStart(span, this.filter),
-            log: (span, log) => printLog(span, log, this.filter),
-            done: (_, span) => printEnd(span, this.filter)
+        config.get(ITracingConfiguration).useTraceWriter({
+            writeStart: (span) => {
+                spans.set(span, { isError: false });
+                printStart(span, this.filter);
+            },
+            writeLog: (span, log) => printLog(span, log, this.filter),
+            writeTag: (span, key, value) => {
+                const info = spans.get(span);
+                if (info) {
+                    if (key === "error") {
+                        spans.set(span, { ...info, isError: true });
+                    }
+
+                    printTag(span, key, value, this.filter);
+                }
+            },
+            writeDone: (span) => {
+                const info = spans.get(span);
+                if (info) {
+                    printDone(span, info, this.filter);
+                    spans.delete(span);
+                }
+            }
         });
     }
 }
@@ -76,17 +104,17 @@ export class TracingConsoleModule implements IModule {
 function printStart(span: ISpan, filter?: IConsoleTraceFilter): void {
     if (!filter || !filter.printSpan || filter.printSpan(span)) {
         if (span.parentId) {
-            console.log(chalk.cyan(`[start]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)} parent-id=${span.parentId} time=${span.startTime} tags=${JSON.stringify(span.tags)}`));
+            console.log(chalk.cyan(`[start]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)} parent-id=${span.parentId} time=${span.startTime}`));
         }
         else {
-            console.log(chalk.cyan(`[start]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)} time=${span.startTime} tags=${JSON.stringify(span.tags)}`));
+            console.log(chalk.cyan(`[start]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)} time=${span.startTime}`));
         }
     }
 }
 
-function printLog(span: ISpan, log: ILog, filter?: IConsoleTraceFilter): void {
-    if (!filter || !filter.printLog || filter.printLog(log)) {
-        const getText = (label: string) => `[${label}]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)} data=${JSON.stringify(log.data)}`;
+function printLog(span: ISpan, log: ILogEntry, filter?: IConsoleTraceFilter): void {
+    if (!filter || !filter.printLog || filter.printLog(span, log)) {
+        const getText = (label: string) => `[${label}]: id=${span.id} trace-id=${getColorString(span.traceId)} data=${JSON.stringify(log.data)}`;
 
         if (log.level < LogLevel.info) {
             console.log(chalk.magenta(getText("debug")));
@@ -103,10 +131,16 @@ function printLog(span: ISpan, log: ILog, filter?: IConsoleTraceFilter): void {
     }
 }
 
-function printEnd(span: ISpan, filter?: IConsoleTraceFilter): void {
+function printTag(span: ISpan, key: string, value: TagValue, filter?: IConsoleTraceFilter): void {
+    if (!filter || !filter.printTag || filter.printTag(span, key, value)) {
+        console.log(chalk.blue(`[tag]: id=${span.id} trace-id=${getColorString(span.traceId)} key=${key} value=${value}`));
+    }
+}
+
+function printDone(span: ISpan, info: ISpanInfo, filter?: IConsoleTraceFilter): void {
     if (!filter || !filter.printSpan || filter.printSpan(span)) {
-        const text = `[end]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)} time=${span.endTime} tags=${JSON.stringify(span.tags)}`; 
-        console.log(span.tags.error ? chalk.red(text) : chalk.cyan(text));
+        const text = `[end]: name=${span.name} id=${span.id} trace-id=${getColorString(span.traceId)} time=${span.endTime}`; 
+        console.log(info.isError ? chalk.red(text) : chalk.cyan(text));
     }
 }
 

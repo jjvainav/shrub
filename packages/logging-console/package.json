@@ -1,6 +1,6 @@
 {
-    "name": "@shrub/request-client-tracing",
-    "description": "Provides functionality for integrating the request-client with the tracing module and service.",
+    "name": "@shrub/logging-console",
+    "description": "A module that provides a simple log writer that writes information to the console.",
     "version": "0.4.75",
     "license": "MIT",
     "repository": {
@@ -16,17 +16,13 @@
     "publishConfig": {
         "access": "public"
     },
-    "engines": {
-        "node": ">=10.0.0"
-    },
     "scripts": {
         "build": "tsc -b .",
-        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
-        "test": "jest"
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
         "@shrub/core": "0.4.75",
-        "@shrub/tracing": "0.4.75",
-        "@sprig/request-client": "^0.1.49"
+        "@shrub/logging": "0.4.75",
+        "chalk": "^2.4.2"
     }
 }

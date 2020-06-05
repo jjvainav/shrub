@@ -27,13 +27,13 @@
     "dependencies": {
         "@shrub/core": "0.4.75",
         "@shrub/express": "0.4.75",
+        "@shrub/logging": "0.4.75",
         "@shrub/messaging": "0.4.75",
-        "@shrub/tracing": "0.4.75",
-        "@sprig/event-emitter": "^0.1.48",
-        "@sprig/request-client": "^0.1.48",
-        "@sprig/request-client-events": "^0.1.48",
-        "@sprig/request-client-mock": "^0.1.48",
-        "@sprig/unique-id": "^0.1.48",
+        "@sprig/event-emitter": "^0.1.49",
+        "@sprig/request-client": "^0.1.49",
+        "@sprig/request-client-events": "^0.1.49",
+        "@sprig/request-client-mock": "^0.1.49",
+        "@sprig/unique-id": "^0.1.49",
         "url-join": "^4.0.1"
     },
     "devDependencies": {

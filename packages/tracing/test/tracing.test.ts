@@ -1,4 +1,7 @@
-import { IErrorLogData, IEventLogData, ILog, IMessageLogData, ISpan, TracingService } from "../src";
+import { IErrorLogData, IEventLogData, ILogEntry, IMessageLogData, LoggingService } from "@shrub/logging";
+import { ISpan, ITags, ITraceWriter, TracingService } from "../src";
+
+type Mutable<T> = { -readonly[P in keyof T]: T[P] };
 
 function mockDateNow(now: number): () => void {
     const nowfn = Date.now;
@@ -6,52 +9,79 @@ function mockDateNow(now: number): () => void {
     return () => Date.now = nowfn;
 }
 
+class MockTraceWriter implements ITraceWriter { 
+    readonly start = new Set<ISpan>();
+    readonly logs = new Map<ISpan, ILogEntry[]>();
+    readonly tags = new Map<ISpan, ITags>();
+    readonly done = new Set<ISpan>();
+
+    writeStart(span: ISpan): void {
+        this.start.add(span);
+    }
+
+    writeLog(span: ISpan, log: ILogEntry): void {
+        const entries = this.logs.get(span) || [];
+        this.logs.set(span, entries);
+        entries.push(log);
+    }
+
+    writeTag(span: ISpan, key: string, value: string | number | boolean): void {
+        const items = this.tags.get(span) || {};
+        this.tags.set(span, items);
+        (<Mutable<ITags>>items)[key] = value;
+    }
+
+    writeDone(span: ISpan): void {
+        this.done.add(span);
+    }
+}
+
 describe("tracing", () => {
     test("create root span", () => {
         const now = 1562602719878;
         const unmock = mockDateNow(now);
 
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
 
         unmock();
 
-        expect(span.id).toHaveLength(8);
-        expect(span.traceId).toHaveLength(16);
+        expect(span.id).toHaveLength(16);
+        expect(span.traceId).toHaveLength(22);
         expect(span.parentId).toBeUndefined();
         expect(span.name).toBe("test");
         expect(span.startTime).toBe(now);
         expect(span.endTime).toBeUndefined();
-        expect(span.logs).toHaveLength(0);
-        expect(Object.keys(span.tags)).toHaveLength(0);
     });
 
     test("create root span with tags", () => {
         const now = 1562602719878;
         const unmock = mockDateNow(now);
 
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
+        const writer = new MockTraceWriter();
+        service.useTraceWriter(writer);
+
         const tracer = service.getTracer();
         const span = tracer.startSpan("test", { tag: "foo" });
 
         unmock();
 
-        expect(span.id).toHaveLength(8);
-        expect(span.traceId).toHaveLength(16);
+        expect(span.id).toHaveLength(16);
+        expect(span.traceId).toHaveLength(22);
         expect(span.parentId).toBeUndefined();
         expect(span.name).toBe("test");
         expect(span.startTime).toBe(now);
         expect(span.endTime).toBeUndefined();
-        expect(span.logs).toHaveLength(0);
-        expect(span.tags.tag).toBe("foo");
+        expect(writer.tags.get(span)!.tag).toBe("foo");
     });
 
     test("create and finish root span", () => {
         const start = 1562602719878;
         const unmockStart = mockDateNow(start);
 
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
 
@@ -64,18 +94,19 @@ describe("tracing", () => {
 
         unmockEnd();
 
-        expect(span.id).toHaveLength(8);
-        expect(span.traceId).toHaveLength(16);
+        expect(span.id).toHaveLength(16);
+        expect(span.traceId).toHaveLength(22);
         expect(span.parentId).toBeUndefined();
         expect(span.name).toBe("test");
         expect(span.startTime).toBe(start);
         expect(span.endTime).toBe(end);
-        expect(span.logs).toHaveLength(0);
-        expect(Object.keys(span.tags)).toHaveLength(0);
     });
 
     test("create and finish root span with error", () => {
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
+        const writer = new MockTraceWriter();
+        service.useTraceWriter(writer);
+
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
         const err = new Error("An error occurred.");
@@ -85,21 +116,26 @@ describe("tracing", () => {
         // make sure the end time is still getting set
         expect(span.endTime).toBeDefined();
         
-        expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].data.type).toBe("error");
-        expect((<IErrorLogData>span.logs[0].data).name).toBe("Error");
-        expect((<IErrorLogData>span.logs[0].data).message).toBe("An error occurred.");
-        expect((<IErrorLogData>span.logs[0].data).stack).toBeDefined();
+        const logs = writer.logs.get(span)!;
+        const tags = writer.tags.get(span)!;
+
+        expect(logs).toHaveLength(1);
+        expect(logs[0].data.type).toBe("error");
+        expect((<IErrorLogData>logs[0].data).name).toBe("Error");
+        expect((<IErrorLogData>logs[0].data).message).toBe("An error occurred.");
+        expect((<IErrorLogData>logs[0].data).stack).toBeDefined();
         
-        expect(Object.keys(span.tags)).toHaveLength(1);
-        expect(span.tags.error).toBe(true);
+        expect(Object.keys(tags)).toHaveLength(1);
+        expect(tags.error).toBe(true);
     });
     
     test("create and finish root span with error using custom converter", () => {
-        const service = new TracingService();
+        const loggingService = new LoggingService();
+        const tracingService = new TracingService(loggingService);
+        const writer = new MockTraceWriter();
 
-        // the converter needs to be injected before getting a tracer and creating a span
-        service.useLogDataConverter(obj => {
+        tracingService.useTraceWriter(writer);
+        loggingService.useLogDataConverter(obj => {
             if (obj instanceof Error) {
                 return <IErrorLogData>({
                     type: "error",
@@ -113,21 +149,23 @@ describe("tracing", () => {
             return undefined;
         });
 
-        const tracer = service.getTracer();
+        const tracer = tracingService.getTracer();
         const span = tracer.startSpan("test");
         const err = new Error("An error occurred.");
 
         span.done(err);
 
-        expect(span.logs).toHaveLength(1);
-        expect((<IErrorLogData>span.logs[0].data).name).toBe("FooError");
-        expect((<IErrorLogData>span.logs[0].data).message).toBe("An error occurred.");
-        expect((<IErrorLogData>span.logs[0].data).stack).toBeDefined();
-        expect((<IErrorLogData>span.logs[0].data).props!.foo).toBe("foo");
+        const logs = writer.logs.get(span)!;
+
+        expect(logs).toHaveLength(1);
+        expect((<IErrorLogData>logs[0].data).name).toBe("FooError");
+        expect((<IErrorLogData>logs[0].data).message).toBe("An error occurred.");
+        expect((<IErrorLogData>logs[0].data).stack).toBeDefined();
+        expect((<IErrorLogData>logs[0].data).props!.foo).toBe("foo");
     });  
 
     test("create multiple root spans", () => {
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
         const tracer = service.getTracer();
 
         const span1 = tracer.startSpan("test 1");
@@ -148,7 +186,7 @@ describe("tracing", () => {
     });  
     
     test("create child span", () => {
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
 
         const root = service.getTracer().startSpan("root");
         const child = service.getTracer(root).startSpan("child");
@@ -167,7 +205,7 @@ describe("tracing", () => {
     });
 
     test("create child span from custom scope", () => {
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
         const scope = { parentId: "1", traceId: "2" };
 
         service.useContextProvider({
@@ -185,39 +223,26 @@ describe("tracing", () => {
         expect(child.name).toBe("child");
     });
 
-    test("create root and child spans with start/done observer", () => {
-        const service = new TracingService();
-        const start: [any, ISpan][] = [];
-        const done: [any, ISpan][] = [];
+    test("create root and child spans with start/done writer", () => {
+        const service = new TracingService(new LoggingService());
+        const writer = new MockTraceWriter();
+        service.useTraceWriter(writer);
 
-        service.useObserver({
-            start: (scope, span) => start.push([scope, span]),
-            done: (scope, span) => done.push([scope, span])
-        });
-
-        const scope = {};
-        const root = service.getTracer(scope).startSpan("root");
+        const root = service.getTracer().startSpan("root");
         const child = service.getTracer(root).startSpan("child");
 
         child.done();
         root.done();
 
-        expect(start.length).toBe(2);
-        expect(start[0][0]).toBe(scope);
-        expect(start[0][1]).toBe(root);
-        expect(start[1][0]).toBe(root);
-        expect(start[1][1]).toBe(child);
+        expect(writer.start.has(root)).toBe(true);
+        expect(writer.start.has(child)).toBe(true);
 
-        // note: these will be in reverse from the start items since the child is expected to be done before the root
-        expect(done.length).toBe(2);
-        expect(done[0][0]).toBe(root);
-        expect(done[0][1]).toBe(child); 
-        expect(done[1][0]).toBe(scope);
-        expect(done[1][1]).toBe(root);
+        expect(writer.done.has(root)).toBe(true);
+        expect(writer.done.has(child)).toBe(true);
     }); 
     
     test("create span with context provider that doesn't recognize scope", () => {
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
 
         service.useContextProvider({
             getSpanContext: () => undefined
@@ -231,7 +256,7 @@ describe("tracing", () => {
     });
 
     test("create span with multiple context providers", () => {
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
 
         service.useContextProvider({
             getSpanContext: () => ({
@@ -259,7 +284,10 @@ describe("tracing", () => {
         const now = 1562602719878;
         const unmock = mockDateNow(now);
 
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
+        const writer = new MockTraceWriter();
+        service.useTraceWriter(writer);
+
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
 
@@ -270,19 +298,23 @@ describe("tracing", () => {
 
         unmock();
 
-        expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].level).toBe(20);
-        expect((<IEventLogData>span.logs[0].data).type).toBe("event");
-        expect((<IEventLogData>span.logs[0].data).name).toBe("foo-event");
-        expect((<IEventLogData>span.logs[0].data).props!.foo).toBe("foo");
-        expect(span.logs[0].timestamp).toBe(now);
+        const logs = writer.logs.get(span)!;
+        expect(logs).toHaveLength(1);
+        expect(logs[0].level).toBe(20);
+        expect((<IEventLogData>logs[0].data).type).toBe("event");
+        expect((<IEventLogData>logs[0].data).name).toBe("foo-event");
+        expect((<IEventLogData>logs[0].data).props!.foo).toBe("foo");
+        expect(logs[0].timestamp).toBe(now);
     });
 
     test("add event object info log to span with custom data prop", () => {
         const now = 1562602719878;
         const unmock = mockDateNow(now);
 
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
+        const writer = new MockTraceWriter();
+        service.useTraceWriter(writer);
+
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
 
@@ -295,19 +327,23 @@ describe("tracing", () => {
 
         unmock();
 
-        expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].level).toBe(20);
-        expect((<IEventLogData>span.logs[0].data).type).toBe("event");
-        expect((<IEventLogData>span.logs[0].data).name).toBe("foo-event");
-        expect((<IEventLogData>span.logs[0].data).props!.foo).toBe("foo");
-        expect(span.logs[0].timestamp).toBe(now);
+        const logs = writer.logs.get(span)!;
+        expect(logs).toHaveLength(1);
+        expect(logs[0].level).toBe(20);
+        expect((<IEventLogData>logs[0].data).type).toBe("event");
+        expect((<IEventLogData>logs[0].data).name).toBe("foo-event");
+        expect((<IEventLogData>logs[0].data).props!.foo).toBe("foo");
+        expect(logs[0].timestamp).toBe(now);
     });
 
     test("add plain JSON object info log to span", () => {
         const now = 1562602719878;
         const unmock = mockDateNow(now);
 
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
+        const writer = new MockTraceWriter();
+        service.useTraceWriter(writer);
+
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
 
@@ -315,96 +351,92 @@ describe("tracing", () => {
 
         unmock();
 
-        expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].level).toBe(20);
-        expect((<IEventLogData>span.logs[0].data).type).toBe("event");
-        expect((<IEventLogData>span.logs[0].data).name).toBe("");
-        expect((<IEventLogData>span.logs[0].data).props!.foo).toBe("foo");
-        expect(span.logs[0].timestamp).toBe(now);
-    });
-
-    test("add plain JSON object info log to span with log observer", () => {
-        const service = new TracingService();
-        const logs: [ISpan, ILog][] = [];
-
-        service.useObserver({
-            log: (span, log) => logs.push([span, log])
-        });
-
-        const tracer = service.getTracer();
-        const span = tracer.startSpan("test");
-
-        span.logInfo({ foo: "foo" });
-        span.logInfo({ bar: "bar" });
-
-        expect(logs).toHaveLength(2);
-        expect(logs[0][0]).toBe(span);
-        expect((<IEventLogData>logs[0][1].data).props!.foo).toBe("foo");
-        expect(logs[1][0]).toBe(span);
-        expect((<IEventLogData>logs[1][1].data).props!.bar).toBe("bar");
-    });    
+        const logs = writer.logs.get(span)!;
+        expect(logs).toHaveLength(1);
+        expect(logs[0].level).toBe(20);
+        expect((<IEventLogData>logs[0].data).type).toBe("event");
+        expect((<IEventLogData>logs[0].data).name).toBe("");
+        expect((<IEventLogData>logs[0].data).props!.foo).toBe("foo");
+        expect(logs[0].timestamp).toBe(now);
+    });   
 
     test("add plain JSON object info log to span with custom log data converter", () => {
-        const service = new TracingService();
+        const loggingService = new LoggingService();
+        const tracingService = new TracingService(loggingService);
+        const writer = new MockTraceWriter();
 
-        // the converter needs to be injected before getting a tracer and creating a span
-        service.useLogDataConverter(obj => <IEventLogData>({ 
+        tracingService.useTraceWriter(writer);
+        loggingService.useLogDataConverter(obj => <IEventLogData>({ 
             type: "event", 
             name: "my-event",
             props: { ...obj, bar: "bar" }
         }));
 
-        const tracer = service.getTracer();
+        const tracer = tracingService.getTracer();
         const span = tracer.startSpan("test");
 
         span.logInfo({ foo: "foo" });
 
-        expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].level).toBe(20);
-        expect((<IEventLogData>span.logs[0].data).props!.foo).toBe("foo");
-        expect((<IEventLogData>span.logs[0].data).props!.bar).toBe("bar");
+        const logs = writer.logs.get(span)!;
+        expect(logs).toHaveLength(1);
+        expect(logs[0].level).toBe(20);
+        expect((<IEventLogData>logs[0].data).props!.foo).toBe("foo");
+        expect((<IEventLogData>logs[0].data).props!.bar).toBe("bar");
     });   
     
     test("add info log to span with multiple log data converters", () => {
-        const service = new TracingService();
+        const loggingService = new LoggingService();
+        const tracingService = new TracingService(loggingService);
+        const writer = new MockTraceWriter();
 
-        service.useLogDataConverter(() => undefined);
-        service.useLogDataConverter(obj => <IEventLogData>({ 
+        tracingService.useTraceWriter(writer);
+        loggingService.useLogDataConverter(() => undefined);
+        loggingService.useLogDataConverter(obj => <IEventLogData>({ 
             type: "event", 
             name: "my-event",
             props: obj
         }));        
 
-        const tracer = service.getTracer();
+        const tracer = tracingService.getTracer();
         const span = tracer.startSpan("test");
 
         span.logInfo({ foo: "foo" });
 
-        expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].level).toBe(20);
-        expect((<IEventLogData>span.logs[0].data).name).toBe("my-event");
-        expect((<IEventLogData>span.logs[0].data).props!.foo).toBe("foo");
+        const logs = writer.logs.get(span)!;
+        expect(logs).toHaveLength(1);
+        expect(logs[0].level).toBe(20);
+        expect((<IEventLogData>logs[0].data).name).toBe("my-event");
+        expect((<IEventLogData>logs[0].data).props!.foo).toBe("foo");
     });
     
     test("add error log to span", () => {
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
+        const writer = new MockTraceWriter();
+        service.useTraceWriter(writer);
+
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
 
         span.logError(new Error("Error test."));
 
-        expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].level).toBe(40);
-        expect((<IErrorLogData>span.logs[0].data).name).toBe("Error");
-        expect((<IErrorLogData>span.logs[0].data).message).toBe("Error test.");
-        expect((<IErrorLogData>span.logs[0].data).stack).toBeDefined();
+        const logs = writer.logs.get(span)!;
+        const tags = writer.tags.get(span)!;
 
-        expect(Object.keys(span.tags)).toHaveLength(1);
-        expect(span.tags.error).toBe(true);        
+        expect(logs).toHaveLength(1);
+        expect(logs[0].level).toBe(40);
+        expect((<IErrorLogData>logs[0].data).name).toBe("Error");
+        expect((<IErrorLogData>logs[0].data).message).toBe("Error test.");
+        expect((<IErrorLogData>logs[0].data).stack).toBeDefined();
+
+        expect(Object.keys(tags)).toHaveLength(1);
+        expect(tags.error).toBe(true);        
     });
 
     test("add error log to span for error that does not properly extend the Error class", () => {
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
+        const writer = new MockTraceWriter();
+        service.useTraceWriter(writer);
+
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
 
@@ -416,51 +448,62 @@ describe("tracing", () => {
             }
         });
 
-        expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].level).toBe(40);
-        expect((<IErrorLogData>span.logs[0].data).name).toBe("Error");
-        expect((<IErrorLogData>span.logs[0].data).message).toBe("Foo");
-        expect((<IErrorLogData>span.logs[0].data).stack).toBeDefined();
+        const logs = writer.logs.get(span)!;
+        const tags = writer.tags.get(span)!;
 
-        expect(Object.keys(span.tags)).toHaveLength(1);
-        expect(span.tags.error).toBe(true);     
+        expect(logs).toHaveLength(1);
+        expect(logs[0].level).toBe(40);
+        expect((<IErrorLogData>logs[0].data).name).toBe("Error");
+        expect((<IErrorLogData>logs[0].data).message).toBe("Foo");
+        expect((<IErrorLogData>logs[0].data).stack).toBeDefined();
+
+        expect(Object.keys(tags)).toHaveLength(1);
+        expect(tags.error).toBe(true);     
     });  
 
     test("add log to span with custom level", () => {
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
+        const writer = new MockTraceWriter();
+        service.useTraceWriter(writer);
+
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
 
         span.log(11, { foo: "foo" });
 
-        expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].level).toBe(11);
-        expect((<IEventLogData>span.logs[0].data).props!.foo).toBe("foo");
+        const logs = writer.logs.get(span)!;
+        expect(logs).toHaveLength(1);
+        expect(logs[0].level).toBe(11);
+        expect((<IEventLogData>logs[0].data).props!.foo).toBe("foo");
     });
 
     test("add log to span with string data", () => {
-        const service = new TracingService();
+        const service = new TracingService(new LoggingService());
+        const writer = new MockTraceWriter();
+        service.useTraceWriter(writer);
+
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
 
         span.logInfo("foo");
 
-        expect(span.logs).toHaveLength(1);
-        expect(span.logs[0].level).toBe(20);
-        expect((<IMessageLogData>span.logs[0].data).type).toBe("message");
-        expect((<IMessageLogData>span.logs[0].data).message).toBe("foo");
+        const logs = writer.logs.get(span)!;
+        expect(logs).toHaveLength(1);
+        expect(logs[0].level).toBe(20);
+        expect((<IMessageLogData>logs[0].data).type).toBe("message");
+        expect((<IMessageLogData>logs[0].data).message).toBe("foo");
     });  
     
-    test("extend tracer with custom builder and observer", () => {
-        const service = new TracingService();
-        let counter = 0;
+    test("extend tracer with custom builder and writer", () => {
+        const service = new TracingService(new LoggingService());
+        const writer = new MockTraceWriter();
 
         const tracer1 = service.getBuilder().build();
-        const tracer2 = service.getBuilder().useObserver({ done: () => counter++ }).build();
+        const tracer2 = service.getBuilder().useTraceWriter(writer).build();
 
         tracer1.startSpan("tracer1").done();
         tracer2.startSpan("tracer2").done();
 
-        expect(counter).toBe(1);
+        expect(writer.start.size).toBe(1);
     }); 
 });

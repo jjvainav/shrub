@@ -103,6 +103,7 @@ class TestConsumer implements IMessageChannelConsumer {
     subscribe(subscriptionId: string, handler: MessageHandler): Promise<ISubscription> {
         this.handlers.push(handler);
         return Promise.resolve({
+            enableLogging: () => {},
             unsubscribe: () => {}
         });
     }

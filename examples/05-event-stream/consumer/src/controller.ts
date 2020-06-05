@@ -21,6 +21,9 @@ export class Controller {
             handler: message => stream.send(message)
         });
 
+        // write log information to the request span
+        subscription.enableLogging(req.context.span!);
+
         // invoke next to open the stream
         next();
 

@@ -1,24 +1,23 @@
 import { createConfig, IModule, IModuleInitializer, IServiceRegistration } from "@shrub/core";
-import { ILogDataConverter, ISpanContextProvider, ITraceObserver, ITracingService, TracingService } from "./service";
+import { LoggingModule } from "@shrub/logging";
+import { ISpanContextProvider, ITraceWriter, ITracingService, TracingService } from "./service";
 
 export const ITracingConfiguration = createConfig<ITracingConfiguration>();
 export interface ITracingConfiguration {
     /** Registers a global span context provider for the tracing service. */
     useContextProvider(provider: ISpanContextProvider): void;
-    /** Registers a log data converter with the builder. The log data converter handles converting logged data into ILogData objects. */
-    useLogDataConverter(converter: ILogDataConverter): void;
-    /** Registers a global observer for the tracing service. */
-    useObserver(observer: ITraceObserver): void; 
+    /** Registers a global trace writer for the tracing service. */
+    useTraceWriter(writer: ITraceWriter): void; 
 }
 
 export class TracingModule implements IModule {
     readonly name = "tracing";
+    readonly dependencies = [LoggingModule];
 
     initialize(init: IModuleInitializer): void {
         init.config(ITracingConfiguration).register(({ services }) => ({
             useContextProvider: provider => (<TracingService>services.get(ITracingService)).useContextProvider(provider),
-            useLogDataConverter: converter => (<TracingService>services.get(ITracingService)).useLogDataConverter(converter),
-            useObserver: observer => (<TracingService>services.get(ITracingService)).useObserver(observer)
+            useTraceWriter: writer => (<TracingService>services.get(ITracingService)).useTraceWriter(writer)
         }));
     }    
 

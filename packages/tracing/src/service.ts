@@ -1,60 +1,12 @@
 import { createService, Singleton } from "@shrub/core";
+import { ILogEntry, ILogger, ILoggingService, LogLevel } from "@shrub/logging";
 import createId from "@sprig/unique-id";
 
 // The tracing logic was motivated by the Google Dapper paper: 
 // https://static.googleusercontent.com/media/research.google.com/en//archive/papers/dapper-2010-1.pdf 
 
-type ErrorLogLevel = 40;
-type WarnLogLevel = 30;
-type InfoLogLevel = 20;
-type DebugLogLevel = 10;
-
-/** Defines the data types for a log. */
-export type LogDataType = "error" | "event" | "message";
-/** Defines a properties dictionary for log data. */
-export type LogDataProps = { readonly [key: string]: string };
-
-/** Represents the data for a log. */
-export interface ILogData {
-    readonly type: LogDataType;
-    readonly props?: LogDataProps;
-}
-
-/** Represents log data for an Error object. */
-export interface IErrorLogData extends ILogData {
-    readonly type: "error";
-    readonly name: string;
-    readonly message: string;
-    readonly stack?: string | undefined;
-}
-
-/** Represents log data for an event. */
-export interface IEventLogData extends ILogData {
-    readonly type: "event";
-    readonly name: string;
-}
-
-/** Represents log data for a standard string message. */
-export interface IMessageLogData extends ILogData {
-    readonly type: "message";
-    readonly message: string;
-}
-
-/** Represents additional information for a span. */
-export interface ILog {
-    /** 
-     * Identifies the severity level for the log; the higher the number the more severe. 
-     * There are a few defined severity level ranges:
-     * 
-     *     error = 4x
-     *     warn = 3x
-     *     info = 2x
-     *     debug = 1x
-     */
-    readonly level: number;    
-    readonly data: ILogData;
-    readonly timestamp: number;
-}
+/** Value type for a tag. */
+export type TagValue = number | string | boolean;
 
 /** Responsible for creating and writing spans. */
 export interface ITracer {
@@ -76,21 +28,8 @@ export interface ITracerBuilder {
     build(scope?: any): ITracer;
     /** Registers a span context provider with the builder. */
     useContextProvider(provider: ISpanContextProvider): ITracerBuilder;
-    /** Registers a log data converter with the builder. The log data converter handles converting logged data into ILogData objects. */
-    useLogDataConverter(converter: ILogDataConverter): ITracerBuilder;
-    /** Registers an observer with the builder. */
-    useObserver(observer: ITraceObserver): ITracerBuilder; 
-}
-
-/** Converts a standard object into a log data json object to be logged with a span. */
-export interface ILogDataConverter {
-    /** The callback should return a new log data object or undefined if it cannot process the object. */
-    (obj: object, context: ILogDataConverterContext): ILogData | undefined;
-}
-
-export interface ILogDataConverterContext {
-    /** Converts a value to be logged as a string property for a log. */
-    toString(value: any): string;
+    /** Registers a trace writer with the builder. */
+    useTraceWriter(writer: ITraceWriter): ITracerBuilder; 
 }
 
 /** Responsible for providing a span context for a given trace scope. */
@@ -99,16 +38,16 @@ export interface ISpanContextProvider {
     getSpanContext(scope: any): ISpanContext | undefined;
 }
 
-/** An observer for trace events. */
-export interface ITraceObserver {
-    /** Occurs when the specified span has started. */
-    readonly start?: (scope: any, span: ISpan) => void;
-    /** Occurs when a log has been added to a span. */
-    readonly log?: (span: ISpan, log: ILog) => void;
-    /** Occurs when a tag has been set for the span. */
-    readonly tag?: (span: ISpan, key: string, value: string | number | boolean) => void;
-    /** Occurs when the specified span is done. */
-    readonly done?: (scope: any, span: ISpan) => void;
+/** Handles writing trace information. */
+export interface ITraceWriter {
+    /** Writes the start event for the specified span. */
+    writeStart(span: ISpan): void;
+    /** Writes a log entry for the specified span. */
+    writeLog(span: ISpan, log: ILogEntry): void;
+    /** Writes a tag for the specified span. */
+    writeTag(span: ISpan, key: string, value: TagValue): void;
+    /** Writes the done event for the specified span. */
+    writeDone(span: ISpan): void;
 }
 
 /** A service responsible for creating and providing tracers. */
@@ -121,11 +60,11 @@ export interface ITracingService {
 
 /** A set of key/value pairs for a span. */
 export interface ITags { 
-    readonly [key: string]: number | string | boolean | undefined;
+    readonly [key: string]: TagValue | undefined;
 }
 
 /** Represents a logical unit of work for a trace record. */
-export interface ISpan {
+export interface ISpan extends ILogger {
     /** A 64 bit identifier for the span. */
     readonly id: string;
     /** An optional parent span id. */
@@ -138,24 +77,10 @@ export interface ISpan {
     readonly startTime: number;
     /** The end time for the span represented as the number of milliseconds from epoch. */
     readonly endTime?: number;
-    /** A set of logs for the span. */
-    readonly logs: ILog[];
-    /** The set of tags for the span. */
-    readonly tags: ITags;
     /** Finalizes the span and accepts an optional Error instance if the span resulted in an error. */
-    done(err?: Error): void;
-    /** Log additional information with the span. */
-    log(level: number, data: any): void;
-    /** Log debug data with the span. */
-    logDebug(data: any): void;
-    /** Log error data with the span. */
-    logError(data: any): void;
-    /** Log info data with the span. */
-    logInfo(data: any): void;
-    /** Log warning data with the span. */
-    logWarn(data: any): void;    
+    done(err?: Error): void;   
     /** Adds a tag to the span. */
-    tag(key: string, value: string | number | boolean): void;
+    tag(key: string, value: TagValue): void;
 }
 
 /** Represents the distributed context for an existing span. */
@@ -167,72 +92,6 @@ export interface ISpanContext {
 }
 
 export const ITracingService = createService<ITracingService>("tracing-service");
-
-/** Defines standard levels for span logs. */
-export const LogLevel: { 
-    readonly error: ErrorLogLevel;
-    readonly warn: WarnLogLevel;
-    readonly info: InfoLogLevel;
-    readonly debug: DebugLogLevel;
-} = {
-    error: 40,
-    warn: 30,
-    info: 20,
-    debug: 10
-};
-
-const defaultLogDataConverter: ILogDataConverter = (obj, context) => {
-    if (isLogData(obj)) {
-        return obj;
-    }
-
-    if (isError(obj)) {
-        return <IErrorLogData>({
-            type: "error",
-            name: obj.name,
-            message: obj.message,
-            stack: obj.stack
-        });
-    }
-
-    const name = (<any>obj).name || "";
-    const props: any = {};
-
-    // check if the event object is in the format: { name, data } or { name, props }
-    // otherwise use the props for the object as the log data props
-    if ((<any>obj).props || (<any>obj).data) {
-        const data = (<any>obj).props || (<any>obj).data;
-        for(const key of Object.keys(data)) {
-            // include null in the condition
-            if ((<any>data)[key] != undefined) {
-                props[key] = context.toString((<any>data)[key]);
-            }
-        }
-    }
-    else {
-        for(const key of Object.keys(obj)) {
-            // include null in the condition
-            if (key !== "name" && (<any>obj)[key] != undefined) {
-                props[key] = context.toString((<any>obj)[key]);
-            }
-        }
-    }
-
-    return <IEventLogData>({ type: "event", name, props });
-};
-
-function isError(obj: any): obj is Error {
-    // instanceof only works if sub-classes extend Error properly (prototype gets set to Error);
-    // if the instanceof check fails assume an Error if name, message, and stack are defined.
-    return obj instanceof Error || (
-        (<Error>obj).name !== undefined &&
-        (<Error>obj).message !== undefined &&
-        (<Error>obj).stack !== undefined);
-}
-
-function isLogData(obj: any): obj is ILogData {
-    return obj.type !== undefined;
-}
 
 function isSpan(scope: any): scope is ISpan {
     return (<ISpan>scope).id !== undefined && (<ISpan>scope).traceId !== undefined; 
@@ -260,16 +119,19 @@ function newTraceId(): string {
 @Singleton
 export class TracingService implements ITracingService {
     private readonly providers: ISpanContextProvider[] = [];
-    private readonly converters: ILogDataConverter[] = [];
-    private readonly observers: ITraceObserver[] = [];
-    private defaultBuilder = new TracerBuilder(this.providers, this.converters, this.observers);
+    private readonly writers: ITraceWriter[] = [];
+    private readonly defaultBuilder: TracerBuilder;
+
+    constructor(@ILoggingService private readonly loggingService: ILoggingService) {
+        this.defaultBuilder = new TracerBuilder(loggingService, this.providers, this.writers);
+    }
 
     getBuilder(): ITracerBuilder {
         // the builder is immutable so pass new arrays for the global items
         return new TracerBuilder(
+            this.loggingService,
             [...this.providers], 
-            [...this.converters], 
-            [...this.observers]);
+            [...this.writers]);
     }
 
     getTracer(scope?: any): ITracer {
@@ -282,45 +144,22 @@ export class TracingService implements ITracingService {
         }
     }
     
-    useLogDataConverter(converter: ILogDataConverter): void {
-        if (!this.converters.includes(converter)) {
-            this.converters.push(converter);
-        }
-    }
-
-    useObserver(observer: ITraceObserver): void {
-        if (!this.observers.includes(observer)) {
-            this.observers.push(observer);
+    useTraceWriter(writer: ITraceWriter): void {
+        if (!this.writers.includes(writer)) {
+            this.writers.push(writer);
         }
     }     
 }
 
 class TracerBuilder implements ITracerBuilder {
     constructor(
+        private readonly loggingService: ILoggingService,
         private readonly providers: ISpanContextProvider[] = [],
-        private readonly converters: ILogDataConverter[] = [],
-        private readonly observers: ITraceObserver[] = []) {
+        private readonly writers: ITraceWriter[] = []) {
     }
-
 
     /** Builds a tracer for the given scope. */
     build(scope?: any): ITracer {
-        const convertLogData: (obj: any) => ILogData = obj => {
-            const context = { 
-                toString: (value: any) => typeof value === "object" ? JSON.stringify(value) : value.toString()
-            };
-
-            for (const converter of this.converters) {
-                const data = converter(obj, context);
-
-                if (data) {
-                    return data;
-                }
-            }
-
-            return defaultLogDataConverter(obj, context)!;
-        };
-
         return {
             startSpan: (name, tags) => {
                 let context = scope && isSpanContext(scope)
@@ -340,15 +179,20 @@ class TracerBuilder implements ITracerBuilder {
                     }
                 }
 
-                const observers = this.observers;
+                // create a logger to use with the span
+                const logger = this.loggingService.createLogger({
+                    writers: this.writers.map(writer => ({
+                        writeLog: entry => writer.writeLog(span, entry)
+                    }))
+                });
+
+                const writers = this.writers;
                 const span: ISpan = {
                     id: newSpanId(),
                     parentId: context && context.getParentSpanId(),
                     traceId: (context && context.getTraceId()) || newTraceId(),
                     name,
                     startTime: Date.now(),
-                    logs: [],
-                    tags: tags || {},
                     done: function(err?: Error) {
                         if (!this.endTime) {
                             if (err) {
@@ -356,41 +200,17 @@ class TracerBuilder implements ITracerBuilder {
                             }
                     
                             (<any>this).endTime = Date.now();
-            
-                            observers.forEach(observer => {
-                                if (observer.done) {
-                                    observer.done(scope, this);
-                                }
-                            });
+                            writers.forEach(writer => writer.writeDone(this));
                         }
                     },
                     log: function (level, data) {
-                        if (typeof level !== "number") {
-                            throw new Error(`Invalid level (${level}), must be a number.`);
-                        }
-
                         if (level >= LogLevel.error) {
                             // automatically tag the span as an error if an error has been logged
                             this.tag("error", true);
                         }
             
-                        const log = {
-                            level,
-                            data: typeof data !== "object" 
-                                ? <ILogData>({ type: "message", message: data.toString() })
-                                : isLogData(data) ? data : convertLogData(data),
-                            timestamp: Date.now()
-                        };
-            
-                        this.logs.push(log);
-            
-                        observers.forEach(observer => {
-                            if (observer.log) {
-                                observer.log(this, log);
-                            }
-                        });
-            
-                        return log;
+                        // the logger will invoke writers so we don't have to worry about that here
+                        logger.log(level, data);
                     },
                     logDebug: function (data) {
                         this.log(LogLevel.debug, data);
@@ -405,20 +225,19 @@ class TracerBuilder implements ITracerBuilder {
                         this.log(LogLevel.warn, data);
                     },        
                     tag: function (key: string, value: any) {
-                        (<any>this.tags)[key] = value;
-                        observers.forEach(observer => {
-                            if (observer.tag) {
-                                observer.tag(this, key, value);
-                            }
-                        });
+                        writers.forEach(writer => writer.writeTag(this, key, value));
                     }
                 };
-            
-                observers.forEach(observer => {
-                    if (observer.start) {
-                        observer.start(scope, span);
+
+                writers.forEach(writer => writer.writeStart(span));
+
+                if (tags) {
+                    for (const key of Object.keys(tags)) {
+                        if (tags[key] !== undefined) {
+                            span.tag(key, tags[key]!);
+                        }
                     }
-                });
+                }
             
                 return span;
             }
@@ -428,26 +247,16 @@ class TracerBuilder implements ITracerBuilder {
     /** Registers a span context provider with the builder. */
     useContextProvider(provider: ISpanContextProvider): ITracerBuilder {
         return new TracerBuilder(
+            this.loggingService,
             [...this.providers, provider],
-            this.converters,
-            this.observers);
+            this.writers);
     }
 
-    /** Registers a log data converter with the builder. The log data converter handles converting logged data into ILogData objects. */
-    useLogDataConverter(converter: ILogDataConverter): ITracerBuilder {
-        
-    
+    /** Registers a trace writer with the builder. */
+    useTraceWriter(writer: ITraceWriter): ITracerBuilder {
         return new TracerBuilder(
+            this.loggingService,
             this.providers,
-            [...this.converters, converter],
-            this.observers);
-    }
-
-    /** Registers an observer with the builder. */
-    useObserver(observer: ITraceObserver): ITracerBuilder {
-        return new TracerBuilder(
-            this.providers,
-            this.converters,
-            [...this.observers, observer]);
+            [...this.writers, writer]);
     }
 }

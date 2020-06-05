@@ -1,6 +1,6 @@
 {
     "name": "@shrub/tracing-console",
-    "description": "A module that provides a simple tracing observer that writes information to the console.",
+    "description": "A module that provides a simple trace writer that writes information to the console.",
     "version": "0.4.75",
     "license": "MIT",
     "repository": {
@@ -21,11 +21,11 @@
     },
     "scripts": {
         "build": "tsc -b .",
-        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
-        "test": "jest"
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
         "@shrub/core": "0.4.75",
+        "@shrub/logging": "0.4.75",
         "@shrub/tracing": "0.4.75",
         "chalk": "^2.4.2"
     }
