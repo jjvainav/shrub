@@ -8,6 +8,7 @@
     "references": [
         { "path": "../core" },
         { "path": "../express" },
+        { "path": "../express-tracing" },
         { "path": "../logging" },
         { "path": "../messaging" },
         { "path": "../tracing" }

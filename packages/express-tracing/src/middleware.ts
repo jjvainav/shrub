@@ -1,5 +1,6 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import "@shrub/express/dist/request-context";
 import { ISpan } from "@shrub/tracing";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IExpressTracingService, IRequestTracingOptions } from "./service";
 
 declare module "@shrub/express/dist/request-context" {

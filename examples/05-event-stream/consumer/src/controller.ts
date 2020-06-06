@@ -29,17 +29,6 @@ export class Controller {
 
         // the stream won't be available until after next is invoked
         const stream = req.context.eventStream!;
-        req.context.span!.logInfo({
-            name: "connection-open",
-            props: { channel, subscriptionId } 
-        });
-
-        stream.onClose(() => {
-            subscription.unsubscribe();
-            req.context.span!.logInfo({
-                name: "connection-closed",
-                props: { channel, subscriptionId } 
-            });
-        });
+        stream.onClose(() => subscription.unsubscribe());
     }
 }

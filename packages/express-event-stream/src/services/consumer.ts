@@ -95,9 +95,10 @@ class EventStreamChannelConsumer implements IMessageChannelConsumer {
     }
 
     subscribe(subscriptionId: string, handler: MessageHandler): Promise<ISubscription> {
-        const url = urlJoin(this.options.url, "?subscriptionId=" + encodeURIComponent(subscriptionId) + "&channel=" + encodeURIComponent(this.options.channelNamePattern));
         const subscription = new Subscription(
-            url, 
+            this.options.url, 
+            subscriptionId,
+            this.options.channelNamePattern,
             handler, 
             this.options.retry || defaultRetry,
             this.options.interceptors);
@@ -115,6 +116,8 @@ class Subscription implements ISubscription {
 
     constructor(
         private readonly url: string, 
+        private readonly subscriptionId: string,
+        private readonly channelNamePattern: string,
         private readonly handler: MessageHandler, 
         private readonly retry: number,
         private readonly interceptors?: IEventStreamInterceptors) {
@@ -135,8 +138,9 @@ class Subscription implements ISubscription {
     }
 
     private connect(): void {
+        const url = urlJoin(this.url, "?subscriptionId=" + encodeURIComponent(this.subscriptionId) + "&channel=" + encodeURIComponent(this.channelNamePattern));
         this.stream = new RequestEventStream<IMessage>({
-            url: this.url,
+            url,
             beforeRequest: this.interceptors && this.interceptors.beforeRequest,
             afterRequest: this.interceptors && this.interceptors.afterRequest,
             validate: (data, resolve, reject) => jsonValidator(
@@ -153,13 +157,32 @@ class Subscription implements ISubscription {
                 message => reject(message))
         });
 
-        // TODO: telemetry - track open and onClose
-        // TODO: the 'telemetry' stuff should be written to this.logger...
-        // TODO: support passing an ILogger to the producers?
+        this.stream.onOpen(() => {
+            if (this.logger) {
+                this.logger.logDebug({
+                    name: "event-stream-open",
+                    props: { 
+                        url: this.url,
+                        channel: this.channelNamePattern, 
+                        subscriptionId: this.subscriptionId
+                    }
+                });
+            }
+        });
 
+        this.stream.onClose(() => {
+            if (this.logger) {
+                this.logger.logDebug({
+                    name: "event-stream-close",
+                    props: { 
+                        url: this.url,
+                        channel: this.channelNamePattern, 
+                        subscriptionId: this.subscriptionId
+                    }
+                });
+            }
+        });
 
-
-        //this.stream.onOpen(() => {});
         this.stream.onError(event => {
             setTimeout(() => {
                 // auto-reconnect unless the consumer has been unsubscribed
@@ -168,12 +191,32 @@ class Subscription implements ISubscription {
                 }
             }, 
             this.retry);
-            // TODO: telemetry - track error 
-            //reject(new Error(`[${event.type}]: Failed to subscribe to '${url}' with response '${event.message}'`));
+
+            if (this.logger) {
+                this.logger.logError({
+                    type: "error",
+                    name: "event-stream-error",
+                    message: "Failed to subscribe to endpoint.",
+                    props: {
+                        url: this.url,
+                        "error.type": event.type,
+                        "error.message": event.message
+                    }
+                });
+            }
         });
 
-        // TODO: telemetry - send invalid data
-        //stream.onInvalidData
+        this.stream.onInvalidData(event => {
+            if (this.logger) {
+                this.logger.logWarn({
+                    name: "event-stream-invalid-data",
+                    props: { 
+                        url: this.url,
+                        reason: event.message
+                    }
+                });
+            }
+        });
 
         // the 'current' promise will block handling the next message until the previous handler returns
         let current = Promise.resolve();

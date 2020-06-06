@@ -1,3 +1,4 @@
+import "@shrub/express/dist/request-context";
 import Cookies from "cookies";
 import { Request, RequestHandler } from "express";
 

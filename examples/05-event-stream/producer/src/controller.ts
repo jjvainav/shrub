@@ -66,20 +66,11 @@ export class Controller {
 
         consumers.set(consumer.id, consumer);
 
-        req.context.span!.logInfo({
-            name: "consumer-connected",
-            props: consumer 
-        });
-
         // send metrics to browsers whenever a consumer has connected or disconnected
         this.sendMetricsToBrowserClients();
         req.on("close", () => {
             consumers.delete(consumer.id);
             this.sendMetricsToBrowserClients();
-            req.context.span!.logInfo({
-                name: "consumer-disconnected",
-                props: consumer 
-            });
         });
     }
 
