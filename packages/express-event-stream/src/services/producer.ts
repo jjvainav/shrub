@@ -59,10 +59,8 @@ export class EventStreamProducerService implements IEventStreamProducerService {
             if (req.context.span) {
                 req.context.span!.logInfo({
                     name: "event-stream-consumer-disconnected",
-                    props: {
-                        channel: channelNamePattern,
-                        subscriptionId
-                    } 
+                    channel: channelNamePattern,
+                    subscriptionId
                 });
             }    
         });
@@ -70,10 +68,8 @@ export class EventStreamProducerService implements IEventStreamProducerService {
         if (req.context.span) {
             req.context.span!.logInfo({
                 name: "event-stream-consumer-connected",
-                props: {
-                    channel: channelNamePattern,
-                    subscriptionId
-                } 
+                channel: channelNamePattern,
+                subscriptionId
             });
         }
 

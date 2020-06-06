@@ -161,11 +161,9 @@ class Subscription implements ISubscription {
             if (this.logger) {
                 this.logger.logDebug({
                     name: "event-stream-open",
-                    props: { 
-                        url: this.url,
-                        channel: this.channelNamePattern, 
-                        subscriptionId: this.subscriptionId
-                    }
+                    url: this.url,
+                    channel: this.channelNamePattern, 
+                    subscriptionId: this.subscriptionId
                 });
             }
         });
@@ -174,11 +172,9 @@ class Subscription implements ISubscription {
             if (this.logger) {
                 this.logger.logDebug({
                     name: "event-stream-close",
-                    props: { 
-                        url: this.url,
-                        channel: this.channelNamePattern, 
-                        subscriptionId: this.subscriptionId
-                    }
+                    url: this.url,
+                    channel: this.channelNamePattern, 
+                    subscriptionId: this.subscriptionId
                 });
             }
         });
@@ -193,15 +189,13 @@ class Subscription implements ISubscription {
             this.retry);
 
             if (this.logger) {
+                // log the error as an event since we 
                 this.logger.logError({
-                    type: "error",
                     name: "event-stream-error",
                     message: "Failed to subscribe to endpoint.",
-                    props: {
-                        url: this.url,
-                        "error.type": event.type,
-                        "error.message": event.message
-                    }
+                    url: this.url,
+                    "error.type": event.type,
+                    "error.message": event.message
                 });
             }
         });
@@ -210,10 +204,8 @@ class Subscription implements ISubscription {
             if (this.logger) {
                 this.logger.logWarn({
                     name: "event-stream-invalid-data",
-                    props: { 
-                        url: this.url,
-                        reason: event.message
-                    }
+                    url: this.url,
+                    reason: event.message
                 });
             }
         });

@@ -1,5 +1,7 @@
-import { IEventLogData, ILogger } from "@shrub/logging";
+import { ILogEvent, ILogger } from "@shrub/logging";
 import { IRequestInterceptor, IResponseInterceptor, IResponseInterceptorContext, isExpectedStatus } from "@sprig/request-client";
+
+type Mutable<T> = {-readonly[P in keyof T]: T[P]};
 
 // Note: the interceptors support an undefined logger; if one is not provided a 'noOp' interceptor is returned.
 // This is useful in situations where users can turn on/off tracing by simply passing a logger or undefined.
@@ -8,18 +10,19 @@ const noOp = (context: any) => context.next();
 /** Creates a new request interceptor that will log request info to the provided logger. */
 export function logRequest(logger?: ILogger): IRequestInterceptor {
     return !logger ? noOp : context => {
-        const props: { [key: string]: string } = {
+        const data: Mutable<ILogEvent> = { 
+            name: "request",
             url: context.request.options.url,
-            method: <string>context.request.options.method
+            method: context.request.options.method
         };
 
         if (context.request.options.headers) {
             for (const key of Object.keys(context.request.options.headers)) {
-                props["header." + key] = context.request.options.headers[key];
+                data["header." + key] = context.request.options.headers[key];
             }
         }
 
-        logger.logInfo(<IEventLogData>({ type: "event", name: "request", props }));
+        logger.logInfo(data);
         context.next();
     };
 }
@@ -32,16 +35,15 @@ export function logRequest(logger?: ILogger): IRequestInterceptor {
 export function logResponse(logger?: ILogger): IResponseInterceptor {
     return !logger ? noOp : context => {
         if (context.response) {
-            const props: { [key: string]: string } = {
-                request_id: context.request.id,
-                status: context.response.status.toString()
+            const data: Mutable<ILogEvent> = { 
+                name: "response",
+                requestId: context.request.id,
+                status: context.response.status
             };
-
-            const data: IEventLogData = { type: "event", name: "response", props };
 
             if (shouldLogResponseWarning(context)) {
                 // only log the response body for unexpected responses and also log it as a warning
-                props.body = JSON.stringify(context.response.data);
+                data.body = JSON.stringify(context.response.data);
                 logger.logWarn(data);
             }
             else {

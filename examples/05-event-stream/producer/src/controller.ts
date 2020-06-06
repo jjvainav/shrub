@@ -40,14 +40,14 @@ export class Controller {
         clients.set(client.id, client);
         req.context.span!.logInfo({
             name: "browser-connected",
-            props: { clientId: client.id } 
+            clientId: client.id
         });
 
         req.context.eventStream!.onClose(() => {
             clients.delete(client.id);
             req.context.span!.logInfo({
                 name: "browser-disconnected",
-                props: { clientId: client.id }
+                clientId: client.id
             });
         });
     }

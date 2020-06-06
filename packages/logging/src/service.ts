@@ -5,46 +5,23 @@ type WarnLogLevel = 30;
 type InfoLogLevel = 20;
 type DebugLogLevel = 10;
 
-/** Defines the data types for a log. */
-export type LogDataType = "error" | "event" | "message";
-/** Defines a properties dictionary for log data. */
-export type LogDataProps = { readonly [key: string]: string };
+/** Defines the type of data that can be passed to a logger. */
+export type LogDataArg = ILogEvent | Error | string;
+/** Defines the type of data that can be saved with a log entry. */
+export type LogData = ILogEvent | string;
 
-/** Represents the data for a log. */
-export interface ILogData {
-    readonly type: LogDataType;
-    readonly props?: LogDataProps;
-}
-
-/** Represents log data for an Error object. */
-export interface IErrorLogData extends ILogData {
-    readonly type: "error";
+/** Represents the data for a logged event. */
+export interface ILogEvent {
+    /** A name for the event. */
     readonly name: string;
-    readonly message: string;
-    readonly stack?: string | undefined;
+    /** Properties for the event. */
+    readonly [key: string]: string | number | boolean | undefined;
 }
 
-/** Represents log data for an event. */
-export interface IEventLogData extends ILogData {
-    readonly type: "event";
-    readonly name: string;
-}
-
-/** Represents log data for a standard string message. */
-export interface IMessageLogData extends ILogData {
-    readonly type: "message";
-    readonly message: string;
-}
-
-/** Converts a standard object into a log data json object to be saved with a log entry. */
-export interface ILogDataConverter {
-    /** The callback should return a new log data object or undefined if it cannot process the object. */
-    (obj: object, context: ILogDataConverterContext): ILogData | undefined;
-}
-
-export interface ILogDataConverterContext {
-    /** Converts a value to be logged as a string property for a log. */
-    toString(value: any): string;
+/** Converts an Error object into a log event to be saved with a log entry. */
+export interface IErrorConverter {
+    /** The callback should return a new log event or undefined if it cannot process the error. */
+    (err: Error): ILogEvent | undefined;
 }
 
 /** Represents an entry in a log. */
@@ -60,7 +37,7 @@ export interface ILogEntry {
      */
     readonly level: number;   
     /** Data saved with the log entry. */ 
-    readonly data: ILogData;
+    readonly data: LogData;
     /** The timestamp (in milliseconds) for when the log was created. */
     readonly timestamp: number;
 }
@@ -73,21 +50,21 @@ export interface ILogWriter {
 /** Handles log data. */
 export interface ILogger {
     /** Creates a log entry with the specified log level. */
-    log(level: number, data: any): void;
+    log(level: number, data: LogDataArg): void;
     /** Creates a debug log entry. */
-    logDebug(data: any): void;
+    logDebug(data: LogDataArg): void;
     /** Creates an error log entry. */
-    logError(data: any): void;
+    logError(data: LogDataArg): void;
     /** Creates an info log entry. */
-    logInfo(data: any): void;
+    logInfo(data: LogDataArg): void;
     /** Creates a warning log entry. */
-    logWarn(data: any): void;
+    logWarn(data: LogDataArg): void;
 }
 
 /** Options for creating a logger used to override the globally registered options for a logger. */
 export interface ILoggerOptions {
-    /** If defined, a set of converters to use instead of the global converters. */
-    readonly converters?: ILogDataConverter[];
+    /** If defined, a set of error converters to use instead of the global converters. */
+    readonly converters?: IErrorConverter[];
     /** If defined, a set of writers to use instead of the global writers. */
     readonly writers?: ILogWriter[];
 }
@@ -96,8 +73,8 @@ export interface ILoggerOptions {
 export interface ILoggingService {
     /** Creates a logger instance using the specified options or use the globally registered data converters and writers. */
     createLogger(options?: ILoggerOptions): ILogger;
-    /** Registers a log data converter that will be available to loggers created by the service. */
-    useLogDataConverter(converter: ILogDataConverter): void;
+    /** Registers an error converter that will be available to loggers created by the service. */
+    useErrorConverter(converter: IErrorConverter): void;
     /** Registers a log writer with the service. */
     useLogWriter(writer: ILogWriter): void;
 }
@@ -123,47 +100,6 @@ export const LogLevel: {
     debug: 10
 };
 
-/** Default log data converter used by the base logger. */
-export const defaultLogDataConverter: ILogDataConverter = (obj, context) => {
-    if (isLogData(obj)) {
-        return obj;
-    }
-
-    if (isError(obj)) {
-        return <IErrorLogData>({
-            type: "error",
-            name: obj.name,
-            message: obj.message,
-            stack: obj.stack
-        });
-    }
-
-    const name = (<any>obj).name || "";
-    const props: any = {};
-
-    // check if the event object is in the format: { name, data } or { name, props }
-    // otherwise use the props for the object as the log data props
-    if ((<any>obj).props || (<any>obj).data) {
-        const data = (<any>obj).props || (<any>obj).data;
-        for(const key of Object.keys(data)) {
-            // include null in the condition
-            if ((<any>data)[key] != undefined) {
-                props[key] = context.toString((<any>data)[key]);
-            }
-        }
-    }
-    else {
-        for(const key of Object.keys(obj)) {
-            // include null in the condition
-            if (key !== "name" && (<any>obj)[key] != undefined) {
-                props[key] = context.toString((<any>obj)[key]);
-            }
-        }
-    }
-
-    return <IEventLogData>({ type: "event", name, props });
-};
-
 function isError(obj: any): obj is Error {
     // instanceof only works if sub-classes extend Error properly (prototype gets set to Error);
     // if the instanceof check fails assume an Error if name, message, and stack are defined.
@@ -173,20 +109,15 @@ function isError(obj: any): obj is Error {
         (<Error>obj).stack !== undefined);
 }
 
-function isLogData(obj: any): obj is ILogData {
-    return obj.type !== undefined;
-}
-
 @Singleton
 export class LoggingService implements ILoggingService {
-    private readonly converters: ILogDataConverter[] = [];
+    private readonly converters: IErrorConverter[] = [];
     private readonly writers: ILogWriter[] = [];
 
-    /** Creates a logger instance using the specified options or use the globally registered data converters and writers. */
     createLogger(options?: ILoggerOptions): ILogger {
         const global = this;
         return new class Logger implements ILogger {
-            private readonly converters: ILogDataConverter[];
+            private readonly converters: IErrorConverter[];
             private readonly writers: ILogWriter[];
 
             constructor() {
@@ -194,40 +125,33 @@ export class LoggingService implements ILoggingService {
                 this.writers = options && options.writers || global.writers;
             }
 
-            /** Creates a log entry with the specified log level. */
-            log(level: number, data: any): void {
+            log(level: number, data: LogDataArg): void {
                 if (typeof level !== "number") {
                     throw new Error(`Invalid level (${level}), must be a number.`);
                 }
         
                 const entry: ILogEntry = {
                     level,
-                    data: typeof data !== "object" 
-                        ? <ILogData>({ type: "message", message: data.toString() })
-                        : isLogData(data) ? data : this.convertLogData(data),
+                    data: this.convertLogDataArg(data),
                     timestamp: Date.now()
                 };
         
                 this.write(entry);
             }
         
-            /** Creates a debug log entry. */
-            logDebug(data: any): void {
+            logDebug(data: LogDataArg): void {
                 this.log(LogLevel.debug, data);
             }
         
-            /** Creates an error log entry. */
-            logError(data: any): void {
+            logError(data: LogDataArg): void {
                 this.log(LogLevel.error, data);
             }
         
-            /** Creates an info log entry. */
-            logInfo(data: any): void {
+            logInfo(data: LogDataArg): void {
                 this.log(LogLevel.info, data);
             }
         
-            /** Creates a warning log entry. */
-            logWarn(data: any): void {
+            logWarn(data: LogDataArg): void {
                 this.log(LogLevel.warn, data);
             }
         
@@ -235,30 +159,35 @@ export class LoggingService implements ILoggingService {
                 this.writers.forEach(writer => writer.writeLog(entry));
             }
         
-            private convertLogData(obj: any): ILogData {
-                const context = { 
-                    toString: (value: any) => typeof value === "object" ? JSON.stringify(value) : value.toString()
-                };
-        
-                for (const converter of this.converters) {
-                    const data = converter(obj, context);
-        
-                    if (data) {
-                        return data;
-                    }
+            private convertLogDataArg(data: LogDataArg): LogData {
+                if (typeof data === "string") {
+                    return data;
                 }
-        
-                return defaultLogDataConverter(obj, context)!;
+
+                if (isError(data)) {
+                    for (const converter of this.converters) {
+                        const error = converter(data);
+                        if (error) {
+                            return error;
+                        }
+                    }
+
+                    return {
+                        name: data.name,
+                        message: data.message,
+                        stack: data.stack
+                    };
+                }
+
+                return data;
             };
         };
     }
 
-    /** Registers a log data converter that will be available to loggers created by the service. */
-    useLogDataConverter(converter: ILogDataConverter): void {
+    useErrorConverter(converter: IErrorConverter): void {
         this.converters.push(converter);
     }
 
-    /** Registers a log writer with the service. */
     useLogWriter(writer: ILogWriter): void {
         this.writers.push(writer);
     }
