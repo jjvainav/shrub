@@ -133,7 +133,7 @@ function printLog(span: ISpan, log: ILogEntry, filter?: IConsoleTraceFilter): vo
 
 function printTag(span: ISpan, key: string, value: TagValue, filter?: IConsoleTraceFilter): void {
     if (!filter || !filter.printTag || filter.printTag(span, key, value)) {
-        console.log(chalk.blue(`[tag]: id=${span.id} trace-id=${getColorString(span.traceId)} key=${key} value=${value}`));
+        console.log(chalk.grey(`[tag]: id=${span.id} trace-id=${getColorString(span.traceId)} key=${key} value=${value}`));
     }
 }
 
