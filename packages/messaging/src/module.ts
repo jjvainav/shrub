@@ -1,5 +1,5 @@
 import { createConfig, IModule, IModuleInitializer, IServiceRegistration } from "@shrub/core";
-import { TracingModule } from "@shrub/tracing";
+import { LoggingModule } from "@shrub/logging";
 import { IMessageBrokerAdapter, IMessageService, MessageService } from "./service";
 
 export const IMessagingConfiguration = createConfig<IMessagingConfiguration>();
@@ -10,7 +10,7 @@ export interface IMessagingConfiguration {
 
 export class MessagingModule implements IModule {
     readonly name = "messaging";
-    readonly dependencies = [TracingModule];
+    readonly dependencies = [LoggingModule];
 
     initialize(init: IModuleInitializer): void {
         init.config(IMessagingConfiguration).register(({ services }) => ({

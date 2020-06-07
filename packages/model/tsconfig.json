@@ -6,7 +6,7 @@
         "rootDir": "src",
         "lib": [
             "dom",
-            "esnext"
+            "ESNext"
         ]
     },
     "include": ["src", "types"],

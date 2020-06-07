@@ -12,11 +12,11 @@
         "inlineSourceMap": true,
         "strict": true,
         "moduleResolution": "node",
-        "module": "esnext",
-        "target": "esnext",
+        "module": "ESNext",
+        "target": "ESNext",
         "lib": [
             "dom",
-            "esnext"
+            "ESNext"
         ]
     }
 }

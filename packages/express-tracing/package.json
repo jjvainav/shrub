@@ -31,6 +31,7 @@
     "dependencies": {
         "@shrub/core": "0.4.75",
         "@shrub/express": "0.4.75",
+        "@shrub/logging": "0.4.75",
         "@shrub/tracing": "0.4.75",
         "express": "^4.17.1"
     }

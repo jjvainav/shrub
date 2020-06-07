@@ -13,11 +13,12 @@ module.exports = {
             tsConfig: "<rootDir>/test/tsconfig.json"
         }
     },
+    preset: "ts-jest",
     roots: [
         "<rootDir>/test"
     ],
     transform: {
-        "^.+\\.(js|ts)$": "ts-jest"
+        "^.+\\.ts$": "ts-jest"
     },
     transformIgnorePatterns: [
         "node_modules/?!(@shrub)"

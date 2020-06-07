@@ -1,4 +1,4 @@
-import { IErrorLogData, IEventLogData, ILogEntry, IMessageLogData, LoggingService } from "@shrub/logging";
+import { ILogEntry, ILogEvent, LoggingService } from "@shrub/logging";
 import { ISpan, ITags, ITraceWriter, TracingService } from "../src";
 
 type Mutable<T> = { -readonly[P in keyof T]: T[P] };
@@ -120,10 +120,9 @@ describe("tracing", () => {
         const tags = writer.tags.get(span)!;
 
         expect(logs).toHaveLength(1);
-        expect(logs[0].data.type).toBe("error");
-        expect((<IErrorLogData>logs[0].data).name).toBe("Error");
-        expect((<IErrorLogData>logs[0].data).message).toBe("An error occurred.");
-        expect((<IErrorLogData>logs[0].data).stack).toBeDefined();
+        expect((<ILogEvent>logs[0].data).name).toBe("Error");
+        expect((<ILogEvent>logs[0].data).message).toBe("An error occurred.");
+        expect((<ILogEvent>logs[0].data).stack).toBeDefined();
         
         expect(Object.keys(tags)).toHaveLength(1);
         expect(tags.error).toBe(true);
@@ -135,18 +134,13 @@ describe("tracing", () => {
         const writer = new MockTraceWriter();
 
         tracingService.useTraceWriter(writer);
-        loggingService.useLogDataConverter(obj => {
-            if (obj instanceof Error) {
-                return <IErrorLogData>({
-                    type: "error",
-                    name: "FooError",
-                    message: obj.message,
-                    props: { foo: "foo" },
-                    stack: obj.stack
-                });
-            }
-
-            return undefined;
+        loggingService.useErrorConverter(obj => {
+            return {
+                name: "FooError",
+                message: obj.message, 
+                stack: obj.stack,
+                foo: "foo"
+            };
         });
 
         const tracer = tracingService.getTracer();
@@ -158,10 +152,10 @@ describe("tracing", () => {
         const logs = writer.logs.get(span)!;
 
         expect(logs).toHaveLength(1);
-        expect((<IErrorLogData>logs[0].data).name).toBe("FooError");
-        expect((<IErrorLogData>logs[0].data).message).toBe("An error occurred.");
-        expect((<IErrorLogData>logs[0].data).stack).toBeDefined();
-        expect((<IErrorLogData>logs[0].data).props!.foo).toBe("foo");
+        expect((<ILogEvent>logs[0].data).name).toBe("FooError");
+        expect((<ILogEvent>logs[0].data).message).toBe("An error occurred.");
+        expect((<ILogEvent>logs[0].data).stack).toBeDefined();
+        expect((<ILogEvent>logs[0].data).foo).toBe("foo");
     });  
 
     test("create multiple root spans", () => {
@@ -301,113 +295,10 @@ describe("tracing", () => {
         const logs = writer.logs.get(span)!;
         expect(logs).toHaveLength(1);
         expect(logs[0].level).toBe(20);
-        expect((<IEventLogData>logs[0].data).type).toBe("event");
-        expect((<IEventLogData>logs[0].data).name).toBe("foo-event");
-        expect((<IEventLogData>logs[0].data).props!.foo).toBe("foo");
-        expect(logs[0].timestamp).toBe(now);
-    });
-
-    test("add event object info log to span with custom data prop", () => {
-        const now = 1562602719878;
-        const unmock = mockDateNow(now);
-
-        const service = new TracingService(new LoggingService());
-        const writer = new MockTraceWriter();
-        service.useTraceWriter(writer);
-
-        const tracer = service.getTracer();
-        const span = tracer.startSpan("test");
-
-        span.logInfo({ 
-            name: "foo-event",
-            data: {
-                foo: "foo"
-            } 
-        });
-
-        unmock();
-
-        const logs = writer.logs.get(span)!;
-        expect(logs).toHaveLength(1);
-        expect(logs[0].level).toBe(20);
-        expect((<IEventLogData>logs[0].data).type).toBe("event");
-        expect((<IEventLogData>logs[0].data).name).toBe("foo-event");
-        expect((<IEventLogData>logs[0].data).props!.foo).toBe("foo");
-        expect(logs[0].timestamp).toBe(now);
-    });
-
-    test("add plain JSON object info log to span", () => {
-        const now = 1562602719878;
-        const unmock = mockDateNow(now);
-
-        const service = new TracingService(new LoggingService());
-        const writer = new MockTraceWriter();
-        service.useTraceWriter(writer);
-
-        const tracer = service.getTracer();
-        const span = tracer.startSpan("test");
-
-        span.logInfo({ foo: "foo" });
-
-        unmock();
-
-        const logs = writer.logs.get(span)!;
-        expect(logs).toHaveLength(1);
-        expect(logs[0].level).toBe(20);
-        expect((<IEventLogData>logs[0].data).type).toBe("event");
-        expect((<IEventLogData>logs[0].data).name).toBe("");
-        expect((<IEventLogData>logs[0].data).props!.foo).toBe("foo");
+        expect((<ILogEvent>logs[0].data).name).toBe("foo-event");
+        expect((<ILogEvent>logs[0].data).foo).toBe("foo");
         expect(logs[0].timestamp).toBe(now);
     });   
-
-    test("add plain JSON object info log to span with custom log data converter", () => {
-        const loggingService = new LoggingService();
-        const tracingService = new TracingService(loggingService);
-        const writer = new MockTraceWriter();
-
-        tracingService.useTraceWriter(writer);
-        loggingService.useLogDataConverter(obj => <IEventLogData>({ 
-            type: "event", 
-            name: "my-event",
-            props: { ...obj, bar: "bar" }
-        }));
-
-        const tracer = tracingService.getTracer();
-        const span = tracer.startSpan("test");
-
-        span.logInfo({ foo: "foo" });
-
-        const logs = writer.logs.get(span)!;
-        expect(logs).toHaveLength(1);
-        expect(logs[0].level).toBe(20);
-        expect((<IEventLogData>logs[0].data).props!.foo).toBe("foo");
-        expect((<IEventLogData>logs[0].data).props!.bar).toBe("bar");
-    });   
-    
-    test("add info log to span with multiple log data converters", () => {
-        const loggingService = new LoggingService();
-        const tracingService = new TracingService(loggingService);
-        const writer = new MockTraceWriter();
-
-        tracingService.useTraceWriter(writer);
-        loggingService.useLogDataConverter(() => undefined);
-        loggingService.useLogDataConverter(obj => <IEventLogData>({ 
-            type: "event", 
-            name: "my-event",
-            props: obj
-        }));        
-
-        const tracer = tracingService.getTracer();
-        const span = tracer.startSpan("test");
-
-        span.logInfo({ foo: "foo" });
-
-        const logs = writer.logs.get(span)!;
-        expect(logs).toHaveLength(1);
-        expect(logs[0].level).toBe(20);
-        expect((<IEventLogData>logs[0].data).name).toBe("my-event");
-        expect((<IEventLogData>logs[0].data).props!.foo).toBe("foo");
-    });
     
     test("add error log to span", () => {
         const service = new TracingService(new LoggingService());
@@ -424,9 +315,9 @@ describe("tracing", () => {
 
         expect(logs).toHaveLength(1);
         expect(logs[0].level).toBe(40);
-        expect((<IErrorLogData>logs[0].data).name).toBe("Error");
-        expect((<IErrorLogData>logs[0].data).message).toBe("Error test.");
-        expect((<IErrorLogData>logs[0].data).stack).toBeDefined();
+        expect((<ILogEvent>logs[0].data).name).toBe("Error");
+        expect((<ILogEvent>logs[0].data).message).toBe("Error test.");
+        expect((<ILogEvent>logs[0].data).stack).toBeDefined();
 
         expect(Object.keys(tags)).toHaveLength(1);
         expect(tags.error).toBe(true);        
@@ -453,9 +344,9 @@ describe("tracing", () => {
 
         expect(logs).toHaveLength(1);
         expect(logs[0].level).toBe(40);
-        expect((<IErrorLogData>logs[0].data).name).toBe("Error");
-        expect((<IErrorLogData>logs[0].data).message).toBe("Foo");
-        expect((<IErrorLogData>logs[0].data).stack).toBeDefined();
+        expect((<ILogEvent>logs[0].data).name).toBe("Error");
+        expect((<ILogEvent>logs[0].data).message).toBe("Foo");
+        expect((<ILogEvent>logs[0].data).stack).toBeDefined();
 
         expect(Object.keys(tags)).toHaveLength(1);
         expect(tags.error).toBe(true);     
@@ -469,12 +360,16 @@ describe("tracing", () => {
         const tracer = service.getTracer();
         const span = tracer.startSpan("test");
 
-        span.log(11, { foo: "foo" });
+        span.log(11, { 
+            name: "test",
+            foo: "foo" 
+        });
 
         const logs = writer.logs.get(span)!;
         expect(logs).toHaveLength(1);
         expect(logs[0].level).toBe(11);
-        expect((<IEventLogData>logs[0].data).props!.foo).toBe("foo");
+        expect((<ILogEvent>logs[0].data).name).toBe("test");
+        expect((<ILogEvent>logs[0].data).foo).toBe("foo");
     });
 
     test("add log to span with string data", () => {
@@ -490,8 +385,7 @@ describe("tracing", () => {
         const logs = writer.logs.get(span)!;
         expect(logs).toHaveLength(1);
         expect(logs[0].level).toBe(20);
-        expect((<IMessageLogData>logs[0].data).type).toBe("message");
-        expect((<IMessageLogData>logs[0].data).message).toBe("foo");
+        expect(logs[0].data).toBe("foo");
     });  
     
     test("extend tracer with custom builder and writer", () => {

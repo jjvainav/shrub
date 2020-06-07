@@ -14,8 +14,8 @@
         "stripInternal": true,
         "moduleResolution": "node",
         "module": "commonjs",
-        "target": "esnext",
-        "lib": ["dom", "esnext"],
+        "target": "ESNext",
+        "lib": ["dom", "ESNext"],
         "paths": {
             "express": ["../../node_modules/express"],
             "http": ["../../node_modules/@types/node/http"],

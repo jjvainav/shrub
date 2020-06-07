@@ -1,13 +1,12 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-      "allowJs": true,
-      "composite": false,
-      "declaration": false,
-      "declarationMap": false,
-      "outDir": "dist",
-      "strictPropertyInitialization": true,
-      "types": ["jest"]
+        "composite": false,
+        "declaration": false,
+        "declarationMap": false,
+        "outDir": "dist",
+        "strictPropertyInitialization": true,
+        "types": ["jest"]
     },
     "include": [".", "../src"]
 }

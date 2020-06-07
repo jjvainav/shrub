@@ -1,5 +1,6 @@
-import request from "supertest";
+import { ILogEvent } from "@shrub/logging";
 import { ISpan } from "@shrub/tracing";
+import request from "supertest";
 import { TraceHeaders } from "../src";
 import { createApp } from "./app";
 
@@ -25,14 +26,14 @@ describe("express tracing middleware", () => {
         expect(startSpan.parentId).toBeUndefined();
         expect(startSpan.endTime).toBeDefined();
 
-        expect(startSpan.logs).toHaveLength(1);
-        expect(startSpan.logs[0].data.message).toBe("foo");
+        expect(context.traceWriter.logs.get(startSpan)).toHaveLength(1);
+        expect(context.traceWriter.logs.get(startSpan)![0].data).toBe("foo");
         
-        expect(Object.keys(startSpan.tags)).toHaveLength(4);
-        expect(startSpan.tags["http.method"]).toBe("GET");
-        expect(startSpan.tags["http.id"]).toBe("123");
-        expect(startSpan.tags["http.url"]).toBe("/test");
-        expect(startSpan.tags["http.status"]).toBe(204);
+        expect(Object.keys(context.traceWriter.tags.get(startSpan)!)).toHaveLength(4);
+        expect(context.traceWriter.tags.get(startSpan)!["http.method"]).toBe("GET");
+        expect(context.traceWriter.tags.get(startSpan)!["http.id"]).toBe("123");
+        expect(context.traceWriter.tags.get(startSpan)!["http.url"]).toBe("/test");
+        expect(context.traceWriter.tags.get(startSpan)!["http.status"]).toBe(204);
     });
 
     test("with request that returns a success status code and has a parent span context", async () => {
@@ -71,17 +72,17 @@ describe("express tracing middleware", () => {
         expect(startSpan.name).toBe("http.request");
         expect(startSpan.endTime).toBeDefined();
 
-        expect(startSpan.logs).toHaveLength(1);
-        expect(startSpan.logs[0].data.name).toBe("Error");
-        expect(startSpan.logs[0].data.message).toBe("Some error.");
-        expect(startSpan.logs[0].data.stack).toBeDefined();
+        expect(context.traceWriter.logs.get(startSpan)).toHaveLength(1);
+        expect((<ILogEvent>context.traceWriter.logs.get(startSpan)![0].data).name).toBe("Error");
+        expect((<ILogEvent>context.traceWriter.logs.get(startSpan)![0].data).message).toBe("Some error.");
+        expect((<ILogEvent>context.traceWriter.logs.get(startSpan)![0].data).stack).toBeDefined();
         
-        expect(Object.keys(startSpan.tags)).toHaveLength(4);
-        expect(startSpan.tags["error"]).toBe(true);
-        expect(startSpan.tags["http.method"]).toBe("GET");
-        expect(startSpan.tags["http.url"]).toBe("/test");
+        expect(Object.keys(context.traceWriter.tags.get(startSpan)!)).toHaveLength(4);
+        expect(context.traceWriter.tags.get(startSpan)!["error"]).toBe(true);
+        expect(context.traceWriter.tags.get(startSpan)!["http.method"]).toBe("GET");
+        expect(context.traceWriter.tags.get(startSpan)!["http.url"]).toBe("/test");
         // note: the express-core package has middleware that will automatically set the status code to 500 if there is an error
-        expect(startSpan.tags["http.status"]).toBe(500);
+        expect(context.traceWriter.tags.get(startSpan)!["http.status"]).toBe(500);
     });    
 
     test("with external request that returns a success status code and ignores trace/span headers", async () => {
