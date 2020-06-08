@@ -52,7 +52,7 @@ export class Controller {
         });
     }
 
-    @EventStreamChannel("/messages/bind", "*")
+    @EventStreamChannel("/messages/bind")
     openMessageStreamChannel(req: Request, res: Response, next: NextFunction): void {
         // open an event-stream as a channel in the shrub messaging system used for server-to-server communication
         // if desired, authorize the request now and skip invoking next if the request is not authorized     
@@ -68,7 +68,7 @@ export class Controller {
 
         // send metrics to browsers whenever a consumer has connected or disconnected
         this.sendMetricsToBrowserClients();
-        req.on("close", () => {
+        req.context.eventStreamChannel!.onClose(() => {
             consumers.delete(consumer.id);
             this.sendMetricsToBrowserClients();
         });

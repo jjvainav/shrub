@@ -1,6 +1,7 @@
 import { createService, Singleton } from "@shrub/core";
 import "@shrub/express-tracing";
 import { IMessage, IMessageChannelProducer, IMessageDetails, isChannelNameMatch, isChannelNamePattern } from "@shrub/messaging";
+import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import createId from "@sprig/unique-id";
 import { Request, Response } from "express";
 
@@ -10,10 +11,15 @@ export interface IEventStreamProducerService {
     getMessageChannelProducer(channelName: string): IMessageChannelProducer | undefined;
     /** Gets whether or not a channel with the specified name is supported by the service. */
     isChannelSupported(channelName: string): boolean;
-    /** Opens an event-stream for the given request and channel name pattern. */
-    openStream(channelNamePattern: string, subscriptionId: string, req: Request, res: Response): void;
+    /** Opens an event-stream for a consumer given the consumer's request and a channel name pattern. */
+    openStream(channelNamePattern: string, subscriptionId: string, req: Request, res: Response): IEventStreamConsumerConnection;
     /** Adds the specified channel name pattern to the list of supported channel names; if no channels are whitelisted then all channels will be supported. */
     whitelistChannel(channelNamePattern: string): void;
+}
+
+/** @internal Represents an event-stream connection for a consumer. */
+export interface IEventStreamConsumerConnection {
+    readonly onClose: IEvent;
 }
 
 interface IEventStream {
@@ -43,13 +49,14 @@ export class EventStreamProducerService implements IEventStreamProducerService {
         return this.whitelist.isChannelSupported(channelName);
     }
 
-    openStream(channelNamePattern: string, subscriptionId: string, req: Request, res: Response): void {
+    openStream(channelNamePattern: string, subscriptionId: string, req: Request, res: Response): IEventStreamConsumerConnection {
         res.status(200).set({
             "connection": "keep-alive",
             "content-type": "text/event-stream"
         });
 
         const stream = this.registerStream(channelNamePattern, subscriptionId, res);
+        const close = new EventEmitter("event-stream-close");
 
         req.socket.setKeepAlive(true);
         req.socket.setNoDelay(true);
@@ -62,7 +69,9 @@ export class EventStreamProducerService implements IEventStreamProducerService {
                     channel: channelNamePattern,
                     subscriptionId
                 });
-            }    
+            }
+            
+            close.emit();
         });
 
         if (req.context.span) {
@@ -74,6 +83,8 @@ export class EventStreamProducerService implements IEventStreamProducerService {
         }
 
         res.write(":go\n\n");
+
+        return { onClose: close.event };
     }
 
     whitelistChannel(channelNamePattern: string): void {
