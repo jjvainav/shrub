@@ -88,6 +88,31 @@ export function EventStreamChannel(path: PathParams, optionsOrProducerChannelPat
     return createRouteDecorator(path, interceptors, router => router.get);
 }
 
+/** @internal */
+export const validateConsumerParams: (producerChannelPattern: string | undefined, onValid: (channel: string, subscriptionId: string) => void) => RequestHandler = (producerChannelPattern, onValid) => (req, res, next) => {
+    const channel = req.query.channel;
+    const subscriptionId = req.query.subscriptionId;
+
+    if (typeof channel !== "string") {
+        res.status(400).json({ message: "Missing or invalid channel query parameter." });
+        return;
+    }
+
+    if (typeof subscriptionId !== "string") {
+        res.status(400).json({ message: "Missing or invalid subscriptionId query parameter." });
+        return;
+    }
+
+    if (producerChannelPattern) {
+        if (!isChannelNameMatch(producerChannelPattern, channel)) {
+            res.status(400).json({ message: `Invalid consumer channel (${channel}), name is not supported by this endpoint.` });
+            return;
+        }
+    }
+
+    onValid(channel, subscriptionId);
+};
+
 const initializeEventStream: RequestHandler = (req, res, next) => {
     (<any>req.context).eventStream = new EventStreamImplementation(req, res);
     next();
@@ -112,28 +137,10 @@ const openEventStream: RequestHandler = (req, res, next) => {
 };
 
 const initializeEventStreamChannel: (options?: IEventStreamChannelOptions) => RequestHandler = options => (req, res, next) => {
-    const channel = req.query.channel;
-    const subscriptionId = req.query.subscriptionId;
-
-    if (typeof channel !== "string") {
-        res.status(400).json({ message: "Missing or invalid channel query parameter." });
-        return;
-    }
-
-    if (typeof subscriptionId !== "string") {
-        res.status(400).json({ message: "Missing or invalid subscriptionId query parameter." });
-        return;
-    }
-
-    if (options && options.producerChannelPattern) {
-        if (!isChannelNameMatch(options.producerChannelPattern, channel)) {
-            res.status(400).json({ message: `Invalid consumer channel (${channel}), name is not supported by this endpoint.` });
-            return;
-        }
-    }
-
-    (<any>req.context).eventStreamChannel = new EventStreamChannelImplementation(req.context.services.get(IEventStreamProducerService), channel, subscriptionId);
-    next();
+    validateConsumerParams(options && options.producerChannelPattern, (channel, subscriptionId) => {
+        (<any>req.context).eventStreamChannel = new EventStreamChannelImplementation(req.context.services.get(IEventStreamProducerService), channel, subscriptionId);
+        next();
+    });
 };
 
 const openEventStreamChannel: RequestHandler = (req, res, next) => {
