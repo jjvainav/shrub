@@ -25,7 +25,7 @@ export interface IAsyncModelFactory<T> {
     create(state: any): Promise<T>;
 }
 
-/** Manages vue component model instances. */
+/** Manages model instances. */
 export interface IModelService {
     get<T>(key: string, ctor: ModelConstructor<T>): T;
     get<T>(key: string, factory: IModelFactory<T>): T;
