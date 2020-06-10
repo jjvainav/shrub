@@ -1,6 +1,6 @@
 import { createInjectable, createService, Singleton } from "@shrub/core";
 import { ILogger } from "@shrub/logging";
-import { IMessage, IMessageDetails } from "./message";
+import { IMessage, MessageMetadata } from "./message";
 
 /** Handles a message and optionally returns a promise to support async message handling and prevent the next message from being processed until this handler finishes. */
 export type MessageHandler = (message: IMessage) => void | Promise<void>;
@@ -12,56 +12,60 @@ export interface IMessageService {
     registerBroker(adapter: IMessageBrokerAdapter): void;
 }
 
-// TODO: a channel may be pub/sub or it maybe persistent - will it be necessary to know this?
-
 /** An adapter to an external message broker system for handling the control of messages. */
 export interface IMessageBrokerAdapter {
     /** Gets a consumer for the specified channel name pattern or undefined if a consumer is not available for the channel. */
-    getChannelConsumer?(channelNamePattern: string): IMessageChannelConsumer | undefined;
+    getChannelConsumer(channelNamePattern: string): IMessageChannelConsumer | undefined;
     /** Gets a producer for the specified channel or undefined if a producer is not available for the channel. */
-    getChannelProducer?(channelName: string): IMessageChannelProducer | undefined;
+    getChannelProducer(channelName: string): IMessageChannelProducer | undefined;
 }
 
-/** Defines a consumer for a specific channel. */
-export interface IMessageChannelConsumer {
-    /** Subscribes to the message consumer. */
-    subscribe(subscriptionId: string, handler: MessageHandler): Promise<ISubscription>;
+/** Defines the options for sending a message via a producer. */
+export interface IMessageProducerSendOptions {
+    /** A set of metadata for the message defined as key/value pairs. */
+    readonly metadata?: MessageMetadata;
+    /** The message payload. */
+    readonly data: any;
 }
 
-/** Responsible for sending a message over a specific channel. */
-export interface IMessageChannelProducer {
-    /** Sends a message on the channel. */
-    send(message: IMessageDetails): void;
-}
-
-/** Defines a consumer for a message broker. */
-export interface IMessageConsumer {
-    /** Subscribes to the message consumer. */
-    subscribe(options: IMessageConsumerOptions): Promise<ISubscription>;
-}
-
-/** Options for subscribing to a consumer. */
-export interface IMessageConsumerOptions {
+/** Defines the options for subscribing to a consumer. */
+export interface IMessageConsumerSubscribeOptions {
     /** Identifies the subscriber; multiple subscriptions with the same subscriber id will be treated as competing consumers (i.e. only one subscription will handle a message). */
     readonly subscriptionId: string;
-    /** A name pattern for the channel(s) to subscribe to; a name pattern currently supports basic pattern matching using the * as a wildcard. */
-    readonly channelNamePattern: string;
+    /** An optional logger to pass to the consumer to enable logging inside the subscription. */
+    readonly logger?: ILogger;
     /** A callback to handle the message. */
     readonly handler: MessageHandler;
 }
 
 /** Represents a message consumer subscription. */
 export interface ISubscription {
-    /** Enables logging inside the consumer subscription. */
-    enableLogging(logger: ILogger): void;
     /** Unsubscribes from the consumer. */
     unsubscribe(): void;
+}
+
+/** Defines a consumer for a message broker. */
+export interface IMessageConsumer {
+    /** Subscribes to the message consumer. */
+    subscribe(channelNamePattern: string, options: IMessageConsumerSubscribeOptions): Promise<ISubscription>;
 }
 
 /** Handles sending messages. */
 export interface IMessageProducer {
     /** Sends a message to the specified channel. */
-    send(channelName: string, message: IMessageDetails): void;
+    send(channelName: string, options: IMessageProducerSendOptions): void;
+}
+
+/** Defines a consumer for a specific channel. */
+export interface IMessageChannelConsumer {
+    /** Subscribes to the message consumer. */
+    subscribe(options: IMessageConsumerSubscribeOptions): Promise<ISubscription>;
+}
+
+/** Defines a producer for sending messages over a specific channel. */
+export interface IMessageChannelProducer {
+    /** Sends a message on the channel. */
+    send(options: IMessageProducerSendOptions): void;
 }
 
 /** @internal */
@@ -70,13 +74,13 @@ export const IMessageService = createService<IMessageService>("message-service")
 /** A decorator for injecting message consumers. */
 export const IMessageConsumer = createInjectable<IMessageConsumer>({
     key: "message-consumer",
-    factory: services => ({ subscribe: options => services.get(IMessageService).getChannelConsumer(options.channelNamePattern).subscribe(options.subscriptionId, options.handler) })
+    factory: services => ({ subscribe: (channelNamePattern, options) => services.get(IMessageService).getChannelConsumer(channelNamePattern).subscribe(options) })
 });
 
 /** A decorator for injecting message producers. */
 export const IMessageProducer = createInjectable<IMessageProducer>({
     key: "message-producer",
-    factory: services => ({ send: (channelName, message) => services.get(IMessageService).getChannelProducer(channelName).send(message) })
+    factory: services => ({ send: (channelName, options) => services.get(IMessageService).getChannelProducer(channelName).send(options) })
 });
 
 /** 

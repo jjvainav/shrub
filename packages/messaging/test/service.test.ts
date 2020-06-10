@@ -2,8 +2,8 @@ import { createService, ServiceMap, Transient } from "@shrub/core";
 import { IMessage } from "../src/message";
 import { 
     IMessageBrokerAdapter, IMessageChannelConsumer, IMessageChannelProducer, IMessageConsumer, 
-    IMessageProducer, IMessageService, isChannelNameMatch, isChannelNamePattern, ISubscription, 
-    MessageHandler, MessageService 
+    IMessageConsumerSubscribeOptions, IMessageProducer, IMessageService, isChannelNameMatch, 
+    isChannelNamePattern, ISubscription, MessageHandler, MessageService 
 } from "../src/service";
 
 describe("message service", () => {
@@ -37,13 +37,13 @@ describe("message service", () => {
         const producer = service.getChannelProducer("foo");
 
         let message: IMessage | undefined;
-        await consumer.subscribe("", m => { message = m });
+        await consumer.subscribe({ subscriptionId: "123", handler: m => { message = m } });
         producer.send({ 
-            body: { foo: "bar" } 
+            data: { foo: "bar" } 
         });
 
          expect(message).toBeDefined();
-         expect(message!.body.foo).toBe("bar");
+         expect(message!.data.foo).toBe("bar");
     });
 
     test("inject consumer and producer", () => {
@@ -73,14 +73,14 @@ class TestBroker implements IMessageBrokerAdapter {
 
     getChannelProducer(channelName: string): IMessageChannelProducer | undefined {
         return {
-            send: details => {
+            send: options => {
                 const id = this.nextId.toString();
                 this.nextId++;
 
                 const message: IMessage = {
                     id,
-                    headers: details.headers || {},
-                    body: details.body
+                    metadata: options.metadata || {},
+                    data: options.data
                 };
 
                 for (const item of this.consumers) {
@@ -100,10 +100,9 @@ class TestConsumer implements IMessageChannelConsumer {
         this.handlers.forEach(handler => handler(message));
     }
 
-    subscribe(subscriptionId: string, handler: MessageHandler): Promise<ISubscription> {
-        this.handlers.push(handler);
+    subscribe(options: IMessageConsumerSubscribeOptions): Promise<ISubscription> {
+        this.handlers.push(options.handler);
         return Promise.resolve({
-            enableLogging: () => {},
             unsubscribe: () => {}
         });
     }

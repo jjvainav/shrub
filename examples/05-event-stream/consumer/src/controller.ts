@@ -15,14 +15,11 @@ export class Controller {
         const channel = <string>req.query.channel || "*";
 
         // subscribe to messages sent from the producer 'server' and pass them down to the browser
-        const subscription = await this.consumer.subscribe({
+        const subscription = await this.consumer.subscribe(channel, {
             subscriptionId,
-            channelNamePattern: channel,
-            handler: message => stream.send(message)
+            handler: message => stream.send(message),
+            logger: req.context.span
         });
-
-        // write log information to the request span
-        subscription.enableLogging(req.context.span!);
 
         // invoke next to open the stream
         next();

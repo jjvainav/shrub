@@ -1,6 +1,6 @@
 import { createService, Singleton } from "@shrub/core";
 import "@shrub/express-tracing";
-import { IMessage, IMessageChannelProducer, IMessageDetails, isChannelNameMatch, isChannelNamePattern } from "@shrub/messaging";
+import { IMessage, IMessageChannelProducer, IMessageProducerSendOptions, isChannelNameMatch, isChannelNamePattern } from "@shrub/messaging";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import createId from "@sprig/unique-id";
 import { Request, Response } from "express";
@@ -41,7 +41,7 @@ export class EventStreamProducerService implements IEventStreamProducerService {
 
     getMessageChannelProducer(channelName: string): IMessageChannelProducer | undefined {
         return this.whitelist.isChannelSupported(channelName) 
-            ? { send: message => this.sendMessage(channelName, message) }
+            ? { send: options => this.sendMessage(channelName, options) }
             : undefined;
     }
 
@@ -91,11 +91,11 @@ export class EventStreamProducerService implements IEventStreamProducerService {
         this.whitelist.add(channelNamePattern);
     }
 
-    private sendMessage(channelName: string, details: IMessageDetails): void {
+    private sendMessage(channelName: string, options: IMessageProducerSendOptions): void {
         const message: IMessage = {
             id: createId(),
-            headers: details.headers || {},
-            body: details.body
+            metadata: options.metadata || {},
+            data: options.data
         };
         const subscriptions = new Map<string, IEventStream[]>();
         const add = (stream: IEventStream) => {

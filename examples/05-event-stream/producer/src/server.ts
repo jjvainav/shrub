@@ -18,7 +18,7 @@ async function start() {
                 TracingConsoleModule
             ],
             configure: ({ config }: IModuleConfigurator) => {
-                config.get(IExpressEventStreamConfiguration).enableProducer();
+                config.get(IExpressEventStreamConfiguration).useProducer();
 
                 const app = config.get(IExpressConfiguration);
 

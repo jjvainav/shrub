@@ -1,6 +1,6 @@
 import { createService, Singleton } from "@shrub/core";
 import { ILogger } from "@shrub/logging";
-import { IMessage, IMessageChannelConsumer, isChannelNameMatch, ISubscription, Message, MessageHandler } from "@shrub/messaging";
+import { IMessage, IMessageChannelConsumer, IMessageConsumerSubscribeOptions, isChannelNameMatch, ISubscription, Message, MessageHandler } from "@shrub/messaging";
 import { IRequest, IRequestPromise } from "@sprig/request-client";
 import { IRequestEventStream, jsonValidator, RequestEventStream } from "@sprig/request-client-events";
 import urlJoin from "url-join";
@@ -94,14 +94,15 @@ class EventStreamChannelConsumer implements IMessageChannelConsumer {
     constructor(private readonly options: IEventStreamChannelConsumerOptions) {
     }
 
-    subscribe(subscriptionId: string, handler: MessageHandler): Promise<ISubscription> {
+    subscribe(options: IMessageConsumerSubscribeOptions): Promise<ISubscription> {
         const subscription = new Subscription(
             this.options.url, 
-            subscriptionId,
+            options.subscriptionId,
             this.options.channelNamePattern,
-            handler, 
+            options.handler, 
             this.options.retry || defaultRetry,
-            this.options.interceptors);
+            this.options.interceptors,
+            options.logger);
 
         // don't wait for the subscription to connect because it may fail and trigger
         // an auto-reconnect loop so simply return the subscription after creating it
@@ -111,7 +112,6 @@ class EventStreamChannelConsumer implements IMessageChannelConsumer {
 
 class Subscription implements ISubscription {
     private stream?: IRequestEventStream<IMessage>;
-    private logger?: ILogger;
     private closed = false;
 
     constructor(
@@ -120,12 +120,9 @@ class Subscription implements ISubscription {
         private readonly channelNamePattern: string,
         private readonly handler: MessageHandler, 
         private readonly retry: number,
-        private readonly interceptors?: IEventStreamInterceptors) {
+        private readonly interceptors?: IEventStreamInterceptors,
+        private readonly logger?: ILogger) {
         this.connect();
-    }
-
-    enableLogging(logger: ILogger): void {
-        this.logger = logger;
     }
 
     unsubscribe(): void {
@@ -139,6 +136,16 @@ class Subscription implements ISubscription {
 
     private connect(): void {
         const url = urlJoin(this.url, "?subscriptionId=" + encodeURIComponent(this.subscriptionId) + "&channel=" + encodeURIComponent(this.channelNamePattern));
+        
+        if (this.logger) {
+            this.logger.logDebug({
+                name: "event-stream-connect",
+                url: this.url,
+                channel: this.channelNamePattern, 
+                subscriptionId: this.subscriptionId
+            });
+        }
+
         this.stream = new RequestEventStream<IMessage>({
             url,
             beforeRequest: this.interceptors && this.interceptors.beforeRequest,

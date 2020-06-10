@@ -89,7 +89,7 @@ export function EventStreamChannel(path: PathParams, optionsOrProducerChannelPat
 }
 
 /** @internal */
-export const validateConsumerParams: (producerChannelPattern: string | undefined, onValid: (channel: string, subscriptionId: string) => void) => RequestHandler = (producerChannelPattern, onValid) => (req, res, next) => {
+export const validateConsumerParams: (producerChannelPattern: string | undefined, req: Request, res: Response, onValid: (channel: string, subscriptionId: string) => void) => void = (producerChannelPattern, req, res, onValid) => {
     const channel = req.query.channel;
     const subscriptionId = req.query.subscriptionId;
 
@@ -137,7 +137,7 @@ const openEventStream: RequestHandler = (req, res, next) => {
 };
 
 const initializeEventStreamChannel: (options?: IEventStreamChannelOptions) => RequestHandler = options => (req, res, next) => {
-    validateConsumerParams(options && options.producerChannelPattern, (channel, subscriptionId) => {
+    validateConsumerParams(options && options.producerChannelPattern, req, res, (channel, subscriptionId) => {
         (<any>req.context).eventStreamChannel = new EventStreamChannelImplementation(req.context.services.get(IEventStreamProducerService), channel, subscriptionId);
         next();
     });

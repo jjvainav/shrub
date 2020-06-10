@@ -85,7 +85,7 @@ export class Controller {
         const message = req.body.message;
 
         this.producer.send(channel, {
-            body: { message }
+            data: { message }
         });
 
         res.sendStatus(200);
