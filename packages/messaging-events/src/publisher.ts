@@ -30,9 +30,9 @@ export class EventPublisher implements IEventPublisher {
     publish(channel: string, event: IEventDetails): void {
         this.producer.send(channel, {
             metadata: {
-                [`${EventMessage.Headers.eventType}`]: event.eventType,
-                [`${EventMessage.Headers.resourceId}`]: event.resourceId,
-                [`${EventMessage.Headers.resourceType}`]: event.resourceType
+                [`${EventMessage.Metadata.eventType}`]: event.eventType,
+                [`${EventMessage.Metadata.resourceId}`]: event.resourceId,
+                [`${EventMessage.Metadata.resourceType}`]: event.resourceType
             },
             data: event.data
         });
