@@ -17,6 +17,17 @@ export interface IEventMessageHandler {
     (message: IEventMessage): Promise<void>;
 }
 
+/** A callback that returns a key for an event message. */
+export interface IEventMessageKeySelector {
+    (message: IEventMessage): string;
+}
+
+/** Represents a registered route for a router. */
+export interface IEventMessageRoute {
+    /** Remove the route from the router. */
+    remove(): void;
+}
+
 export namespace EventMessage {
     /** Defines common headers for an event message. */
     export namespace Headers {
@@ -30,5 +41,46 @@ export namespace EventMessage {
 
     export function isEventMessage(message: IMessage): message is IEventMessage {
         return message.metadata[Headers.eventType] !== undefined;
+    }
+}
+
+/** A utility class that will handle routing messages to event message handlers based on a routing key. */
+export class EventMessageRouter {
+    private readonly handlers = new Map<string, Set<IEventMessageHandler>>();
+
+    constructor(private readonly keySelector: IEventMessageKeySelector) {
+    }
+
+    addRoute(key: string, handler: IEventMessageHandler): IEventMessageRoute {
+        let handlers = this.handlers.get(key);
+
+        if (!handlers) {
+            handlers = new Set<IEventMessageHandler>();
+            this.handlers.set(key, handlers);
+        }
+
+        handlers.add(handler);
+        return { remove: () => this.removeHandler(key, handler) };
+    }
+
+    async handle(message: IEventMessage): Promise<void> {
+        const handlers = this.handlers.get(this.keySelector(message));
+
+        if (handlers) {
+            const promises: Promise<void>[] = [];
+            for (const handler of handlers) {
+                promises.push(handler(message));
+            }
+
+            await Promise.all(promises);
+        }
+    }
+
+    private removeHandler(key: string, handler: IEventMessageHandler): void {
+        const handlers = this.handlers.get(key);
+        // delete the handler and delete the handler set if empty
+        if (handlers && handlers.delete(handler) && handlers.size === 0) {
+            this.handlers.delete(key);
+        }
     }
 }
