@@ -2,8 +2,8 @@ import { createService, ServiceMap, Transient } from "@shrub/core";
 import { IMessage } from "../src/message";
 import { 
     IMessageBrokerAdapter, IMessageChannelConsumer, IMessageChannelProducer, IMessageConsumer, 
-    IMessageConsumerSubscribeOptions, IMessageProducer, IMessageService, isChannelNameMatch, 
-    isChannelNamePattern, ISubscription, MessageHandler, MessageService 
+    IMessageProducer, IMessageService, isChannelNameMatch, isChannelNamePattern,
+    ISubscribeOptions, ISubscription, MessageHandler, MessageService 
 } from "../src/service";
 
 describe("message service", () => {
@@ -73,14 +73,14 @@ class TestBroker implements IMessageBrokerAdapter {
 
     getChannelProducer(channelName: string): IMessageChannelProducer | undefined {
         return {
-            send: options => {
+            send: details => {
                 const id = this.nextId.toString();
                 this.nextId++;
 
                 const message: IMessage = {
                     id,
-                    metadata: options.metadata || {},
-                    data: options.data
+                    metadata: details.metadata || {},
+                    data: details.data
                 };
 
                 for (const item of this.consumers) {
@@ -100,7 +100,7 @@ class TestConsumer implements IMessageChannelConsumer {
         this.handlers.forEach(handler => handler(message));
     }
 
-    subscribe(options: IMessageConsumerSubscribeOptions): Promise<ISubscription> {
+    subscribe(options: ISubscribeOptions): Promise<ISubscription> {
         this.handlers.push(options.handler);
         return Promise.resolve({
             unsubscribe: () => {}

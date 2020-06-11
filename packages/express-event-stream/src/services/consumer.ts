@@ -1,6 +1,6 @@
 import { createService, Singleton } from "@shrub/core";
 import { ILogger } from "@shrub/logging";
-import { IMessage, IMessageChannelConsumer, IMessageConsumerSubscribeOptions, isChannelNameMatch, ISubscription, Message, MessageHandler } from "@shrub/messaging";
+import { IMessage, IMessageChannelConsumer, isChannelNameMatch, ISubscribeOptions, ISubscription, Message, MessageHandler } from "@shrub/messaging";
 import { IRequest, IRequestPromise } from "@sprig/request-client";
 import { IRequestEventStream, jsonValidator, RequestEventStream } from "@sprig/request-client-events";
 import urlJoin from "url-join";
@@ -94,7 +94,7 @@ class EventStreamChannelConsumer implements IMessageChannelConsumer {
     constructor(private readonly options: IEventStreamChannelConsumerOptions) {
     }
 
-    subscribe(options: IMessageConsumerSubscribeOptions): Promise<ISubscription> {
+    subscribe(options: ISubscribeOptions): Promise<ISubscription> {
         const subscription = new Subscription(
             this.options.url, 
             options.subscriptionId,

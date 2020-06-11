@@ -20,8 +20,8 @@ export interface IMessageBrokerAdapter {
     getChannelProducer(channelName: string): IMessageChannelProducer | undefined;
 }
 
-/** Defines the options for sending a message via a producer. */
-export interface IMessageProducerSendOptions {
+/** Represents message details to send via a producer. */
+export interface IMessageDetails {
     /** A set of metadata for the message defined as key/value pairs. */
     readonly metadata?: MessageMetadata;
     /** The message payload. */
@@ -29,7 +29,7 @@ export interface IMessageProducerSendOptions {
 }
 
 /** Defines the options for subscribing to a consumer. */
-export interface IMessageConsumerSubscribeOptions {
+export interface ISubscribeOptions {
     /** Identifies the subscriber; multiple subscriptions with the same subscriber id will be treated as competing consumers (i.e. only one subscription will handle a message). */
     readonly subscriptionId: string;
     /** An optional logger to pass to the consumer to enable logging inside the subscription. */
@@ -47,25 +47,25 @@ export interface ISubscription {
 /** Defines a consumer for a message broker. */
 export interface IMessageConsumer {
     /** Subscribes to the message consumer. */
-    subscribe(channelNamePattern: string, options: IMessageConsumerSubscribeOptions): Promise<ISubscription>;
+    subscribe(channelNamePattern: string, options: ISubscribeOptions): Promise<ISubscription>;
 }
 
 /** Handles sending messages. */
 export interface IMessageProducer {
     /** Sends a message to the specified channel. */
-    send(channelName: string, options: IMessageProducerSendOptions): void;
+    send(channelName: string, message: IMessageDetails): void;
 }
 
 /** Defines a consumer for a specific channel. */
 export interface IMessageChannelConsumer {
     /** Subscribes to the message consumer. */
-    subscribe(options: IMessageConsumerSubscribeOptions): Promise<ISubscription>;
+    subscribe(options: ISubscribeOptions): Promise<ISubscription>;
 }
 
 /** Defines a producer for sending messages over a specific channel. */
 export interface IMessageChannelProducer {
     /** Sends a message on the channel. */
-    send(options: IMessageProducerSendOptions): void;
+    send(message: IMessageDetails): void;
 }
 
 /** @internal */
@@ -80,7 +80,7 @@ export const IMessageConsumer = createInjectable<IMessageConsumer>({
 /** A decorator for injecting message producers. */
 export const IMessageProducer = createInjectable<IMessageProducer>({
     key: "message-producer",
-    factory: services => ({ send: (channelName, options) => services.get(IMessageService).getChannelProducer(channelName).send(options) })
+    factory: services => ({ send: (channelName, message) => services.get(IMessageService).getChannelProducer(channelName).send(message) })
 });
 
 /** 

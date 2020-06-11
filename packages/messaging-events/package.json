@@ -1,0 +1,30 @@
+{
+    "name": "@shrub/messaging-events",
+    "description": "A simple layer on top of messaging to support basic event pub/sub.",
+    "version": "0.4.80",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "module": "dist/esm/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.0.0"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
+    },
+    "dependencies": {
+        "@shrub/core": "0.4.80",
+        "@shrub/messaging": "0.4.80"
+    }
+}
