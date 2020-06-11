@@ -1,7 +1,7 @@
 import { IMessage } from "@shrub/messaging";
 import { EventMessage, EventMessageRouter, IEventMessageHandler, IEventMessageKeySelector, IEventMessageRoute } from "./event";
 
-const eventTypeKeySelector: IEventMessageKeySelector = message => message.metadata[EventMessage.Headers.eventType];
+const eventTypeKeySelector: IEventMessageKeySelector = message => message.metadata[EventMessage.Metadata.eventType];
 
 /** Processes event messages from a message channel and routes to registered event handlers based on a routing key; the default is to route by event-type. */
 export class EventDispatcher {

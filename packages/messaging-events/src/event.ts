@@ -29,8 +29,8 @@ export interface IEventMessageRoute {
 }
 
 export namespace EventMessage {
-    /** Defines common headers for an event message. */
-    export namespace Headers {
+    /** Defines common metadata for an event message. */
+    export namespace Metadata {
         /** The type of event. */
         export const eventType = "event-type";
         /** The id of the resource the event is associated with. */
@@ -40,7 +40,7 @@ export namespace EventMessage {
     }
 
     export function isEventMessage(message: IMessage): message is IEventMessage {
-        return message.metadata[Headers.eventType] !== undefined;
+        return message.metadata[Metadata.eventType] !== undefined;
     }
 }
 
