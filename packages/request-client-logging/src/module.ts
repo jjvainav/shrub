@@ -14,10 +14,15 @@ const requestErrorConverter: IErrorConverter = (err) => {
         };
 
         if (err.data) {
-            for (const key of Object.keys(err.data)) {
-                if (err.data[key] != undefined) {
-                    data["data." + key] = JSON.stringify(err.data[key]);
-                }
+            if (isError(err.data)) {
+                data.inner = JSON.stringify({
+                    name: err.data.name,
+                    message: err.data.message,
+                    stack: err.data.stack
+                });
+            }
+            else {
+                data.data = JSON.stringify(err.data);
             }
         }
 
@@ -33,6 +38,15 @@ const requestErrorConverter: IErrorConverter = (err) => {
 
     return undefined;
 };
+
+function isError(obj: any): obj is Error {
+    // instanceof only works if sub-classes extend Error properly (prototype gets set to Error);
+    // if the instanceof check fails assume an Error if name, message, and stack are defined.
+    return obj instanceof Error || (
+        (<Error>obj).name !== undefined &&
+        (<Error>obj).message !== undefined &&
+        (<Error>obj).stack !== undefined);
+}
 
 /** Module that injects an error converter for request client errors; this is useful when a module uses the request-client to make API calls. */
 export class RequestClientLoggingModule implements IModule {
