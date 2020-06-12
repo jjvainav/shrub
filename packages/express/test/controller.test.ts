@@ -56,6 +56,17 @@ describe("controller", () => {
         expect(response.body.foo).toBe("123");
     });
 
+    test("with GET handler and custom request handler", async () => {
+        const app = await ExpressFactory.create();
+        app.use(useController(FooController));
+
+        const response = await request(app).get("/foo/handler");
+
+        expect(response.status).toBe(200);
+        expect(response.body.foo).toBe("bar");
+        expect(response.header.foo).toBe("bar");
+    });
+
     test("with multiple Get decorators for the same handler", async () => {
         const app = await ExpressFactory.create();
         app.use(useController(FooController));
@@ -111,6 +122,11 @@ describe("controller", () => {
     }); 
 });
 
+function customRequestHandler(req: Request, res: Response, next: NextFunction): void {
+    res.setHeader("foo", "bar");
+    next();
+}
+
 function timeout(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -152,6 +168,11 @@ class FooController {
     getFoo34(req: Request, res: Response, next: NextFunction): void {
         res.json({ foo: req.path });
     }       
+
+    @Get("/handler", customRequestHandler)
+    getFooWithCustomRequestHandler(req: Request, res: Response, next: NextFunction): void {
+        res.json({ foo: "bar" });
+    }
 
     @Get("/:id")
     getFooById(req: Request, res: Response, next: NextFunction): void {

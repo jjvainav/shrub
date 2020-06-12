@@ -5,12 +5,6 @@ import { IControllerRequestService } from "./internal";
 
 export type Constructor<T> = { new(...args: any[]): T };
 
-/** Defines route handlers that get injected into the route handler chain for a controller function. */
-export interface IRouteInterceptors {
-    readonly before?: RequestHandler | RequestHandler[];
-    readonly after?: RequestHandler | RequestHandler[];
-}
-
 interface IRouterMatcher {
     (path: PathParams, ...handlers: RequestHandler[]): Router;
 }
@@ -66,38 +60,28 @@ export const Route: IRouteAttribute = function () {
 }
 
 /** A function decorator identifying a request handler on a controller for a specific path and HTTP DELETE method.*/        
-export function Delete(path?: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void;
-export function Delete(path?: PathParams, interceptors?: IRouteInterceptors): (target: any, propertyKey: string) => void; 
-export function Delete(path?: PathParams, interceptors?: any): (target: any, propertyKey: string) => void {
-    return createRouteDecorator(path || "/", toRouteInterceptors(interceptors), router => router.delete);
+export function Delete(path?: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void {
+    return createRouteDecorator(registerRoute(path || "/", handlers, router => router.delete));
 }
 
 /** A function decorator identifying a request handler on a controller for a specific path and HTTP GET method.*/        
-export function Get(path?: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void;
-export function Get(path?: PathParams, interceptors?: IRouteInterceptors): (target: any, propertyKey: string) => void; 
-export function Get(path?: PathParams, interceptors?: any): (target: any, propertyKey: string) => void {
-    return createRouteDecorator(path || "/", toRouteInterceptors(interceptors), router => router.get);
+export function Get(path?: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void {
+    return createRouteDecorator(registerRoute(path || "/", handlers, router => router.get));
 }
 
 /** A function decorator identifying a request handler on a controller for a specific path and HTTP PATCH method.*/        
-export function Patch(path?: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void;
-export function Patch(path?: PathParams, interceptors?: IRouteInterceptors): (target: any, propertyKey: string) => void; 
-export function Patch(path?: PathParams, interceptors?: any): (target: any, propertyKey: string) => void {
-    return createRouteDecorator(path || "/", toRouteInterceptors(interceptors), router => router.patch);
+export function Patch(path?: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void {
+    return createRouteDecorator(registerRoute(path || "/", handlers, router => router.patch));
 }
 
 /** A function decorator identifying a request handler on a controller for a specific path and HTTP POST method.*/        
-export function Post(path?: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void;
-export function Post(path?: PathParams, interceptors?: IRouteInterceptors): (target: any, propertyKey: string) => void; 
-export function Post(path?: PathParams, interceptors?: any): (target: any, propertyKey: string) => void {
-    return createRouteDecorator(path || "/", toRouteInterceptors(interceptors), router => router.post);
+export function Post(path?: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void {
+    return createRouteDecorator(registerRoute(path || "/", handlers, router => router.post));
 }
 
-/** A function decorator identifying a request handler on a controller for a specific path and HTTP PUT method.*/        
-export function Put(path?: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void;
-export function Put(path?: PathParams, interceptors?: IRouteInterceptors): (target: any, propertyKey: string) => void; 
-export function Put(path?: PathParams, interceptors?: any): (target: any, propertyKey: string) => void {
-    return createRouteDecorator(path || "/", toRouteInterceptors(interceptors), router => router.put);
+/** A function decorator identifying a request handler on a controller for a specific path and HTTP PUT method.*/
+export function Put(path?: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void {
+    return createRouteDecorator(registerRoute(path || "/", handlers, router => router.put));
 }
 
 /** Middleware that exposes the routes for a Controller. */
@@ -111,21 +95,19 @@ export function useController<T>(ctor: Constructor<T>): RequestHandler {
 }
 
 /** 
- * Creates a route decorator for a controller. This is used to create the HTTP method routes and is
- * useful for creating custom route decorators.
+ * Creates a route decorator for a controller function; the provided callback is responsible for
+ * registering a route with the provided router and the given handler is the controller handler
+ * that should be included in the call chain.
  */
-export function createRouteDecorator(path: PathParams, interceptors: IRouteInterceptors, cb: (router: Router) => IRouterMatcher): (target: any, propertyKey: string) => void {
+export function createRouteDecorator(register: (router: Router, handler: RequestHandler) => void): (target: any, propertyKey: string) => void {
     return (target, propertyKey) => {
         target[routesKey] = target[routesKey] || Router();
-
-        const routes: Router = target[routesKey];
-        cb(routes).call(
-            routes, 
-            path, 
-            ...toArray(interceptors.before), 
-            routeHandler(target, propertyKey),
-            ...toArray(interceptors.after));
+        register(target[routesKey], routeHandler(target, propertyKey));
     };
+}
+
+function registerRoute(path: PathParams, handlers: RequestHandler[], cb: (router: Router) => IRouterMatcher): (router: Router, handler: RequestHandler) => void {
+    return (router, handler) => cb(router).call(router, path, ...[...handlers, handler]);
 }
  
 /** Middleware that creates a new Controller instance for a request. */
@@ -135,29 +117,4 @@ function createController<T>(ctor: Constructor<T>): RequestHandler {
         (<any>req)[controllerKey] = req.context.services.get(IInstantiationService).createInstance(ctor);
         next();
     };
-}
-
-function toArray(handlers?: RequestHandler | RequestHandler[]): RequestHandler[] {
-    return !handlers 
-        ? []
-        : Array.isArray(handlers)
-            ? handlers
-            : [handlers];
-}
-
-function toRouteInterceptors(args: IArguments): IRouteInterceptors {
-    if (!args || args.length < 2) {
-        return {};
-    }
-
-    if (args.length === 2 && typeof args[1] === "object") {
-        return args[1];
-    }
-
-    const handlers: RequestHandler[] = [];
-    for (let i = 1; i < args.length; i++) {
-        handlers.push(args[i]);
-    }
-
-    return { before: handlers };
 }
