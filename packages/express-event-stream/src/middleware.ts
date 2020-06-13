@@ -68,7 +68,10 @@ export function EventStream(path: PathParams, ...handlers: RequestHandler[]): (t
                 eventStream.open();
             }
 
-            next(err);
+            if (err) {
+                // only invoke next if there is an error
+                next(err);
+            }
         });
     }));
 }
@@ -102,7 +105,10 @@ export function EventStreamChannel(path: PathParams, optionsOrProducerChannelPat
                     eventStreamChannel.open();
                 }
     
-                next(err);
+                if (err) {
+                    // only invoke next if there is an error
+                    next(err);
+                }
             });
         });
     }));
