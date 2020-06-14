@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
 import { ILogEntry, ILoggingConfiguration, LoggingModule, LogLevel } from "@shrub/logging";
 
@@ -44,16 +43,16 @@ function printLog(entry: ILogEntry, filter?: IConsoleLoggingFilter): void {
         const getText = (label: string) => `[${label}]: data=${JSON.stringify(entry.data)}`;
 
         if (entry.level < LogLevel.info) {
-            console.log(chalk.magenta(getText("debug")));
+            console.log(getText("debug"));
         }
         else if (entry.level < LogLevel.warn) {
-            console.log(chalk.green(getText("info")));
+            console.log(getText("debug"));
         }
         else if (entry.level < LogLevel.error) {
-            console.log(chalk.yellow(getText("warn")));
+            console.log(getText("debug"));
         }
         else {
-            console.log(chalk.bgRed(getText("error")));
+            console.log(getText("debug"));
         }
     }
 }
