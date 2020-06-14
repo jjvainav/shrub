@@ -1,35 +1,35 @@
 import { IModule, IModuleConfigurator } from "@shrub/core";
-import { IErrorConverter, ILogEvent, ILoggingConfiguration, LoggingModule } from "@shrub/logging";
+import { ILogDataConverter, ILogEvent, ILoggingConfiguration, LoggingModule } from "@shrub/logging";
 import { RequestError } from "@sprig/request-client";
 
 type Mutable<T> = {-readonly[P in keyof T]: T[P]};
 
-const requestErrorConverter: IErrorConverter = (err) => {
-    if (RequestError.isRequestError(err)) {
+const requestErrorConverter: ILogDataConverter = (arg) => {
+    if (isError(arg) && RequestError.isRequestError(arg)) {
         const data: Mutable<ILogEvent> = {
             name: "request-error",
-            code: err.code,
-            message: err.message,
-            stack: err.stack
+            code: arg.code,
+            message: arg.message,
+            stack: arg.stack
         };
 
-        if (err.data) {
-            if (isError(err.data)) {
+        if (arg.data) {
+            if (isError(arg.data)) {
                 data.inner = JSON.stringify({
-                    name: err.data.name,
-                    message: err.data.message,
-                    stack: err.data.stack
+                    name: arg.data.name,
+                    message: arg.data.message,
+                    stack: arg.data.stack
                 });
             }
             else {
-                data.data = JSON.stringify(err.data);
+                data.data = JSON.stringify(arg.data);
             }
         }
 
-        if (err.response) {
-            data["response.status"] = err.response.status.toString();
-            if (err.response.data) {
-                data["response.body"] = JSON.stringify(err.response.data);
+        if (arg.response) {
+            data["response.status"] = arg.response.status.toString();
+            if (arg.response.data) {
+                data["response.body"] = JSON.stringify(arg.response.data);
             }
         }
         
@@ -54,6 +54,6 @@ export class RequestClientLoggingModule implements IModule {
     readonly dependencies = [LoggingModule];
 
     configure({ config }: IModuleConfigurator): void {
-        config.get(ILoggingConfiguration).useErrorConverter(requestErrorConverter);
+        config.get(ILoggingConfiguration).useConverter(requestErrorConverter);
     }
 }

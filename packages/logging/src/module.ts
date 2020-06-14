@@ -1,12 +1,12 @@
 import { createConfig, IModule, IModuleInitializer, IServiceRegistration } from "@shrub/core";
-import { IErrorConverter, ILogWriter, ILoggingService, LoggingService } from "./service";
+import { ILogDataConverter, ILogWriter, ILoggingService, LoggingService } from "./service";
 
 export const ILoggingConfiguration = createConfig<ILoggingConfiguration>();
 export interface ILoggingConfiguration {
-    /** Registers a global error converter. */
-    useErrorConverter(converter: IErrorConverter): void;
+    /** Registers a global log data converter. */
+    useConverter(converter: ILogDataConverter): void;
     /** Registers a global log writer. */
-    useLogWriter(writer: ILogWriter): void;
+    useWriter(writer: ILogWriter): void;
 }
 
 export class LoggingModule implements IModule {
@@ -14,8 +14,8 @@ export class LoggingModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(ILoggingConfiguration).register(({ services }) => ({
-            useErrorConverter: converter => (<LoggingService>services.get(ILoggingService)).useErrorConverter(converter),
-            useLogWriter: writer => (<LoggingService>services.get(ILoggingService)).useLogWriter(writer)
+            useConverter: converter => (<LoggingService>services.get(ILoggingService)).useConverter(converter),
+            useWriter: writer => (<LoggingService>services.get(ILoggingService)).useWriter(writer)
         }));
     }    
 

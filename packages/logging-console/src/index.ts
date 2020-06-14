@@ -33,23 +33,23 @@ export class LoggingConsoleModule implements IModule {
     }
 
     configure({ config }: IModuleConfigurator): void {
-        config.get(ILoggingConfiguration).useLogWriter({
-            writeLog: log => printLog(log, this.filter)
+        config.get(ILoggingConfiguration).useWriter({
+            writeLog: entry => printLog(entry, this.filter)
         });
     }
 }
 
-function printLog(log: ILogEntry, filter?: IConsoleLoggingFilter): void {
-    if (!filter || !filter.printLog || filter.printLog(log)) {
-        const getText = (label: string) => `[${label}]: data=${JSON.stringify(log.data)}`;
+function printLog(entry: ILogEntry, filter?: IConsoleLoggingFilter): void {
+    if (!filter || !filter.printLog || filter.printLog(entry)) {
+        const getText = (label: string) => `[${label}]: data=${JSON.stringify(entry.data)}`;
 
-        if (log.level < LogLevel.info) {
+        if (entry.level < LogLevel.info) {
             console.log(chalk.magenta(getText("debug")));
         }
-        else if (log.level < LogLevel.warn) {
+        else if (entry.level < LogLevel.warn) {
             console.log(chalk.green(getText("info")));
         }
-        else if (log.level < LogLevel.error) {
+        else if (entry.level < LogLevel.error) {
             console.log(chalk.yellow(getText("warn")));
         }
         else {
