@@ -10,8 +10,8 @@
         "test": "jest --runInBand --forceExit"
     },
     "dependencies": {
-        "@shrub/core": "^0.4.87",
-        "@shrub/express": "^0.4.87",
+        "@shrub/core": "^0.4.90",
+        "@shrub/express": "^0.4.90",
         "express": "^4.17.1"
     },
     "devDependencies": {
