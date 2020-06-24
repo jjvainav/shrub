@@ -1,10 +1,12 @@
 import { IMessage, MessageMetadata } from "@shrub/messaging";
 
-/** Defines required metadata for an event. */
+/** Defines required and known metadata for an event. */
 export type EventMessageMetadata = MessageMetadata & {
     readonly "event-type": string;
     readonly "resource-id": string;
     readonly "resource-type": string;
+    readonly "child-resource-id"?: string;
+    readonly "child-resource-type"?: string;
 };
 
 /** Defines a message representing an event against a specific resource. */
@@ -37,6 +39,10 @@ export namespace EventMessage {
         export const resourceId = "resource-id";
         /** The type of resource the event is associated with. */
         export const resourceType = "resource-type";
+        /** The id of a child resource if the event is associated with a child of the root resource. */
+        export const childResourceId = "child-resource-id";
+        /** A value identifying the type of child resource. */
+        export const childResourceType = "child-resource-type";
     }
 
     export function isEventMessage(message: IMessage): message is IEventMessage {

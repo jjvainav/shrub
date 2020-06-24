@@ -1,4 +1,4 @@
-export type MessageMetadata = { readonly [key: string]: string | number };
+export type MessageMetadata = { readonly [key: string]: string | number | undefined };
 
 export interface IMessage {
     /** A unique id assigned to the message by the message producer. */
