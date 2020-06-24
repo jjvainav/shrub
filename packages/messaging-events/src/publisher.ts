@@ -1,5 +1,5 @@
 import { createService, Transient } from "@shrub/core";
-import { IMessageProducer } from "@shrub/messaging";
+import { IMessageProducer, MessageMetadata } from "@shrub/messaging";
 import { EventMessage } from "./event";
 
 /** Handles publishing events against a message producer. */
@@ -12,6 +12,8 @@ export interface IEventPublisher {
 export interface IEventDetails {
     /** The type of event being published. */
     readonly eventType: string;
+    /** Additional metadata to associate with the event message. */
+    readonly metadata?: MessageMetadata;
     /** The id of the resource the event is associated with. */
     readonly resourceId: string;
     /** A value identifying the type of resource. */
@@ -30,6 +32,7 @@ export class EventPublisher implements IEventPublisher {
     publish(channel: string, event: IEventDetails): void {
         this.producer.send(channel, {
             metadata: {
+                ...event.metadata,
                 [`${EventMessage.Metadata.eventType}`]: event.eventType,
                 [`${EventMessage.Metadata.resourceId}`]: event.resourceId,
                 [`${EventMessage.Metadata.resourceType}`]: event.resourceType
