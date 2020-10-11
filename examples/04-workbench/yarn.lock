@@ -819,72 +819,72 @@
     once "^1.4.0"
     universal-user-agent "^4.0.0"
 
-"@shrub/core@0.4.38", "@shrub/core@^0.4.38":
-  version "0.4.38"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.4.38.tgz#d1e5d939650d5a5695c28c899c84b27045e292d9"
-  integrity sha512-xjT5mfP8DMSiCOSnQ3INQyFyCbI7BhAyJyoae0socBTfU3AwoGtUxrdhOdur93+M8QpkeVP/feVF/kQ0CwuYbg==
+"@shrub/core@0.4.90", "@shrub/core@^0.4.90":
+  version "0.4.90"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.4.90.tgz#08671a0315b6f145b36eaf1fdeca6d769795af03"
+  integrity sha512-s+Pphoi9Waw1HeRh/qVMN+valOTuFitO5HBO6c7rrd4N890M6d+krmE6X3TEO93Sic5Yuz2NdQfWtXLclNPeyA==
 
-"@shrub/express@^0.4.38":
-  version "0.4.38"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.4.38.tgz#cbc5d565e9a93539aeaaeebd387246b28bfce90b"
-  integrity sha512-dSLit/yEiNyY5QCUU3T6SkZVFSFwC3osYgD7gvOZ2lcHKf2gTjw3EG6jZ3bYBSCuxo1eSeFVFRoW4dz+x9l7XQ==
+"@shrub/express@^0.4.90":
+  version "0.4.90"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.4.90.tgz#0e4be7eb333be99df88b1b663a374cf3838668a9"
+  integrity sha512-6zHCa4qXl3SJ+PTwmiGBynbcxVhCArN9NpcuLTZA/cwNXWCDnRh3Pd67B/5i925envRvWLP4LkPbJeVRnQ6fOw==
   dependencies:
-    "@shrub/core" "0.4.38"
-    "@shrub/http" "0.4.38"
+    "@shrub/core" "0.4.90"
+    "@shrub/http" "0.4.90"
     express "^4.17.1"
 
-"@shrub/http@0.4.38":
-  version "0.4.38"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.4.38.tgz#c15398e1bd117313ef6e6932d123bd63aa018ebd"
-  integrity sha512-Jm0Yg4v+tB235LP6m7UyiGbL1HTrjjrK6/IlvQFEXOqTRCLinzC8ksoW2wdZO0PqZ7oz3sFKnidbEZ00//sTPQ==
+"@shrub/http@0.4.90":
+  version "0.4.90"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.4.90.tgz#ebd9735813cf4671fd3409089aa40973efc580ff"
+  integrity sha512-Bh6clfZLC8mTnieobhcherfNEPFwGqsh/GXaRauNHG7J1mih5lANwDWjisvWLwFhPnyOCJ7VWaObg3XNBKDWSQ==
   dependencies:
-    "@shrub/core" "0.4.38"
+    "@shrub/core" "0.4.90"
 
-"@shrub/model@0.4.38", "@shrub/model@^0.4.38":
-  version "0.4.38"
-  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.4.38.tgz#f1221af8b8a9936f79293363770140f0194c2a8f"
-  integrity sha512-PLAdCKkr5faIXoZ+tJbIliJLr0Sff9m1tKyhFgZjNYhLvdBlG7WezegIy5i36fTXLf0halTHRLk9iUAoCkO6CQ==
+"@shrub/model@0.4.90", "@shrub/model@^0.4.90":
+  version "0.4.90"
+  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.4.90.tgz#211f6b49c7cac2484e5dcfe9c70a0f8da9f05443"
+  integrity sha512-uFQ5X0rAlZcIz9sFlw5LuKGyyArlQxhoP/HIrVg/K+/UIEM46kwkblwtehkY69ehGS5SOjb27zceCm5xvw/7rA==
   dependencies:
-    "@shrub/core" "0.4.38"
-    "@sprig/serialization" "0.1.12"
+    "@shrub/core" "0.4.90"
+    "@sprig/serialization" "0.1.50"
 
-"@shrub/vue-i18n@^0.4.38":
-  version "0.4.38"
-  resolved "https://registry.yarnpkg.com/@shrub/vue-i18n/-/vue-i18n-0.4.38.tgz#21b067f3d65e0e1108c6bc0f0e1f86da39cd0276"
-  integrity sha512-/MJ3oTWbU89mG6BlYalpQghBRBp8fc5dKsa2vgEp/id+A4dC8vfUoh2pXG3pX6GMuFwxnWz5NsB94sbRnLb3GQ==
+"@shrub/vue-i18n@^0.4.90":
+  version "0.4.90"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-i18n/-/vue-i18n-0.4.90.tgz#636eb8928a6c8ca61cffc96bd19530e7ea348839"
+  integrity sha512-ssKO2rMvOFkmum/n9UeZQD0eYSMDhxLqCRAsn7LUf7vnagZDslUcjybNjfoMwBXniB/9BW6OhjwktaQqRdDiLw==
   dependencies:
-    "@shrub/core" "0.4.38"
-    "@shrub/vue" "0.4.38"
-    "@sprig/event-emitter" "^0.1.12"
+    "@shrub/core" "0.4.90"
+    "@shrub/vue" "0.4.90"
+    "@sprig/event-emitter" "^0.1.50"
     vue-i18n "^8.15.4"
 
-"@shrub/vue@0.4.38", "@shrub/vue@^0.4.38":
-  version "0.4.38"
-  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.4.38.tgz#0a8f22195802674a480a7d64372ce03e84b15983"
-  integrity sha512-J0cdXzxYY0J840462gDgoUhmVTyDgau2C1kDUpCXtrK0CxZ+kn1P1Ure2cTjQ6AEWjOgeNpTYEC1Hr5Rjkgn5g==
+"@shrub/vue@0.4.90", "@shrub/vue@^0.4.90":
+  version "0.4.90"
+  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.4.90.tgz#3093af73f0171856c2930543cfb62b866ebbeb7e"
+  integrity sha512-j6evJjUmzhIka3SRfQ+Gy4LDFHPOajSbNkCMslJDW/T4XB8gL3GizaZSXTFZ9p56oVlYAYloLLtp6JoMJn8+Xw==
   dependencies:
-    "@shrub/core" "0.4.38"
-    "@shrub/model" "0.4.38"
-    "@sprig/serialization" "0.1.12"
+    "@shrub/core" "0.4.90"
+    "@shrub/model" "0.4.90"
+    "@sprig/serialization" "0.1.50"
     vue "^2.6.10"
     vue-class-component "^7.1.0"
 
-"@sprig/event-emitter-dom@^0.1.12":
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.1.12.tgz#c503bce490ce8248f551e2cfda039f37ec24a30e"
-  integrity sha512-wwdpCl8hvSVZpfwMaCLXqS6DbLbE2VVPMGOtYCnXEcGz5BdLZt4CcS8NUgUdR/RNXyc3rCrwFZ0fBLSp9j1m9g==
+"@sprig/event-emitter-dom@^0.1.50":
+  version "0.1.50"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.1.50.tgz#e87733f1502a01df1cebadbb62570f81dc36f7c1"
+  integrity sha512-GgEP9bRQqCURjRSg2pyMhQCntTa2miATAmk0oUqAlFKaxcOEqeRl2n1356KSaakS71LUdLm1TNCsVzpqU+YFQw==
   dependencies:
-    "@sprig/event-emitter" "0.1.12"
+    "@sprig/event-emitter" "0.1.50"
 
-"@sprig/event-emitter@0.1.12", "@sprig/event-emitter@^0.1.12":
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.12.tgz#c2c26de5edcf779f6ac5c0b3fffc3a2acf3d5153"
-  integrity sha512-1S7kOixa7r0Z9n8JOuwCXjJw+sD6etyCP7StSanQusHxYPhPkbmHy5GeYZOnq09o5NkmXutRmWwiGiKC7glctA==
+"@sprig/event-emitter@0.1.50", "@sprig/event-emitter@^0.1.50":
+  version "0.1.50"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.50.tgz#d82304e613decbdbc23ef6bd7eadd6f3fac287fd"
+  integrity sha512-G5xlClrpRC7zuqmOAbAvBp3avr6JIsyGf0Uv9kp0k0DCxGOOAUBw/J7uzOgkcVTX+8PPE/fJoO9R1lApexNTPA==
 
-"@sprig/serialization@0.1.12":
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.12.tgz#95b4fe924da7f8f054037b4a90278e73b5957a41"
-  integrity sha512-1RhtyOxSnUi7k/dV+E9pO28uz+4rXSmGPcGqUYBv1AHIj2ARLSSU5SmJwXZlssWPVjpsTwkaA73afkkO9QHPqA==
+"@sprig/serialization@0.1.50":
+  version "0.1.50"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.50.tgz#3c9efed17bd1393ea54b04ef51e47ccb5ff46364"
+  integrity sha512-IINRgLn2UsSmABaGe5WzD7rvdl0yzyJe+IaWtkLAfQSMEkKtMfC7iA+Ki6HYaPNIQlhyWk4RBWM2cnuajoicJA==
 
 "@types/body-parser@*":
   version "1.17.1"
@@ -6980,9 +6980,9 @@ tr46@^1.0.1:
     punycode "^2.1.0"
 
 tree-kill@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/tree-kill/-/tree-kill-1.2.1.tgz#5398f374e2f292b9dcc7b2e71e30a5c3bb6c743a"
-  integrity sha512-4hjqbObwlh2dLyW4tcz0Ymw0ggoaVDMveUB9w8kFSQScdRLo0gxO9J7WFcUBo+W3C1TLdFIEwNOWebgZZ0RH9Q==
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/tree-kill/-/tree-kill-1.2.2.tgz#4ca09a9092c88b73a7cdc5e8a01b507b0790a0cc"
+  integrity sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==
 
 trim-newlines@^1.0.0:
   version "1.0.0"
