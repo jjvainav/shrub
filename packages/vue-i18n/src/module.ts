@@ -42,6 +42,8 @@ export interface IVueI18nService {
     readonly currentLocale: string;
     /** An event that is raised when the current locale has changed. */
     readonly onLocaleChanged: IEvent;
+    /** Manually loads messages based on the current locale. */
+    load(loader: ILocaleLoader): Promise<void>;
     /** 
      * Register a callaback that will handle loading messages for a locale. 
      * Multiple loaders may be registered and the resulting messages will be merged together.
@@ -158,6 +160,11 @@ class VueI18nService implements IVueI18nService {
 
     get onLocaleChanged(): IEvent {
         return this.localeChanged.event;
+    }
+
+    load(loader: ILocaleLoader): Promise<void> {
+        const invoker = this.createInvoker(loader);
+        return invoker({ locale: this.i18n.locale });
     }
 
     registerLoader(loader: ILocaleLoader): void {

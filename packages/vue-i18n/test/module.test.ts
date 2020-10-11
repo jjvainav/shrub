@@ -32,6 +32,26 @@ describe("module", () => {
         expect(instance.$t("hi")).toBe("hi");
     });
 
+    test("manually load locale messages", async () => {
+        let services: IServiceCollection | undefined;
+        await ModuleLoader.load([{
+            name: "test",
+            dependencies: [VueI18nModule],
+            configure: config => {
+                services = config.services;
+            }
+        }]);
+
+        const service = services!.get(IVueI18nService);
+        await service.load(() => Promise.resolve({
+            "en-US": { hi: "hi" },
+            "es": { hi: "hola" }
+        }));
+
+        const instance = new Vue();
+        expect(instance.$t("hi")).toBe("hi");
+    });
+
     test("merge messages from multiple modules", async () => {
         await ModuleLoader.load([
             {
