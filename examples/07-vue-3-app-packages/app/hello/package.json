@@ -1,0 +1,19 @@
+{
+    "name": "@app/hello",
+    "version": "1.0.0",
+    "private": true,
+    "main": "dist/index.js",
+    "typings": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc && yarn run copy-vue",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "copy-vue": "copyfiles -u 1 ./src/**/*.vue dist"
+    },
+    "dependencies": {
+        "@shrub/core": "^0.4.91",
+        "vue": "^3.0.2"
+    },
+    "devDependencies": {
+        "copyfiles": "^2.1.1"
+    }
+}

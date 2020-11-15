@@ -1,4 +1,4 @@
-import { ILogEntry, ILogEvent, LoggingService } from "@shrub/logging";
+import { ILogEntry, ILogEvent, isError, LoggingService } from "@shrub/logging";
 import { ISpan, ITags, ITraceWriter, TracingService } from "../src";
 
 type Mutable<T> = { -readonly[P in keyof T]: T[P] };
@@ -134,13 +134,15 @@ describe("tracing", () => {
         const writer = new MockTraceWriter();
 
         tracingService.useTraceWriter(writer);
-        loggingService.useErrorConverter(obj => {
-            return {
-                name: "FooError",
-                message: obj.message, 
-                stack: obj.stack,
-                foo: "foo"
-            };
+        loggingService.useConverter(obj => {
+            return isError(obj) 
+                ? ({
+                    name: "FooError",
+                    message: obj.message, 
+                    stack: obj.stack,
+                    foo: "foo"
+                })
+                : undefined;
         });
 
         const tracer = tracingService.getTracer();

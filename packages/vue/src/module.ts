@@ -144,6 +144,7 @@ export class VueModule implements IModule {
         });
 
         if (router) {
+            // need to wait on the router when using SSR
             router.onReady(() => app.$mount(el));
         }
         else {

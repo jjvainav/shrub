@@ -1,0 +1,28 @@
+{
+    "name": "@shrub/vue-3",
+    "description": "A module that adds support for Vue 3 based apps.",
+    "version": "0.4.91",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "module": "dist/esm/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "build:esm": "tsc -p tsconfig.esm.json",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
+    },
+    "dependencies": {
+        "@shrub/core": "0.4.91",
+        "vue": "^3.0.2"
+    }
+}

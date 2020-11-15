@@ -106,13 +106,14 @@ const defaultLogDataConverter: (arg: LogDataArg) => LogData = arg => !isError(ar
     stack: arg.stack
 };
 
-function isError(obj: any): obj is Error {
+/** Helper function to verify if the specified LogDataArg is an error. */
+export function isError(arg: LogDataArg): arg is Error {
     // instanceof only works if sub-classes extend Error properly (prototype gets set to Error);
     // if the instanceof check fails assume an Error if name, message, and stack are defined.
-    return obj instanceof Error || (
-        (<Error>obj).name !== undefined &&
-        (<Error>obj).message !== undefined &&
-        (<Error>obj).stack !== undefined);
+    return arg instanceof Error || (
+        (<Error><unknown>arg).name !== undefined &&
+        (<Error><unknown>arg).message !== undefined &&
+        (<Error><unknown>arg).stack !== undefined);
 }
 
 @Singleton
