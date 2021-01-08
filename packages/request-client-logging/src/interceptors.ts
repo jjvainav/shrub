@@ -29,10 +29,12 @@ export function logRequest(logger?: ILogger): IRequestInterceptor {
 
 /** 
  * Creates a new response interceptor that will log response info to the provided logger. 
+ * If includeClientErrors is true, the response body for all 4xx errors will also be logged.
+ * 
  * Note, this only logs if a response was received from the end point and does not log
  * the request error if one had occurred and the request failed.
  */
-export function logResponse(logger?: ILogger): IResponseInterceptor {
+export function logResponse(logger?: ILogger, includeClientErrors?: boolean): IResponseInterceptor {
     return !logger ? noOp : context => {
         if (context.response) {
             const data: Mutable<ILogEvent> = { 
@@ -42,11 +44,15 @@ export function logResponse(logger?: ILogger): IResponseInterceptor {
             };
 
             if (shouldLogResponseWarning(context)) {
-                // only log the response body for unexpected responses and also log it as a warning
+                // include the response body when logging warnings
                 data.body = JSON.stringify(context.response.data);
                 logger.logWarn(data);
             }
             else {
+                if (includeClientErrors) {
+                    data.body = JSON.stringify(context.response.data);
+                }
+
                 logger.logInfo(data);
             }
         }
