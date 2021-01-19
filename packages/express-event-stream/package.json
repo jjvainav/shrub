@@ -1,7 +1,7 @@
 {
     "name": "@shrub/express-event-stream",
     "description": "Express module that provides support for event-stream endpoints and event-stream brokerless messaging.",
-    "version": "0.4.91",
+    "version": "0.4.92",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -25,12 +25,12 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.4.91",
-        "@shrub/express": "0.4.91",
-        "@shrub/express-tracing": "0.4.91",
-        "@shrub/logging": "0.4.91",
-        "@shrub/messaging": "0.4.91",
-        "@shrub/tracing": "0.4.91",
+        "@shrub/core": "0.4.92",
+        "@shrub/express": "0.4.92",
+        "@shrub/express-tracing": "0.4.92",
+        "@shrub/logging": "0.4.92",
+        "@shrub/messaging": "0.4.92",
+        "@shrub/tracing": "0.4.92",
         "@sprig/event-emitter": "^0.1.52",
         "@sprig/request-client": "^0.1.52",
         "@sprig/request-client-events": "^0.1.52",
