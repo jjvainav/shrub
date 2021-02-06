@@ -1,7 +1,7 @@
 {
     "name": "@shrub/tracing",
     "description": "Node.js module for distributed logging based on dapper.",
-    "version": "0.4.92",
+    "version": "0.4.93",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -25,8 +25,8 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/core": "0.4.92",
-        "@shrub/logging": "0.4.92",
+        "@shrub/core": "0.4.93",
+        "@shrub/logging": "0.4.93",
         "@sprig/unique-id": "^0.1.53"
     }
 }
