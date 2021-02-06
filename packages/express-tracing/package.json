@@ -25,7 +25,7 @@
         "test": "jest"
     },
     "devDependencies": {
-        "@sprig/event-emitter": "^0.1.52",
+        "@sprig/event-emitter": "^0.1.53",
         "@types/express": "^4.17.1"
     },
     "dependencies": {
