@@ -36,6 +36,22 @@ describe("module", () => {
         expect(message.data).toBe("Hello");
     });
 
+    test("verify producer doesn't send message to subscriber of a different channel", async () => {
+        const context = await setupTest();
+        const messaging = context.services.get(IMessageService);
+
+        let receivedMessage: IMessage | undefined;
+        await messaging.getConsumer().subscribe("foo", { 
+            subscriptionId: "1",
+            handler: message => { receivedMessage = message; }
+        });
+
+        messaging.getProducer().send("bar", { data: "Hello" });
+        await new Promise<void>(resolve => setTimeout(resolve, 10));
+
+        expect(receivedMessage).toBeUndefined();
+    });
+
     test("verify sending messages to multiple consumers with the same subscription id", async () => {
         const context = await setupTest();
         const messaging = context.services.get(IMessageService);
