@@ -121,7 +121,7 @@ export class LoggingService implements ILoggingService {
     private readonly converters: ILogDataConverter[] = [];
     private readonly writers: ILogWriter[] = [];
 
-    createLogger(options: ILoggerOptions): ILogger {
+    createLogger(options?: ILoggerOptions): ILogger {
         const global = this;
         return new class Logger implements ILogger {
             private readonly converters: ILogDataConverter[];

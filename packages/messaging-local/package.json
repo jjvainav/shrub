@@ -1,0 +1,32 @@
+{
+    "name": "@shrub/messaging-local",
+    "description": "Provides local pub/sub using event emitters.",
+    "version": "0.4.93",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "module": "dist/esm/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.0.0"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "test": "jest"
+    },
+    "dependencies": {
+        "@shrub/core": "0.4.93",
+        "@sprig/event-emitter": "^0.1.53",
+        "@sprig/unique-id": "^0.1.53"
+    }
+}

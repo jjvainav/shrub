@@ -1,6 +1,6 @@
 import { createService, Singleton } from "@shrub/core";
 import "@shrub/express-tracing";
-import { IMessage, IMessageChannelProducer, IMessageDetails, isChannelNameMatch, isChannelNamePattern } from "@shrub/messaging";
+import { ChannelWhitelist, IMessage, IMessageChannelProducer, IMessageDetails, isChannelNameMatch, isChannelNamePattern } from "@shrub/messaging";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import createId from "@sprig/unique-id";
 import { Request, Response } from "express";
@@ -162,52 +162,5 @@ export class EventStreamProducerService implements IEventStreamProducerService {
         items.set(stream.id, stream);
 
         return stream;
-    }
-}
-
-class ChannelWhitelist {
-    private readonly patterns: string[] = [];
-    private readonly channels = new Set<string>();
-    private allowAll = false;
-
-    add(channelNamePattern: string): void {
-        if (!this.allowAll) {
-            channelNamePattern = this.normalizePattern(channelNamePattern);
-            if (isChannelNamePattern(channelNamePattern)) {
-                if (channelNamePattern === "*") {
-                    this.allowAll = true;
-                    this.patterns.splice(0);
-                    this.channels.clear();
-                }
-
-                this.patterns.push(channelNamePattern);
-            }
-            else {
-                this.channels.add(channelNamePattern);
-            }
-        }
-    }
-
-    isChannelSupported(channelName: string): boolean {
-        if (this.allowAll || this.channels.has(channelName)) {
-            return true;
-        }
-
-        for (const pattern of this.patterns) {
-            if (isChannelNameMatch(pattern, channelName)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private normalizePattern(channelNamePattern: string): string {
-        channelNamePattern = channelNamePattern.trim();
-        while (channelNamePattern.indexOf("**") > -1) {
-            channelNamePattern = channelNamePattern.replace("**", "*");
-        }
-
-        return channelNamePattern;
     }
 }

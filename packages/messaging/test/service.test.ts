@@ -1,44 +1,23 @@
-import { createService, ServiceMap, Transient } from "@shrub/core";
+import { createService, ServiceMap, SingletonServiceFactory, Transient } from "@shrub/core";
 import { IMessage } from "../src/message";
 import { 
-    IMessageBrokerAdapter, IMessageChannelConsumer, IMessageChannelProducer, IMessageConsumer, 
-    IMessageProducer, IMessageService, isChannelNameMatch, isChannelNamePattern,
-    ISubscribeOptions, ISubscription, MessageHandler, MessageService 
+    IMessageBrokerAdapter, IMessageBrokerService, IMessageChannelConsumer, IMessageChannelProducer, IMessageConsumer, 
+    IMessageProducer, IMessageService, ISubscribeOptions, ISubscription, MessageHandler, MessageService 
 } from "../src/service";
+import { isChannelNameMatch } from "../src/whitelist";
 
 describe("message service", () => {
-    test("verify channel name is a pattern", () => {
-        expect(isChannelNamePattern("")).toBe(false);
-        expect(isChannelNamePattern("foo")).toBe(false);
-        expect(isChannelNamePattern("foo:*")).toBe(true);
-        expect(isChannelNamePattern("*")).toBe(true);
-    });
-
-    test("verify channel name pattern match", () => {
-        expect(isChannelNameMatch("", "foo")).toBe(false);
-        expect(isChannelNameMatch("foo", "foo")).toBe(true);
-        expect(isChannelNameMatch("*oo", "foo")).toBe(true);
-        expect(isChannelNameMatch("f*o", "foo")).toBe(true);
-        expect(isChannelNameMatch("f*oo", "foo")).toBe(true);
-        expect(isChannelNameMatch("foo*", "foo")).toBe(true);
-        expect(isChannelNameMatch("foo:*", "foo")).toBe(false);
-        expect(isChannelNameMatch("foo:*", "foo:bar")).toBe(true);
-        expect(isChannelNameMatch("foo:*:*", "foo:bar:1")).toBe(true);
-        expect(isChannelNameMatch("foo:*", "foo:*:*")).toBe(true);
-        expect(isChannelNameMatch("*", "foo")).toBe(true);
-    });
-
     test("send message to consumer from producer", async () => {
         const service = new MessageService();
 
         service.registerBroker(new TestBroker());
 
-        const consumer = service.getChannelConsumer("foo");
-        const producer = service.getChannelProducer("foo");
+        const consumer = service.getConsumer();
+        const producer = service.getProducer();
 
         let message: IMessage | undefined;
-        await consumer.subscribe({ subscriptionId: "123", handler: m => { message = m } });
-        producer.send({ 
+        await consumer.subscribe("foo", { subscriptionId: "123", handler: m => { message = m } });
+        producer.send("foo", { 
             data: { foo: "bar" } 
         });
 
@@ -46,13 +25,37 @@ describe("message service", () => {
          expect(message!.data.foo).toBe("bar");
     });
 
+    test("send message to consumer from multiple producers", async () => {
+        const service = new MessageService();
+        const broker1 = new TestBroker();
+        const broker2 = new TestBroker();
+
+        // register 2 different brokers that handle all channels
+        service.registerBroker(broker1);
+        service.registerBroker(broker2);
+
+        const consumer = service.getConsumer();
+        const producer = service.getProducer();
+
+        const messages: IMessage[] = [];
+        await consumer.subscribe("foo", { subscriptionId: "123", handler: m => { messages.push(m) } });
+        producer.send("foo", { 
+            data: { foo: "bar" } 
+        });
+
+        // each broker should send a message to the consumer
+         expect(messages).toHaveLength(2);
+    });
+
     test("inject consumer and producer", () => {
         const services = new ServiceMap();
 
-        services.register(IMessageService, MessageService);
+        const factory = new SingletonServiceFactory(MessageService);
+        services.registerSingleton(IMessageService, factory);
+        services.registerSingleton(IMessageBrokerService, factory);
         services.register(ITestService, TestService);
 
-        services.get(IMessageService).registerBroker(new TestBroker());
+        services.get(IMessageBrokerService).registerBroker(new TestBroker());
 
         const service = services.get(ITestService);
 

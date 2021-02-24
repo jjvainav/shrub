@@ -10,7 +10,7 @@ export const IExpressEventStreamConfiguration = createConfig<IExpressEventStream
 export interface IExpressEventStreamConfiguration {
     /** Adds an event-stream consumer with the messaging message broker. */
     addConsumer(config: IEventStreamConsumerConfiguration): void;
-    /** Register the use of the event-stream producer and is required when using the EventStreamChannel controller decorator. */
+    /** Register and configures the use of the event-stream producer; note, this is still required when using the EventStreamChannel controller decorator. */
     useProducer(options?: IEventStreamProducerOptions): void;
 }
 
@@ -26,12 +26,20 @@ export interface IEventStreamProducerRoute {
 export interface IEventStreamProducerOptions {
     /** A set of routes that will accept event-stream consumer subscriptions. Routes can be defined here or using the EventStreamChannel controller decorator. */
     readonly routes?: IEventStreamProducerRoute[];
-    /** A set of channel name patterns to whitelist for the producer; if no channels are specified then all channels will be supported. */
-    readonly whitelist?: string[];
+    /**
+     * A set of defined channel name patterns the producer will send messages to and is used in a couple different scenarios:
+     * 1. This is required when using the EventStreamChannel controller decorator as it does not have access to register the channel name patterns with the service.
+     * 2. When using multiple routes and you'd like to optimize the produce with a shortened list of patterns that cover all the configured routes.
+     */
+    readonly channelNamePatterns?: string[];
 }
 
+/** 
+ * A module that provides support for brokerless messaging using event-streams. The consumer connects to an event-stream endpoint
+ * representing a channel name. The producer ties into express and opens an event-stream for a request route. 
+ */
 export class ExpressEventStreamModule implements IModule {
-    private broker = new EventStreamMessageBrokerAdapter();
+    private broker?: EventStreamMessageBrokerAdapter;
 
     readonly name = "express-event-stream";
     readonly dependencies = [
@@ -40,10 +48,18 @@ export class ExpressEventStreamModule implements IModule {
     ];
 
     initialize(init: IModuleInitializer): void {
-        init.config(IExpressEventStreamConfiguration).register(({ config, services }) => ({
-            addConsumer: config => this.broker.addConsumer(services.get(IEventStreamConsumerService), config),
-            useProducer: options => this.broker.useProducer(config.get(IExpressConfiguration), services.get(IEventStreamProducerService), options)
-        }));
+        init.config(IExpressEventStreamConfiguration).register(({ config, services }) => {
+            this.broker = new EventStreamMessageBrokerAdapter(
+                config.get(IExpressConfiguration),
+                services.get(IEventStreamConsumerService),
+                services.get(IEventStreamProducerService)
+            );
+
+            return {
+                addConsumer: config => this.broker!.addConsumer(config),
+                useProducer: options => this.broker!.useProducer(options)
+            };
+        });
     }
     
     configureServices(registration: IServiceRegistration): void {
@@ -52,34 +68,30 @@ export class ExpressEventStreamModule implements IModule {
     }
 
     configure({ config }: IModuleConfigurator): void {
-        config.get(IMessagingConfiguration).useMessageBroker(this.broker);
+        config.get(IMessagingConfiguration).useMessageBroker(this.broker!);
     }
 }
 
 class EventStreamMessageBrokerAdapter implements IMessageBrokerAdapter {
-    private _getChannelConsumer?: (channelNamePattern: string) => IMessageChannelConsumer | undefined;
-    private _getChannelProducer?: (channelName: string) => IMessageChannelProducer | undefined;
-
-    addConsumer(service: IEventStreamConsumerService, config: IEventStreamConsumerConfiguration): void {
-        if (!this._getChannelConsumer) {
-            this._getChannelConsumer = channelNamePattern => service.getMessageChannelConsumer(channelNamePattern);
-        }
-
-        service.addConsumer(config);
+    constructor(
+        private readonly app: IExpressConfiguration, 
+        private readonly consumerService: IEventStreamConsumerService,
+        private readonly producerService: IEventStreamProducerService) {
     }
 
-    useProducer(app: IExpressConfiguration, service: IEventStreamProducerService, options?: IEventStreamProducerOptions): void {
-        if (!this._getChannelProducer) {
-            this._getChannelProducer = channelName => service.getMessageChannelProducer(channelName);
-        }
+    addConsumer(config: IEventStreamConsumerConfiguration): void {
+        this.consumerService.addConsumer(config);
+    }
 
-        const whitelist = options && options.whitelist || ["*"];
-        whitelist.forEach(entry => service.whitelistChannel(entry));
+    useProducer(options?: IEventStreamProducerOptions): void {
+        const channelNamePatterns = options && options.channelNamePatterns || ["*"];
+        channelNamePatterns.forEach(pattern => this.producerService.whitelistChannel(pattern));
 
         if (options && options.routes) {
             for (const route of options.routes) {
-                app.use(route.path, (req, res, next) => validateConsumerParams(route.channelNamePattern, req, res, (channel, subscriptionId) => {
-                    service.openStream(channel, subscriptionId, req, res);
+                this.producerService.whitelistChannel(route.channelNamePattern || "*");
+                this.app.use(route.path, (req, res, next) => validateConsumerParams(route.channelNamePattern, req, res, (channel, subscriptionId) => {
+                    this.producerService.openStream(channel, subscriptionId, req, res);
                     next();
                 }));
             }
@@ -87,10 +99,10 @@ class EventStreamMessageBrokerAdapter implements IMessageBrokerAdapter {
     }
 
     getChannelConsumer(channelNamePattern: string): IMessageChannelConsumer | undefined {
-        return this._getChannelConsumer && this._getChannelConsumer(channelNamePattern);
+        return this.consumerService.getMessageChannelConsumer(channelNamePattern);
     }
 
     getChannelProducer(channelName: string): IMessageChannelProducer | undefined {
-        return this._getChannelProducer && this._getChannelProducer(channelName);
+        return this.producerService.getMessageChannelProducer(channelName);
     }
 }

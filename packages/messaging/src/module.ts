@@ -1,6 +1,6 @@
-import { createConfig, IModule, IModuleInitializer, IServiceRegistration } from "@shrub/core";
+import { createConfig, IModule, IModuleInitializer, IServiceRegistration, SingletonServiceFactory } from "@shrub/core";
 import { LoggingModule } from "@shrub/logging";
-import { IMessageBrokerAdapter, IMessageService, MessageService } from "./service";
+import { IMessageBrokerAdapter, IMessageBrokerService, IMessageService, MessageService } from "./service";
 
 export const IMessagingConfiguration = createConfig<IMessagingConfiguration>();
 export interface IMessagingConfiguration {
@@ -14,11 +14,13 @@ export class MessagingModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(IMessagingConfiguration).register(({ services }) => ({
-            useMessageBroker: adapter => services.get(IMessageService).registerBroker(adapter)
+            useMessageBroker: adapter => services.get(IMessageBrokerService).registerBroker(adapter)
         }));
     }
 
     configureServices(registration: IServiceRegistration): void {
-        registration.register(IMessageService, MessageService);
+        const factory = new SingletonServiceFactory(MessageService);
+        registration.registerSingleton(IMessageService, factory);
+        registration.registerSingleton(IMessageBrokerService, factory);
     }
 }
