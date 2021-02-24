@@ -1,4 +1,4 @@
-import { createConfig, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration } from "@shrub/core";
+import { createConfig, IModule, IModuleConfiguration, IModuleConfigurator, IModuleInitializer, IServiceCollection, IServiceRegistration } from "@shrub/core";
 import { ExpressModule, IExpressConfiguration } from "@shrub/express";
 import { IMessageBrokerAdapter, IMessageChannelConsumer, IMessageChannelProducer, IMessagingConfiguration, MessagingModule } from "@shrub/messaging";
 import { PathParams } from "express-serve-static-core";
@@ -49,15 +49,10 @@ export class ExpressEventStreamModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(IExpressEventStreamConfiguration).register(({ config, services }) => {
-            this.broker = new EventStreamMessageBrokerAdapter(
-                config.get(IExpressConfiguration),
-                services.get(IEventStreamConsumerService),
-                services.get(IEventStreamProducerService)
-            );
-
+            const broker = this.getMessageBroker(config, services);
             return {
-                addConsumer: config => this.broker!.addConsumer(config),
-                useProducer: options => this.broker!.useProducer(options)
+                addConsumer: config => broker.addConsumer(config),
+                useProducer: options => broker.useProducer(options)
             };
         });
     }
@@ -67,8 +62,18 @@ export class ExpressEventStreamModule implements IModule {
         registration.register(IEventStreamProducerService, EventStreamProducerService);
     }
 
-    configure({ config }: IModuleConfigurator): void {
-        config.get(IMessagingConfiguration).useMessageBroker(this.broker!);
+    configure({ config, services }: IModuleConfigurator): void {
+        config.get(IMessagingConfiguration).useMessageBroker(this.getMessageBroker(config, services));
+    }
+
+    private getMessageBroker(config: IModuleConfiguration, services: IServiceCollection): EventStreamMessageBrokerAdapter {
+        this.broker = this.broker || new EventStreamMessageBrokerAdapter(
+            config.get(IExpressConfiguration),
+            services.get(IEventStreamConsumerService),
+            services.get(IEventStreamProducerService)
+        );
+
+        return this.broker;
     }
 }
 
