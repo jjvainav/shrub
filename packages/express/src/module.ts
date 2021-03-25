@@ -2,10 +2,19 @@ import express from "express";
 import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration, IServiceCollection } from "@shrub/core";
 import { HttpModule, IHttpModuleConfiguration, IHttpServer } from "@shrub/http";
 import { ControllerRequestService, IControllerRequestService } from "./internal";
-import { IRequestContext, IRequestContextService, RequestContextService } from "./request-context";
+import { 
+    IRequestContextBuilderCallback, IRequestContextBuilderRegistration, IRequestContextService, 
+    RequestContextBuilderRegistration, RequestContextService 
+} from "./request-context";
 
 export const IExpressConfiguration = createConfig<IExpressConfiguration>();
 export interface IExpressConfiguration extends express.Application {
+    /** 
+     * Registers a callback to use with the IRequestBuilder; the name of the builder is used
+     * as the name of the function that gets created on the IRequestBuilder and the callback
+     * is the function that will get invoked internally when called by an external user.
+     */
+    useRequestBuilder(name: string, callback: IRequestContextBuilderCallback): void;
 }
 
 export const IExpressApplication = createService<IExpressApplication>("express-application");
@@ -17,11 +26,12 @@ export class ExpressModule implements IModule {
     readonly dependencies = [HttpModule];
 
     initialize(init: IModuleInitializer): void {
-        init.config(IExpressConfiguration).register(({ services }) => services.get(IExpressApplication));
+        init.config(IExpressConfiguration).register(({ services }) => <IExpressConfiguration>services.get(IExpressApplication));
     }
 
     configureServices(registration: IServiceRegistration): void {
         registration.register(IControllerRequestService, ControllerRequestService);
+        registration.register(IRequestContextBuilderRegistration, RequestContextBuilderRegistration);
         registration.register(IRequestContextService, RequestContextService);
         registration.registerSingleton(IExpressApplication, {
             create: services => {
@@ -29,15 +39,24 @@ export class ExpressModule implements IModule {
                 this.overrideListen(services, app);
 
                 app.use((req, res, next) => {
-                    const context: IRequestContext = {
-                        bag: {},
-                        services
-                    };
-        
-                    (<any>req.context) = context;
-        
+                    const builder = services.get(IRequestContextService).getBuilder();
+
+                    Object.defineProperty(req, "context", {
+                        get() { return builder.instance(); }
+                    });
+
+                    Object.defineProperty(req, "contextBuilder", {
+                        get() { return builder; }
+                    });
+
                     next();
                 });
+
+                // the express app gets returned as the express configuration object so add the extended
+                // configuration functions to the express app here
+                (<IExpressConfiguration>(<any>app)).useRequestBuilder = (name, callback) => {
+                    services.get(IRequestContextBuilderRegistration).register(name, callback);
+                };
 
                 return app;
             }

@@ -10,7 +10,7 @@ function encode(obj: any): string {
 describe("session authentication", () => {
     test("authorize user from session", async () => {
         const authorization: IAuthorizationOptions = {};
-        const app = createTestApp([sessionAuthentication()], authorization);
+        const app = await createTestApp([sessionAuthentication()], authorization);
 
         session.values["identity"] = encode({
             claims: { id: "1", scope: "read" }
@@ -27,7 +27,7 @@ describe("session authentication", () => {
 
     test("unauthenticated request that redirects to login url without return to", async () => {
         const authorization: IAuthorizationOptions = {};
-        const app = createTestApp([sessionAuthentication({
+        const app = await createTestApp([sessionAuthentication({
             failureRedirectUrl: "http://localhost/login"
         })],
         authorization);
@@ -40,7 +40,7 @@ describe("session authentication", () => {
     
     test("unauthenticated request that redirects to login url with return to", async () => {
         const authorization: IAuthorizationOptions = {};
-        const app = createTestApp([sessionAuthentication({
+        const app = await createTestApp([sessionAuthentication({
             failureRedirectUrl: "http://localhost/login",
             returnToUrlKey: "return_to"
         })],
@@ -54,7 +54,7 @@ describe("session authentication", () => {
     
     test("unauthenticated request that redirects to login url with complex return to", async () => {
         const authorization: IAuthorizationOptions = {};
-        const app = createTestApp([sessionAuthentication({
+        const app = await createTestApp([sessionAuthentication({
             failureRedirectUrl: "http://localhost/login?state=1234",
             returnToUrlKey: "return_to"
         })],
@@ -73,7 +73,7 @@ describe("session authentication", () => {
                 v2: "bar"
             }
         };
-        const app = createTestApp([sessionAuthentication({
+        const app = await createTestApp([sessionAuthentication({
             failureRedirectUrl: "http://localhost/login",
             returnToUrlKey: "return_to"
         })],
@@ -92,7 +92,7 @@ describe("session authentication", () => {
                 v2: "bar"
             }
         };
-        const app = createTestApp([sessionAuthentication({
+        const app = await createTestApp([sessionAuthentication({
             failureRedirectUrl: "/login",
             returnToUrlKey: "return_to"
         })],
@@ -106,7 +106,7 @@ describe("session authentication", () => {
     
     test("log user into session", async () => {
         const authorization: IAuthorizationOptions = {};
-        const app = createTestApp([sessionAuthentication()], authorization);
+        const app = await createTestApp([sessionAuthentication()], authorization);
 
         // first log the user into a session using the login end-point
         const login = await request(app).post("/login?id=1&scope=read");
@@ -127,7 +127,7 @@ describe("session authentication", () => {
 
     test("log user out of session", async () => {
         const authorization: IAuthorizationOptions = {};
-        const app = createTestApp([sessionAuthentication({
+        const app = await createTestApp([sessionAuthentication({
             failureRedirectUrl: "http://localhost/login"
         })],
         authorization);

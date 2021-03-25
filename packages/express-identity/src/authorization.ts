@@ -16,8 +16,6 @@ export interface IAuthorizeContext {
 export interface IAuthorizationOptions {
     /** An optional set of parameters (or a request callback that returns parameters) that will get passed to the authentication handler challenging authorization. */
     readonly challengeParameters?: IChallengeParameters | ((req: Request) => IChallengeParameters);
-    /** The authentication schemes allowed for the authorized request; if not defined, all schemes are allowed. */
-    readonly schemes?: string[];
     /** 
      * An optional callback to verify and authorize the specified claims information. 
      * If omitted, the authorization middleware will only verify that a request is made by an authenticated user.
@@ -28,7 +26,6 @@ export interface IAuthorizationOptions {
 /** Route middleware for requests that require user authorization. If no options are provided the middleware will simply verify if the request has an authenticated user. */
 export function useAuthorization(verifyOrOptions?: AuthorizeCallback | IAuthorizationOptions): RequestHandler {
     let challengeParameters: IChallengeParameters | ((req: Request) => IChallengeParameters) | undefined;
-    let schemes: string[] | undefined;
     let verify: AuthorizeCallback | undefined;
 
     verifyOrOptions = verifyOrOptions || {};
@@ -37,7 +34,6 @@ export function useAuthorization(verifyOrOptions?: AuthorizeCallback | IAuthoriz
     }
     else {
         challengeParameters = verifyOrOptions.challengeParameters;
-        schemes = verifyOrOptions.schemes;
         verify = verifyOrOptions.verify;
     }
 
@@ -59,11 +55,7 @@ export function useAuthorization(verifyOrOptions?: AuthorizeCallback | IAuthoriz
         }
 
         if (!req.context.identity.isAuthenticated) {
-            return challenge(req, getChallengeParameters(req), schemes);
-        }
-
-        if (schemes && schemes.indexOf(req.context.identity.scheme!) === -1) {
-            return challenge(req, getChallengeParameters(req), schemes);
+            return req.context.identity.challenge(req, res, next, { parameters: getChallengeParameters(req) });
         }
 
         if (verify) {
@@ -72,7 +64,7 @@ export function useAuthorization(verifyOrOptions?: AuthorizeCallback | IAuthoriz
                     next();
                 }
                 else {
-                    req.context.identity!.deny();
+                    req.context.identity!.deny(req, res, next);
                 }
             });
         }
@@ -80,12 +72,4 @@ export function useAuthorization(verifyOrOptions?: AuthorizeCallback | IAuthoriz
             next();
         }
     };
-}
-
-function challenge(req: Request, challengeParameters?: IChallengeParameters, schemes?: string[]): void {
-    req.context.identity!.challenge({
-        parameters: challengeParameters,
-        // TODO: what if there are multiple schemes?
-        scheme: schemes && schemes.length ? schemes[0] : undefined,
-    });
 }

@@ -1,6 +1,7 @@
-import { IModule, IServiceRegistration } from "@shrub/core";
-import { ExpressModule } from "@shrub/express";
+import { IModule, IModuleConfigurator, IServiceRegistration } from "@shrub/core";
+import { ExpressModule, IExpressConfiguration } from "@shrub/express";
 import { TracingModule } from "@shrub/tracing";
+import { addSpanRequestBuilder } from "./middleware";
 import { ExpressTracingService, IExpressTracingService } from "./service";
 
 export class ExpressTracingModule implements IModule {
@@ -12,5 +13,9 @@ export class ExpressTracingModule implements IModule {
 
     configureServices(registration: IServiceRegistration): void {
         registration.register(IExpressTracingService, ExpressTracingService);
+    }
+
+    configure({ config }: IModuleConfigurator): void {
+        config.get(IExpressConfiguration).useRequestBuilder("addSpan", addSpanRequestBuilder);
     }
 }

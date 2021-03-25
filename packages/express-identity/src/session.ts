@@ -1,7 +1,7 @@
 import { Request } from "express";
 import createError from "http-errors";
 import url from "url";
-import { ChallengeResult, DenyResult, IAuthenticationHandler, IChallengeParameters } from "./authentication";
+import { IAuthenticationHandler, IChallengeParameters, IChallengeResult, IDenyResult } from "./authentication";
 
 /** Defines options for the session authentication handler. */
 export interface ISessionAuthenticationOptions {
@@ -11,7 +11,7 @@ export interface ISessionAuthenticationOptions {
     readonly failureRedirectUrl?: string;
     /** An optional query parameter key identifying the original request that was not authorized and will be passed to the failureRedirectUrl if one was specified. */
     readonly returnToUrlKey?: string;
-    /** The session key for the user's session; the default is 'identity'. */
+    /** The session key for the user's session; the default is 'claims'. */
     readonly sessionKey?: string;
     /** An optional function for serializing the claims object before saving it to a user session. */
     readonly serialize?: (claims: any) => any;
@@ -35,12 +35,12 @@ export function sessionAuthentication(options?: ISessionAuthenticationOptions): 
 
     return {
         scheme: "session",
-        authenticate: (req, result) => {
-            if (!req.context.session) {
+        authenticate: (context, result) => {
+            if (!context.session) {
                 return result.error(new Error("Session middleware not installed."));
             }
 
-            const session = decode<IIdentitySession>(<string>req.context.session!.values[key]);
+            const session = decode<IIdentitySession>(<string>context.session.values[key]);
             if (!session) {
                 return result.skip();
             }
@@ -54,25 +54,25 @@ export function sessionAuthentication(options?: ISessionAuthenticationOptions): 
         },
         challenge: (req, result, parameters) => tryChallengeRedirect(req, result, parameters || {}, options!),
         deny: (req, result) => tryRedirect(result, 403, options!.deniedRedirectUrl),
-        onLogin: (req, claims) => {
-            if (!req.context.session) {
+        onLogin: (context, claims) => {
+            if (!context.session) {
                 throw new Error("Session middleware not installed.");
             }
 
             const session: IIdentitySession = { claims: options!.serialize ? options!.serialize(claims) : claims };
-            req.context.session.values[key] = encode(session);
+            context.session.values[key] = encode(session);
         },
-        onLogout: req => {
-            if (!req.context.session) {
+        onLogout: context => {
+            if (!context.session) {
                 throw new Error("Session middleware not installed.");
             }
 
-            req.context.session.values[key] = undefined;
+            context.session.values[key] = undefined;
         }
     };
 }
 
-function tryChallengeRedirect(req: Request, result: ChallengeResult, parameters: IChallengeParameters, options: ISessionAuthenticationOptions): void {
+function tryChallengeRedirect(req: Request, result: IChallengeResult, parameters: IChallengeParameters, options: ISessionAuthenticationOptions): void {
     if (options.failureRedirectUrl) {
         // add the 'return to' url to the parameters if one does not exist already
         parameters = options.returnToUrlKey && !parameters[options.returnToUrlKey]
@@ -111,7 +111,7 @@ function tryChallengeRedirect(req: Request, result: ChallengeResult, parameters:
     return tryRedirect(result, 401, undefined);
 }
 
-function tryRedirect(result: ChallengeResult | DenyResult, status: number, url?: string): void {
+function tryRedirect(result: IChallengeResult | IDenyResult, status: number, url?: string): void {
     if (url) {
         result.redirect(url);
     }

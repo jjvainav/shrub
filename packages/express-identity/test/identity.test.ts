@@ -4,9 +4,9 @@ import { createTestApp, ITestResponse } from "./app";
 
 describe("identity", () => {
     test("identity middleware with authenticated user", async () => {
-        const app = createTestApp([{
+        const app = await createTestApp([{
             scheme: "test",
-            authenticate: (req, result) => result.success({ id: "1", scope: "read" })
+            authenticate: (context, result) => result.success({ id: "1", scope: "read" })
         }]);
 
         const response = await request(app).get("/test");
@@ -19,7 +19,7 @@ describe("identity", () => {
     });
 
     test("identity middleware with no authentication handlers", async () => {
-        const app = createTestApp([]);
+        const app = await createTestApp([]);
         const response = await request(app).get("/test");
 
         expect(response.status).toBe(200);
@@ -29,10 +29,10 @@ describe("identity", () => {
     });
 
     test("identity middleware with authentication handler that fails", async () => {
-        const app = createTestApp([{
+        const app = await createTestApp([{
             scheme: "test",
-            authenticate: (req, result) => result.fail("Testing"),
-            challenge: (req, result) => result.send(createError(400))
+            authenticate: (context, result) => result.fail("Testing"),
+            challenge: (context, result) => result.send(createError(400))
         }]);
 
         const response = await request(app).get("/test");
@@ -41,14 +41,14 @@ describe("identity", () => {
     });    
 
     test("identity middleware with multiple authentication handlers", async () => {
-        const app = createTestApp([
+        const app = await createTestApp([
             {
                 scheme: "foo",
-                authenticate: (req, result) => result.skip()
+                authenticate: (context, result) => result.skip()
             },
             {
                 scheme: "bar",
-                authenticate: (req, result) => result.success({ id: "1", scope: "read" })
+                authenticate: (context, result) => result.success({ id: "1", scope: "read" })
             }
         ]);
 
@@ -62,14 +62,14 @@ describe("identity", () => {
     });
 
     test("identity middleware with multiple authentication handlers that all succeed", async () => {
-        const app = createTestApp([
+        const app = await createTestApp([
             {
                 scheme: "foo",
-                authenticate: (req, result) => result.success({ id: "1", scope: "read" })
+                authenticate: (context, result) => result.success({ id: "1", scope: "read" })
             },
             {
                 scheme: "bar",
-                authenticate: (req, result) => result.success({ id: "2", scope: "write" })
+                authenticate: (context, result) => result.success({ id: "2", scope: "write" })
             }
         ]);
 
@@ -84,14 +84,14 @@ describe("identity", () => {
     });    
 
     test("identity middleware with multiple authentication handlers that all skip", async () => {
-        const app = createTestApp([
+        const app = await createTestApp([
             {
                 scheme: "foo",
-                authenticate: (req, result) => result.skip()
+                authenticate: (context, result) => result.skip()
             },
             {
                 scheme: "bar",
-                authenticate: (req, result) => result.skip()
+                authenticate: (context, result) => result.skip()
             }
         ]);
 

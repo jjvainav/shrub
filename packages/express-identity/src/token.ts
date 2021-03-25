@@ -1,10 +1,26 @@
+import { IRequestContext } from "@shrub/express";
+import { NextFunction, Request, Response } from "express";
 import createError, { HttpError } from "http-errors";
 import { IAuthenticationHandler } from "./authentication";
 
-/** Defines options for the token authentication handler. */
-export interface ITokenAuthenticationOptions {
+declare module "@shrub/express/dist/request-context" {
+    interface IRequestContext {
+        readonly token?: string;
+    }
+
+    interface IRequestContextBuilder {
+        addToken(token: string): IRequestContextBuilder;
+    }
+}
+
+/** Defines options for parsing the bearer token from a request. */
+export interface ITokenOptions {
     /** The parameter key to use when processing an access token from a query string or url-encoded body; the default is access_token. */
     readonly key?: string;
+}
+
+/** Defines options for the token authentication handler. */
+export interface ITokenAuthenticationOptions {
     /** An optional realm to include with the response header. */
     readonly realm?: string;
     /** Gets one or more scopes for the provided claims; this is used when denying an unauthenticated request. */
@@ -20,47 +36,62 @@ interface IAuthenticateHeaderOptions {
     readonly scope?: string | string[];
 }
 
-/** Bearer token authentication handler. https://tools.ietf.org/html/rfc6750 */
+/** @internal */
+export const addTokenRequestBuilder = (context: IRequestContext, token: string) => ({ ...context, token });
+
+/** @internal Express middleware for parsing bearer tokens for a request. */
+export const tokenMiddleware = (options: ITokenOptions) => (req: Request, res: Response, next: NextFunction) => {
+    // TODO: the OAuth Bearer Token spec allows the token to be sent via header, body, or query but we are only going to support header for now
+    // https://tools.ietf.org/html/rfc6750#section-2
+
+    if (req.headers) {
+        const key = options.key || "access_token";
+        let token: string | undefined;
+
+        if (req.headers.authorization) {
+            const match = req.headers.authorization.match(/^Bearer\s(.*)$/);
+            if (match) {
+                token = match[1];
+            }
+        }
+
+        if (req.headers["content-type"] === "application/x-www-form-urlencoded" && req.body && req.body[key]) {
+            if (token) {
+                return next(invalidRequest("Multiple access tokens found."));
+            }
+
+            token = req.body[key];
+        }
+
+        if (req.query && req.query[key]) {
+            if (token) {
+                return next(invalidRequest("Multiple access tokens found."));
+            }
+
+            if (typeof req.query[key] === "string") {
+                token = <string>req.query[key];
+            }
+        }
+
+        if (token) {
+            req.contextBuilder.addToken(token);
+        }
+    }
+
+    next();
+};
+
+/** 
+ * Bearer token authentication handler. https://tools.ietf.org/html/rfc6750 
+ * Note: tokenMiddleware must also be used if this is intended to be used in the express middleware pipeline.
+ */
 export function tokenAuthentication(options: ITokenAuthenticationOptions): IAuthenticationHandler {
     return {
         scheme: "bearer-token",
-        authenticate: (req, result) => {
-            const key = options.key || "access_token";
-            let token: string | undefined;
-
-            // TODO: the OAuth Bearer Token spec allows the token to be sent via header, body, or query but we are only going to support header for now
-            // https://tools.ietf.org/html/rfc6750#section-2
-
-            if (req.headers) {
-                if (req.headers.authorization) {
-                    const match = req.headers.authorization.match(/^Bearer\s(.*)$/);
-                    if (match) {
-                        token = match[1];
-                    }
-                }
-
-                if (req.headers["content-type"] === "application/x-www-form-urlencoded" && req.body && req.body[key]) {
-                    if (token) {
-                        return result.error(invalidRequest("Multiple access tokens found."));
-                    }
-    
-                    token = req.body[key];
-                }
-
-                if (req.query && req.query[key]) {
-                    if (token) {
-                        return result.error(invalidRequest("Multiple access tokens found."));
-                    }
-        
-                    if (typeof req.query[key] === "string") {
-                        token = <string>req.query[key];
-                    }
-                }
-            }
-    
-            if (token) {
+        authenticate: (context, result) => {
+            if (context.token) {
                 options.verifyToken(
-                    token,
+                    context.token,
                     claims => result.success(claims),
                     reason => result.fail(reason));
             }

@@ -1,3 +1,4 @@
+import { IRequestContext } from "@shrub/express";
 import { Request } from "express";
 import { HttpError } from "http-errors";
 
@@ -12,7 +13,11 @@ export type AuthenticationVerifyResult = {
     readonly skip: () => void;
 };
 
-export type ChallengeResult = {
+export interface IChallengeParameters {
+    readonly [key: string]: string | number | boolean;
+}
+
+export interface IChallengeResult {
     /** Redirects the user to the specified url. */
     readonly redirect: (url: string) => void;
     /** Sends the specified HTTP error. */
@@ -21,7 +26,7 @@ export type ChallengeResult = {
     readonly error: (err: Error) => void;
 };
 
-export type DenyResult = {
+export interface IDenyResult {
     /** Redirects the user to the specified url. */
     readonly redirect: (url: string) => void;
     /** Sends the specified HTTP error. */
@@ -30,34 +35,30 @@ export type DenyResult = {
     readonly error: (err: Error) => void;
 };
 
-export interface IChallengeParameters {
-    readonly [key: string]: string | number | boolean;
-}
-
 /** An observer for the authentication login/logout events. */
 export interface IAuthenticationObserver {
     /** Gets invoked when a user has logged in. */
-    readonly onLogin?: (req: Request, claims: any) => void;
+    readonly onLogin?: (context: IRequestContext, claims: any) => void;
     /** Gets invoked when a user has logged out. */
-    readonly onLogout?: (req: Request, claims: any) => void;
+    readonly onLogout?: (context: IRequestContext, claims: any) => void;
 }
 
 /** Handles authenticating a request. */
 export interface IAuthenticationHandler extends IAuthenticationObserver {
     /** The default scheme name for the authentication handler. */
     readonly scheme: string;
-    /** Authenticates the current response. */
-    readonly authenticate: (req: Request, result: AuthenticationVerifyResult) => void;
+    /** Authenticates the current request. */
+    readonly authenticate: (context: IRequestContext, result: AuthenticationVerifyResult) => void;
     /** 
      * Challenges the current authentication scheme. 
      * This is typically invoked when a request requires a user to be authenticated using this scheme.
      * If not defined, the default is to send a 401 status.
      */
-    readonly challenge?: (req: Request, result: ChallengeResult, parameters?: IChallengeParameters, message?: string) => void;
+    readonly challenge?: (req: Request, result: IChallengeResult, parameters?: IChallengeParameters, message?: string) => void;
     /** 
      * Denies access for the current user. 
      * This is invoked when a user has been authenticated using this scheme but failed authorization.
      * If not defined, the default is to send a 403 status.
      */
-    readonly deny?: (req: Request, result: DenyResult) => void;
+    readonly deny?: (req: Request, result: IDenyResult) => void;
 }

@@ -7,9 +7,9 @@ describe("authorization", () => {
         // pass an empty authorization options so that the createTestApp function will inject the
         // useAuthorization route middleware - by default this will simply ensure a user has been authenticated
         const authorization: IAuthorizationOptions = {};
-        const app = createTestApp([{
+        const app = await createTestApp([{
             scheme: "test",
-            authenticate: (req, result) => result.success({ id: "1", scope: "read" })
+            authenticate: (context, result) => result.success({ id: "1", scope: "read" })
         }],
         authorization);
 
@@ -22,9 +22,9 @@ describe("authorization", () => {
         const authorization: IAuthorizationOptions = {
             verify: context => Promise.resolve(context.claims.scope === "read")
         };
-        const app = createTestApp([{
+        const app = await createTestApp([{
             scheme: "test",
-            authenticate: (req, result) => result.success({ id: "1", scope: "read" })
+            authenticate: (context, result) => result.success({ id: "1", scope: "read" })
         }],
         authorization);
 
@@ -37,9 +37,9 @@ describe("authorization", () => {
         const authorization: IAuthorizationOptions = {
             verify: context => Promise.resolve(context.claims.scope === "write")
         };
-        const app = createTestApp([{
+        const app = await createTestApp([{
             scheme: "test",
-            authenticate: (req, result) => result.success({ id: "1", scope: "read" })
+            authenticate: (context, result) => result.success({ id: "1", scope: "read" })
         }],
         authorization);
 
@@ -50,9 +50,9 @@ describe("authorization", () => {
 
     test("unauthenticated request should fail authorization", async () => {
         const authorization: IAuthorizationOptions = {};
-        const app = createTestApp([{
+        const app = await createTestApp([{
             scheme: "test",
-            authenticate: (req, result) => result.skip()
+            authenticate: (context, result) => result.skip()
         }],
         authorization);
 

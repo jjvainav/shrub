@@ -1,4 +1,4 @@
-import "@shrub/express/dist/request-context";
+import { IRequestContext } from "@shrub/express";
 import { ISpan } from "@shrub/tracing";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IExpressTracingService, IRequestTracingOptions } from "./service";
@@ -7,9 +7,16 @@ declare module "@shrub/express/dist/request-context" {
     interface IRequestContext {
         readonly span?: ISpan;
     }
+
+    interface IRequestContextBuilder {
+        addSpan(span: ISpan): IRequestContextBuilder;
+    }
 }
 
 attachErrorListener();
+
+/** @internal */
+export const addSpanRequestBuilder = (context: IRequestContext, span: ISpan) => ({ ...context, span });
 
 /** Request tracing middleware that will start a new span for a request. */
 export const useRequestTracing = (options?: IRequestTracingOptions): RequestHandler => {
@@ -20,7 +27,7 @@ export const useRequestTracing = (options?: IRequestTracingOptions): RequestHand
         }
 
         const span = service.startSpan(req, options);
-        (<any>req.context).span = span;
+        req.contextBuilder.addSpan(span);
 
         // if a request connection is 'keep-alive' the response will never finish;
         // so instead, listen for the close event for when the connection has been closed
