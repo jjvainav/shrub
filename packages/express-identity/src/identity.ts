@@ -33,7 +33,7 @@ export interface IIdentity {
     /** Indicates if the current request has an authenticated user; if not defined, then the current request has not yet been authenticated. */
     readonly isAuthenticated?: boolean;
     /** Authenticates the current request. */
-    authenticate(): IAuthenticateResult;
+    authenticate(): Promise<IAuthenticateResult>;
     /** Challenges the current authentication scheme. This is intended to be used inside express middleware. */
     challenge(req: Request, res: Response, next: NextFunction, options?: IChallengeOptions): void;
     /** Denies access for the current user. This is intended to be used inside express middleware. */
@@ -85,48 +85,58 @@ export const addIdentityRequestBuilder = (context: IRequestContext, options: IId
         get scheme(): any {
             return scheme;
         },
-        authenticate(): IAuthenticateResult {
+        authenticate(): Promise<IAuthenticateResult> {
             if (options.authenticationHandlers.length) {
-                // index for the current authentication handler
-                let index = 0;
-                const verifyResult: AuthenticationVerifyResult = {
-                    success: c => {
-                        if (result) { throw new Error("Authentication processing is already done."); }
-                        if (!c) { throw new Error("claims required"); }
-        
-                        scheme = options.authenticationHandlers[index].scheme;
-                        claims = c;
-        
-                        result = { isAuthenticated: true };
-                    },
-                    fail: message => {
-                        if (result) { throw new Error("Authentication processing is already done."); }
+                return new Promise<IAuthenticateResult>(resolve => {
+                    // index for the current authentication handler
+                    let index = 0;
+                    const verifyResult: AuthenticationVerifyResult = {
+                        success: c => {
+                            if (result) { throw new Error("Authentication processing is already done."); }
+                            if (!c) { throw new Error("claims required"); }
+            
+                            scheme = options.authenticationHandlers[index].scheme;
+                            claims = c;
+            
+                            result = { isAuthenticated: true };
+                            resolve(result);
+                        },
+                        fail: message => {
+                            if (result) { throw new Error("Authentication processing is already done."); }
 
-                        scheme = options.authenticationHandlers[index].scheme;
-                        result = { handler: options.authenticationHandlers[index], isChallenged: true, message };
-                    },
-                    error: error => {
-                        if (result) { throw new Error("Authentication processing is already done."); }
-                        result = { error };
-                    },
-                    skip: () => {
-                        if (result) { throw new Error("Authentication processing is already done."); }
-        
-                        index++;
-                        if (options.authenticationHandlers.length > index) {
-                            options.authenticationHandlers[index].authenticate(context, verifyResult);
+                            scheme = options.authenticationHandlers[index].scheme;
+                            result = { handler: options.authenticationHandlers[index], isChallenged: true, message };
+                            resolve(result);
+                        },
+                        error: error => {
+                            if (result) { throw new Error("Authentication processing is already done."); }
+                            result = { error };
+                            resolve(result);
+                        },
+                        skip: () => {
+                            if (result) { throw new Error("Authentication processing is already done."); }
+            
+                            index++;
+                            if (options.authenticationHandlers.length > index) {
+                                options.authenticationHandlers[index].authenticate(context, verifyResult);
+                            }
+                            else {
+                                result = { isAuthenticated: false };
+                                resolve(result);
+                            }
                         }
-                    }
-                };
-        
-                // this will initiate the first authentication handler; each handler is expected
-                // to invoke one of the result functions and if the handler wants to ignore or pass
-                // the request to the next handler it should invoke 'skip'
-                options.authenticationHandlers[index].authenticate(context, verifyResult);
+                    };
+            
+                    // this will initiate the first authentication handler; each handler is expected
+                    // to invoke one of the result functions and if the handler wants to ignore or pass
+                    // the request to the next handler it should invoke 'skip'
+                    options.authenticationHandlers[index].authenticate(context, verifyResult);
+                });
             }
+            
 
-            result = result || { isAuthenticated: false };
-            return result;
+            result = { isAuthenticated: false };
+            return Promise.resolve(result);
         },
         challenge: function(req: Request, res: Response, next: NextFunction, options?: IChallengeOptions) {
             const scheme = options && options.scheme || this.scheme;
@@ -186,17 +196,18 @@ export const addIdentityRequestBuilder = (context: IRequestContext, options: IId
 /** @internal Identity middleware for adding the identity and authenticating the current request. */
 export const identityMiddleware = (options: IIdentityOptions) => (req: Request, res: Response, next: NextFunction) => {
     const identity = req.contextBuilder.addIdentity(options).instance().identity!;
-    const result = identity.authenticate();
-
-    if (result.isChallenged) {
-        identity.challenge(req, res, next);
-    }
-    else if (result.isDenied) {
-        identity.deny(req, res, next);
-    }
-    else {
-        next(result.error);
-    }
+    identity.authenticate().then(result => {
+        if (result.isChallenged) {
+            identity.challenge(req, res, next);
+        }
+        else if (result.isDenied) {
+            identity.deny(req, res, next);
+        }
+        else {
+            next(result.error);
+        }
+    })
+    .catch(err => next(err));
 };
 
 function on<TFunction extends Function>(
