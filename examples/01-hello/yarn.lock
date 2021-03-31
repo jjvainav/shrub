@@ -2,26 +2,26 @@
 # yarn lockfile v1
 
 
-"@shrub/core@0.3.3", "@shrub/core@^0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.3.3.tgz#08007787339e4e703eb4d4661957beb611f4d032"
-  integrity sha512-BfkYiLQqhl/EtqqxbcXlrbqoTKIG/Gk3ShMmSKxeRwYlK3R3jiLCicRCp4a9xwW0r9xUKB+2gIlDGFnt98p+5Q==
+"@shrub/core@0.4.95", "@shrub/core@^0.4.90":
+  version "0.4.95"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.4.95.tgz#549e09910db7dc51e139ac9ec77dff7f6dd0004e"
+  integrity sha512-lhjXEar8a1/c8V1GuZ5WyPDPrE/CUoAbt269SDhpNEgBR+3vfpRWxg7j7u8XMOvWtxz/53cqF3STOnkdeLB3bA==
 
-"@shrub/express@^0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.3.3.tgz#30752daf6f0b0000f22e99c2f9d8b287ef0406d8"
-  integrity sha512-Q9KssjgKCQu04zOrqMXG07RB51LnySIVwTT2JQYJxiRlCHdKkpRjPx6T5DqEE2xSAE8n+tneDTq1SwFOWmLAJQ==
+"@shrub/express@^0.4.90":
+  version "0.4.95"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.4.95.tgz#7f5d33e317921d606969eef231a73421bada78e3"
+  integrity sha512-5C/GUl3pztd3wN2ujafqHJyhKf1oLf1c3sq5oBiet0DkDbaP/erI8aYaPKTF7+7K0lijEqX+cUol0ha9KyJwUg==
   dependencies:
-    "@shrub/core" "0.3.3"
-    "@shrub/http" "0.3.3"
+    "@shrub/core" "0.4.95"
+    "@shrub/http" "0.4.95"
     express "^4.17.1"
 
-"@shrub/http@0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.3.3.tgz#f12e25fae35a4acc9cda437896aaa0159f0b71b2"
-  integrity sha512-ZWBDYrPV/BmKaTUcf86+GpAoUl1DabrtXn43g249V8K8DqWXwcGhxZ10g5bXVThDVK5ATjzchIMB+1bc2ZZ2RQ==
+"@shrub/http@0.4.95":
+  version "0.4.95"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.4.95.tgz#762c32db91a8b5c09d07cb89050e20047df305d3"
+  integrity sha512-8CNLYt1BNKmWGrUdRxVWXaGe45ejNN7s2JShX4Wq9Mb7OGux5X/+ScutDXGn/ITqDPP2s/4uKPwSsmVytEmwUg==
   dependencies:
-    "@shrub/core" "0.3.3"
+    "@shrub/core" "0.4.95"
 
 "@types/body-parser@*":
   version "1.17.1"
@@ -765,9 +765,9 @@ xtend@~4.0.1:
   integrity sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==
 
 y18n@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/y18n/-/y18n-4.0.0.tgz#95ef94f85ecc81d007c264e190a120f0a3c8566b"
-  integrity sha512-r9S/ZyXu/Xu9q1tYlpsLIsa3EeLXXk0VwlxqTcFRfg9EhMW+17kbt9G0NrgCmhGb5vT2hyhJZLfDGx+7+5Uj/w==
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/y18n/-/y18n-4.0.1.tgz#8db2b83c31c5d75099bb890b23f3094891e247d4"
+  integrity sha512-wNcy4NvjMYL8gogWWYAO7ZFWFfHcbdbE57tZO8e4cbpj8tfUcwrwqSl3ad8HxpYWCdXcJUCeKKZS62Av1affwQ==
 
 yargs-parser@^13.1.1:
   version "13.1.1"
