@@ -10,12 +10,12 @@
         "start": "node dist/server.js"
     },
     "dependencies": {
-        "@shrub/core": "^0.5.1",
-        "@shrub/express": "^0.5.1",
-        "@shrub/express-event-stream": "^0.5.1",
-        "@shrub/express-tracing": "^0.5.1",
-        "@shrub/messaging": "^0.5.1",
-        "@shrub/tracing-console": "^0.5.1",
+        "@shrub/core": "^0.5.2",
+        "@shrub/express": "^0.5.2",
+        "@shrub/express-event-stream": "^0.5.2",
+        "@shrub/express-tracing": "^0.5.2",
+        "@shrub/messaging": "^0.5.2",
+        "@shrub/tracing-console": "^0.5.2",
         "@sprig/request-client": "^0.1.53",
         "@sprig/request-client-events": "^0.1.53",
         "@sprig/unique-id": "^0.1.53",
