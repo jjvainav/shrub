@@ -41,11 +41,17 @@ export class ExpressModule implements IModule {
                 app.use((req, res, next) => {
                     const builder = services.get(IRequestContextService).getBuilder();
 
+                    // note: these properties need to be configurable to support express sub apps
+                    // when loading a set of modules as an independent sub app the root app will
+                    // have defined a context on the request but for sub apps we need to overwrite
+                    // it using the context configured for this specific domain
                     Object.defineProperty(req, "context", {
+                        configurable: true,
                         get() { return builder.instance(); }
                     });
 
                     Object.defineProperty(req, "contextBuilder", {
+                        configurable: true,
                         get() { return builder; }
                     });
 

@@ -2,26 +2,26 @@
 # yarn lockfile v1
 
 
-"@shrub/core@0.3.3", "@shrub/core@^0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.3.3.tgz#08007787339e4e703eb4d4661957beb611f4d032"
-  integrity sha512-BfkYiLQqhl/EtqqxbcXlrbqoTKIG/Gk3ShMmSKxeRwYlK3R3jiLCicRCp4a9xwW0r9xUKB+2gIlDGFnt98p+5Q==
+"@shrub/core@0.5.1", "@shrub/core@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.1.tgz#0003ac2f238cc4ca192f71f5b629fb49c129e350"
+  integrity sha512-ZNyIHrICAZWLR2V12/lN4m2av3K7wMhHWdIY/csE2yFZZ8jTPAkFbNmZhr5lOOmU52r0D2Hz0ievyXxbrhftiw==
 
-"@shrub/express@^0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.3.3.tgz#30752daf6f0b0000f22e99c2f9d8b287ef0406d8"
-  integrity sha512-Q9KssjgKCQu04zOrqMXG07RB51LnySIVwTT2JQYJxiRlCHdKkpRjPx6T5DqEE2xSAE8n+tneDTq1SwFOWmLAJQ==
+"@shrub/express@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.1.tgz#5304a1f908b5172f293e47e0b52e1dbdcc9ee112"
+  integrity sha512-E3BYYV+cDQEWYHeh8gtkxLRQm7cnKmBpAuXpa9gRHQ6ROB2EhNzS8BgkwNTJvsOXl/l/tJ+mNfu9/XdfrewAYw==
   dependencies:
-    "@shrub/core" "0.3.3"
-    "@shrub/http" "0.3.3"
+    "@shrub/core" "0.5.1"
+    "@shrub/http" "0.5.1"
     express "^4.17.1"
 
-"@shrub/http@0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.3.3.tgz#f12e25fae35a4acc9cda437896aaa0159f0b71b2"
-  integrity sha512-ZWBDYrPV/BmKaTUcf86+GpAoUl1DabrtXn43g249V8K8DqWXwcGhxZ10g5bXVThDVK5ATjzchIMB+1bc2ZZ2RQ==
+"@shrub/http@0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.1.tgz#0a619d95384cafa7f78c6e60b84923faf5115531"
+  integrity sha512-SGx6ZT3vOm/CYIINpk/pvTsp2w2uZ4pL0LqRV2PKU/Wolt4z7FvMg/LH4x61FQ6inlzld2dNgH45A0sDURmo/A==
   dependencies:
-    "@shrub/core" "0.3.3"
+    "@shrub/core" "0.5.1"
 
 "@types/body-parser@*":
   version "1.17.1"
@@ -719,6 +719,11 @@ type-is@~1.6.17, type-is@~1.6.18:
   dependencies:
     media-typer "0.3.0"
     mime-types "~2.1.24"
+
+typescript@^3.9.5:
+  version "3.9.9"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.9.tgz#e69905c54bc0681d0518bd4d587cc6f2d0b1a674"
+  integrity sha512-kdMjTiekY+z/ubJCATUPlRDl39vXYiMV9iyeMuEuXZh2we6zz80uovNN2WlAxmmdE/Z/YQe+EbOEXB5RHEED3w==
 
 unpipe@1.0.0, unpipe@~1.0.0:
   version "1.0.0"

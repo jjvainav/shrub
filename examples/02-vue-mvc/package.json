@@ -10,9 +10,9 @@
         "start": "node dist/server.js"
     },
     "dependencies": {
-        "@shrub/core": "^0.4.90",
-        "@shrub/express": "^0.4.90",
-        "@shrub/vue": "^0.4.90",
+        "@shrub/core": "^0.5.1",
+        "@shrub/express": "^0.5.1",
+        "@shrub/vue": "^0.5.1",
         "express": "^4.16.4",
         "vue": "^2.6.10"
     },
@@ -21,6 +21,7 @@
         "css-loader": "^2.1.1",
         "html-webpack-plugin": "^3.2.0",
         "rimraf": "^2.6.3",
+        "typescript": "^3.9.5",
         "vue-loader": "^15.7.1",
         "webpack": "^4.28.4",
         "webpack-cli": "^3.2.1"
