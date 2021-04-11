@@ -27,6 +27,6 @@
         "@shrub/core": "0.5.2",
         "@shrub/logging": "0.5.2",
         "@shrub/tracing": "0.5.2",
-        "@sprig/request-client": "^0.1.53"
+        "@sprig/request-client": "^0.1.54"
     }
 }

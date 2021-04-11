@@ -1,4 +1,4 @@
-import { createRouteDecorator } from "@shrub/express";
+import { createRouteDecorator, IRequestContext } from "@shrub/express";
 import { isChannelNameMatch } from "@shrub/messaging";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import { Request, RequestHandler, Response } from "express";
@@ -11,6 +11,11 @@ declare module "@shrub/express/dist/request-context" {
         readonly eventStream?: IEventStream;
         /** Provides access to the event-stream channel for messaging consumers subscribed to endpoints using the EventStreamChannel decorator. */
         readonly eventStreamChannel?: IEventStreamChannel;
+    }
+
+    interface IRequestContextBuilder {
+        addEventStream(eventStream: IEventStream): IRequestContextBuilder;
+        addEventStreamChannel(eventStreamChannel: IEventStreamChannel): IRequestContextBuilder;
     }
 }
 
@@ -52,6 +57,12 @@ export interface IEventStreamChannelOptions {
     readonly handlers?: RequestHandler[];
 }
 
+/** @internal */
+export const addEventStreamRequestBuilder = (context: IRequestContext, eventStream: IEventStream) => ({ ...context, eventStream });
+
+/** @internal */
+export const addEventStreamChannelRequestBuilder = (context: IRequestContext, eventStreamChannel: IEventStreamChannel) => ({ ...context, eventStreamChannel });
+
 /** 
  * A controller function decorator that will open an event-stream with the requesting client. The server
  * can interact with the client via the req.context.eventStream objects that will be injected for the route.
@@ -62,7 +73,8 @@ export interface IEventStreamChannelOptions {
 export function EventStream(path: PathParams, ...handlers: RequestHandler[]): (target: any, propertyKey: string) => void {
     return createRouteDecorator((router, handler) => router.get(path, ...handlers, (req, res, next) => {
         const eventStream = new EventStreamImplementation(req, res);
-        (<any>req.context).eventStream = eventStream;
+        req.contextBuilder.addEventStream(eventStream);
+
         handler(req, res, (err?: any) => {
             if (!err && !eventStream.isOpen()) {
                 eventStream.open();
@@ -99,7 +111,8 @@ export function EventStreamChannel(path: PathParams, optionsOrProducerChannelPat
     return createRouteDecorator((router, handler) => router.get(path, ...handlers, (req, res, next) => {
         validateConsumerParams(options && options.producerChannelPattern, req, res, (channel, subscriptionId) => {
             const eventStreamChannel = new EventStreamChannelImplementation(req.context.services.get(IEventStreamProducerService), req, res, channel, subscriptionId);
-            (<any>req.context).eventStreamChannel = eventStreamChannel;
+            req.contextBuilder.addEventStreamChannel(eventStreamChannel);
+            
             handler(req, res, (err?: any) => {
                 if (!err && !eventStreamChannel.isOpen()) {
                     eventStreamChannel.open();

@@ -1,10 +1,15 @@
-import "@shrub/express/dist/request-context";
+import { IRequestContext } from "@shrub/express";
 import Cookies from "cookies";
-import { Request, RequestHandler } from "express";
+import { RequestHandler } from "express";
 
 declare module "@shrub/express/dist/request-context" {
     interface IRequestContext {
         readonly cookies?: ICookies;
+    }
+
+    interface IRequestContextBuilder {
+        /** Adds cookies to the request context for the specified express request. */
+        addCookies(cookies: Cookies): IRequestContextBuilder;
     }
 }
 
@@ -36,20 +41,27 @@ export interface IGetCookieOptions {
     readonly signed?: boolean;
 }
 
-export const cookies: RequestHandler = (req, res, next) => {
+/** @internal */
+export const addCookiesRequestBuilder = (context: IRequestContext, cookies: Cookies) => {
     const instance: ICookies = {
         get: (name, options) => {
-            const value = (<Cookies>req.cookies).get(name, {
+            const value = cookies.get(name, {
                 signed: options.signed || true
             });
     
-            const cookie = new Cookie(req, name, value);
+            const cookie = new Cookie(cookies, name, value);
             cookie.options.signed = options.signed;
             return cookie;
         }
     };
 
-    (<any>req.context.cookies) = instance;
+    context = <IRequestContext>{ ...context, cookies: instance };
+
+    return context;
+};
+
+export const cookies: RequestHandler = (req, res, next) => {
+    req.contextBuilder.addCookies(<Cookies>req.cookies);
     next();
 };
 
@@ -67,7 +79,7 @@ class Cookie implements ICookie {
     };
 
     constructor(
-        private readonly request: Request, 
+        private readonly cookies: Cookies, 
         readonly name: string,
         private _value?: string) {
     }
@@ -88,10 +100,10 @@ class Cookie implements ICookie {
 
         // if the value is empty delete the cookie
         if (!this._value) {
-            (<Cookies>this.request.cookies).set(this.name, this.getCookieOptionsForDelete());    
+            this.cookies.set(this.name, this.getCookieOptionsForDelete());    
         }
         else {
-            (<Cookies>this.request.cookies).set(this.name, this._value, this.getCookieOptions()); 
+            this.cookies.set(this.name, this._value, this.getCookieOptions()); 
         }
     }
 

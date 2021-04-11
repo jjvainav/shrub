@@ -1,10 +1,3 @@
-declare module "@shrub/express/dist/request-context" {
-    interface IRequestContext {
-        /** Session state for the request if session state is available. */
-        readonly session?: ISession;
-    }
-}
-
 export interface ISession {
     /** 
      * The maximum age for the session expressed as the number of milliseconds from the current time, or undefined if the session context does not expire. 

@@ -3,7 +3,7 @@ import { ExpressModule, IExpressConfiguration } from "@shrub/express";
 import { ExpressCookiesModule } from "@shrub/express-cookies";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ICookieSessionOptions } from "./cookie-session";
-import { cookieSession } from "./middleware";
+import { addCookieSessionRequestBuilder, cookieSession } from "./middleware";
 
 export const IExpressSessionConfiguration = createConfig<IExpressSessionConfiguration>();
 export interface IExpressSessionConfiguration {
@@ -38,6 +38,7 @@ export class ExpressSessionModule implements IModule {
     }
 
     configure({ config }: IModuleConfigurator): void {
+        config.get(IExpressConfiguration).useRequestBuilder("addCookieSession", addCookieSessionRequestBuilder);
         config.get(IExpressConfiguration).use((req: Request, res: Response, next: NextFunction) => {
             return this.middleware ? this.middleware(req, res, next) : next();
         });

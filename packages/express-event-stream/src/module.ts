@@ -2,7 +2,7 @@ import { createConfig, IModule, IModuleConfiguration, IModuleConfigurator, IModu
 import { ExpressModule, IExpressConfiguration } from "@shrub/express";
 import { IMessageBrokerAdapter, IMessageChannelConsumer, IMessageChannelProducer, IMessagingConfiguration, MessagingModule } from "@shrub/messaging";
 import { PathParams } from "express-serve-static-core";
-import { validateConsumerParams } from "./middleware";
+import { addEventStreamChannelRequestBuilder, addEventStreamRequestBuilder, validateConsumerParams } from "./middleware";
 import { EventStreamConsumerService, IEventStreamConsumerConfiguration, IEventStreamConsumerService } from "./services/consumer";
 import { EventStreamProducerService, IEventStreamProducerService } from "./services/producer";
 
@@ -63,6 +63,9 @@ export class ExpressEventStreamModule implements IModule {
     }
 
     configure({ config, services }: IModuleConfigurator): void {
+        config.get(IExpressConfiguration).useRequestBuilder("addEventStream", addEventStreamRequestBuilder);
+        config.get(IExpressConfiguration).useRequestBuilder("addEventStreamChannel", addEventStreamChannelRequestBuilder);
+
         config.get(IMessagingConfiguration).useMessageBroker(this.getMessageBroker(config, services));
     }
 
