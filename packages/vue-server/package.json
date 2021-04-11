@@ -1,7 +1,7 @@
 {
     "name": "@shrub/vue-server",
     "description": "A module that extends the Vue module for server-side rendering support.",
-    "version": "0.5.2",
+    "version": "0.5.3",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -31,9 +31,9 @@
         "vue-server-renderer": "^2.6.10"
     },
     "devDependencies": {
-        "@shrub/core": "0.5.2",
-        "@shrub/model": "0.5.2",
-        "@shrub/vue": "0.5.2",
+        "@shrub/core": "0.5.3",
+        "@shrub/model": "0.5.3",
+        "@shrub/vue": "0.5.3",
         "@sprig/serialization": "0.1.54"
     }
 }
