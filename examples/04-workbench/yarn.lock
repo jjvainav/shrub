@@ -819,72 +819,72 @@
     once "^1.4.0"
     universal-user-agent "^4.0.0"
 
-"@shrub/core@0.5.2", "@shrub/core@^0.5.2":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.2.tgz#3f24b62c0ff8f4734804843dd7949a28b1689dce"
-  integrity sha512-xzaH/roTRwo9wuADCGg8UpjdEJMew/zVa/BIu7rfvDOjsTaeOkyvJYpidaapnMPXH8MXu6uMFwVbNQ4DonNKCw==
+"@shrub/core@0.5.3", "@shrub/core@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.3.tgz#9fd111771ec5618bbdf6d8398123e2d3acbddf03"
+  integrity sha512-58mZl+ZWI3dZk35iuirbE4s0kzvEAT2fud5vWBPpkgZprvH0swmicW79KZngmGxfMVeXTRsWFr5jk9MJSn7mrg==
 
-"@shrub/express@^0.5.2":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.2.tgz#be476206398e73ada6f8a11a962e9a070f82cf99"
-  integrity sha512-QnkCp1KAqyNI9SJTHDG9yOdVIiT905CVVQvY7JLCjRLpRXneS6GdWgYCzr3DkTqIKNRNhFR9q+PDMca/Hy+UbA==
+"@shrub/express@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.3.tgz#49b68ab2756babcf6e9da2fd8c217512d82aae47"
+  integrity sha512-Zd3GR0IyAtMtDRwcaPZZmqGL+zh2tKCMIv6Eczon69bkadLwauENDEhNITM6PiEFfklASWXnYBqQSAe7hHIGKg==
   dependencies:
-    "@shrub/core" "0.5.2"
-    "@shrub/http" "0.5.2"
+    "@shrub/core" "0.5.3"
+    "@shrub/http" "0.5.3"
     express "^4.17.1"
 
-"@shrub/http@0.5.2":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.2.tgz#4bbfca9bd62e1289440af299908a57c9ccd91b41"
-  integrity sha512-b8hz75I4Sy6DZq/3h5gI+0xeltph27gGDNggXSzrqraHU/tNQcRcXvrK8Cm7TpvYC+55EuorWONCAdCt/L/Bdw==
+"@shrub/http@0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.3.tgz#6c704a1685cfb107c56ea1d20549e21da36147d6"
+  integrity sha512-fJAF7xWQarWr3T40i4EyUZgMmsYiTE6wHU8D0RCo12u+AIcdITLZyesyMRJSCRuQ1J282pegChAC+JYwsIEc/w==
   dependencies:
-    "@shrub/core" "0.5.2"
+    "@shrub/core" "0.5.3"
 
-"@shrub/model@0.5.2", "@shrub/model@^0.5.2":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.5.2.tgz#f15432a12457d86739788b5b01368002e4b27332"
-  integrity sha512-oWag/Ki0spHipIB/dZXVn+4aba/evj1knVjaj2YQzqfNsoKsiwIk6ihQVaXnyoDEyShB6SfNo2TP0o5aM8tuiA==
+"@shrub/model@0.5.3", "@shrub/model@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.5.3.tgz#4929d87f2e9707433220c11aff42ba021c6c1831"
+  integrity sha512-Ve4DYketiM+WXtxIAR4VWknlWYymzT1xNuRzwBjZMqw3X1Tvc5ddvztnPe6erqdWCiQtA80JYAorxporPzs8Pg==
   dependencies:
-    "@shrub/core" "0.5.2"
-    "@sprig/serialization" "0.1.53"
+    "@shrub/core" "0.5.3"
+    "@sprig/serialization" "0.1.54"
 
-"@shrub/vue-i18n@^0.5.2":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@shrub/vue-i18n/-/vue-i18n-0.5.2.tgz#61eb19d9730ae911afd6990dba798e7b4cb41d70"
-  integrity sha512-ewXx2xM0EOpVM31WUVur7dV9CatITEkEB4lNeW/cYTtvxJZi0d+IiJxoqBRa/CK1v0URUCEt1jhbLd40cq6KMw==
+"@shrub/vue-i18n@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-i18n/-/vue-i18n-0.5.3.tgz#83b9f69a6f2ff3f69a297e32dc94c136673a0544"
+  integrity sha512-4keT0Y8nUDzDJpTba+ySI+3i2BF2OpkQOMu09H2XHrBFXlcAa9jRZJz1UNC5heuSJQCkGqjFI4rHMjNXloryvQ==
   dependencies:
-    "@shrub/core" "0.5.2"
-    "@shrub/vue" "0.5.2"
-    "@sprig/event-emitter" "^0.1.53"
+    "@shrub/core" "0.5.3"
+    "@shrub/vue" "0.5.3"
+    "@sprig/event-emitter" "^0.1.54"
     vue-i18n "^8.15.4"
 
-"@shrub/vue@0.5.2", "@shrub/vue@^0.5.2":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.5.2.tgz#71d071c7494de17a60dcbc14ba858c1c6496545a"
-  integrity sha512-AB0OXH9ceoJXnrKAOP1LtJCE5bM0WLHsBFMJHRK8JYhHw+yZy8oJv0zrNEVTvksIgo1KELZEntZGwW3zKpJttA==
+"@shrub/vue@0.5.3", "@shrub/vue@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.5.3.tgz#edaa2177bf13a286d0eb42d7abf8c7abd0442366"
+  integrity sha512-jwKvua3XaLiFIhOFC1G5tTihAHzyOUmdomNjsoJRFqUKQQCorTBC4aUegsDC2N4kDBa1Qk4fJmPXK8yO+mb16w==
   dependencies:
-    "@shrub/core" "0.5.2"
-    "@shrub/model" "0.5.2"
-    "@sprig/serialization" "0.1.53"
+    "@shrub/core" "0.5.3"
+    "@shrub/model" "0.5.3"
+    "@sprig/serialization" "0.1.54"
     vue "^2.6.10"
     vue-class-component "^7.1.0"
 
-"@sprig/event-emitter-dom@^0.1.53":
-  version "0.1.53"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.1.53.tgz#09aa699d6364b56ff3f4dd98d1dab77cbb5332ce"
-  integrity sha512-9uLRxBLvf0Rhif9u+ildH2inaR6Ie17MUJG6ccoZxC3HKFBkp1n5GaVbat/NYp6KnxmQnlVNy1J+qtQ7WUOzFA==
+"@sprig/event-emitter-dom@^0.1.54":
+  version "0.1.54"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.1.54.tgz#f4f97dbd8acfb35608c134cc62556f9604763e13"
+  integrity sha512-vRPJGwIHob8RRaw9mxNJEhSBa+tHz+/bINDaHfVQg/g95DJAAd9aKGlCG3oRYnrE+PTrZTrhTzc5t+MgqF5vnA==
   dependencies:
-    "@sprig/event-emitter" "0.1.53"
+    "@sprig/event-emitter" "0.1.54"
 
-"@sprig/event-emitter@0.1.53", "@sprig/event-emitter@^0.1.53":
-  version "0.1.53"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.53.tgz#18a7bce4bd52e44d59feab74e27f1c9e1d6470bb"
-  integrity sha512-DyGu14StMwfm4USOVjO6ruT3vifvTKuFJptmH4ORIyLoMKUzeBvbbZxYePtpKFsFu9Kets3PN7X01nCqoSdNFA==
+"@sprig/event-emitter@0.1.54", "@sprig/event-emitter@^0.1.54":
+  version "0.1.54"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.54.tgz#3232c91319dd32968e3e98addfd3a2d8d555e669"
+  integrity sha512-FGln1EYzw+jnSfwGMDFoneYuaObTT6/+b/TQGF5e0dnjN3qkS7K2A5ueuK64UsiukmJYAtFdS1ZwLD4xINRIjw==
 
-"@sprig/serialization@0.1.53":
-  version "0.1.53"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.53.tgz#6647e5740affcf624708e2105811b542e9848957"
-  integrity sha512-P7zRojAKRRYeGTABLeZ5qnrC0ySTRT/b8Pi60S1dhR9hi7WT6nR0EEblch8c2cCy+CnHK7mpBl8IUtC07gKwmA==
+"@sprig/serialization@0.1.54":
+  version "0.1.54"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.54.tgz#5d0606cc48858ed8d3cf6fcb9bfad9f726eaebff"
+  integrity sha512-QH/5X+FLNBQvDm6iZ0PNLHstMEIRbyzMLhClM955uowozgsgMJrEDw0ss/18jR8KK2PeX53r60mJDFVheNbBKA==
 
 "@types/body-parser@*":
   version "1.17.1"

@@ -10,10 +10,10 @@
         "copy-vue": "copyfiles -u 1 ./src/component/**/*.vue dist"
     },
     "dependencies": {
-        "@shrub/core": "^0.5.2",
-        "@shrub/model": "^0.5.2",
-        "@shrub/vue": "^0.5.2",
-        "@shrub/vue-i18n": "^0.5.2",
+        "@shrub/core": "^0.5.3",
+        "@shrub/model": "^0.5.3",
+        "@shrub/vue": "^0.5.3",
+        "@shrub/vue-i18n": "^0.5.3",
         "@sprig/event-emitter": "^0.1.54",
         "axios": "^0.21.1",
         "socket.io-client": "^2.2.0",

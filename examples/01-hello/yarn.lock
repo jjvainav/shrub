@@ -2,26 +2,26 @@
 # yarn lockfile v1
 
 
-"@shrub/core@0.5.1", "@shrub/core@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.1.tgz#0003ac2f238cc4ca192f71f5b629fb49c129e350"
-  integrity sha512-ZNyIHrICAZWLR2V12/lN4m2av3K7wMhHWdIY/csE2yFZZ8jTPAkFbNmZhr5lOOmU52r0D2Hz0ievyXxbrhftiw==
+"@shrub/core@0.5.3", "@shrub/core@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.3.tgz#9fd111771ec5618bbdf6d8398123e2d3acbddf03"
+  integrity sha512-58mZl+ZWI3dZk35iuirbE4s0kzvEAT2fud5vWBPpkgZprvH0swmicW79KZngmGxfMVeXTRsWFr5jk9MJSn7mrg==
 
-"@shrub/express@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.1.tgz#5304a1f908b5172f293e47e0b52e1dbdcc9ee112"
-  integrity sha512-E3BYYV+cDQEWYHeh8gtkxLRQm7cnKmBpAuXpa9gRHQ6ROB2EhNzS8BgkwNTJvsOXl/l/tJ+mNfu9/XdfrewAYw==
+"@shrub/express@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.3.tgz#49b68ab2756babcf6e9da2fd8c217512d82aae47"
+  integrity sha512-Zd3GR0IyAtMtDRwcaPZZmqGL+zh2tKCMIv6Eczon69bkadLwauENDEhNITM6PiEFfklASWXnYBqQSAe7hHIGKg==
   dependencies:
-    "@shrub/core" "0.5.1"
-    "@shrub/http" "0.5.1"
+    "@shrub/core" "0.5.3"
+    "@shrub/http" "0.5.3"
     express "^4.17.1"
 
-"@shrub/http@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.1.tgz#0a619d95384cafa7f78c6e60b84923faf5115531"
-  integrity sha512-SGx6ZT3vOm/CYIINpk/pvTsp2w2uZ4pL0LqRV2PKU/Wolt4z7FvMg/LH4x61FQ6inlzld2dNgH45A0sDURmo/A==
+"@shrub/http@0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.3.tgz#6c704a1685cfb107c56ea1d20549e21da36147d6"
+  integrity sha512-fJAF7xWQarWr3T40i4EyUZgMmsYiTE6wHU8D0RCo12u+AIcdITLZyesyMRJSCRuQ1J282pegChAC+JYwsIEc/w==
   dependencies:
-    "@shrub/core" "0.5.1"
+    "@shrub/core" "0.5.3"
 
 "@types/body-parser@*":
   version "1.17.1"
