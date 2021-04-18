@@ -14,7 +14,7 @@
         "@shrub/model": "^0.5.3",
         "@shrub/vue": "^0.5.3",
         "@shrub/vue-i18n": "^0.5.3",
-        "@sprig/event-emitter": "^0.1.55",
+        "@sprig/event-emitter": "^0.1.56",
         "axios": "^0.21.1",
         "socket.io-client": "^2.2.0",
         "vue": "^2.6.10",

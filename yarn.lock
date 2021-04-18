@@ -1392,47 +1392,47 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@sprig/event-emitter@0.1.55", "@sprig/event-emitter@^0.1.55":
-  version "0.1.55"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.55.tgz#4fb8faf1bf7367e0d541c1d659bbb4559ea83df5"
-  integrity sha512-2QrPpY0fpaQf+LXosxns15EFlW+wjuOovfPyxUz8PhLh/hFpZ7WksfS4HNwA3sNzfypMuu7t02G5MSLxq8SenA==
+"@sprig/event-emitter@0.1.56", "@sprig/event-emitter@^0.1.56":
+  version "0.1.56"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.56.tgz#6eaa324234a248e25ff107f77dbfccd1e65bb2fe"
+  integrity sha512-2mg+iDOFf/tSlHE68WlWeKjsPHviQEBn20Be1deLCZJnZNedUS8fONtShi9gu3bS7cALzJ10kVYX/kXFzZ489g==
 
-"@sprig/request-client-events@^0.1.55":
-  version "0.1.55"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client-events/-/request-client-events-0.1.55.tgz#9e9e9b5f7ed561ae1f387351e3e485ee632e125c"
-  integrity sha512-2U4Bi1MNx+QuPZC3dLSYw9e1BJ/oFmXGco5yIrq2sWD9HyQw65I2BkZuJvXzt6Mz1/uBck2cXMCe34yPE+npVA==
+"@sprig/request-client-events@^0.1.56":
+  version "0.1.56"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client-events/-/request-client-events-0.1.56.tgz#0e5bc23eeb985567ae81f20e9dda43d2c0d4185d"
+  integrity sha512-uwTEag0ESEKnw3ryvDpIua0WwLCSTPkauGATdSZuD69lF9KrMvK5U8rbWIbbGhXT2gaES+EO1CJjHYFFmLsWgA==
   dependencies:
-    "@sprig/event-emitter" "0.1.55"
-    "@sprig/request-client" "0.1.55"
-    eventsource "^1.0.7"
+    "@sprig/event-emitter" "0.1.56"
+    "@sprig/request-client" "0.1.56"
+    eventsource "^1.1.0"
 
-"@sprig/request-client-mock@^0.1.55":
-  version "0.1.55"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client-mock/-/request-client-mock-0.1.55.tgz#dab9d142d0f9a75c6f25e23b50044c127d22aacb"
-  integrity sha512-rj8ce7y5+NJnSsbw4ZtO8jMRVOI/a9FnWojUTSFw3g9nl9Kc5AkHn0ZOP178YYJAgJYpQTpIieB46Ip639zv+Q==
+"@sprig/request-client-mock@^0.1.56":
+  version "0.1.56"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client-mock/-/request-client-mock-0.1.56.tgz#f96caf4f48bd9f598c4b345b30bdbfdda139d16e"
+  integrity sha512-Ge7F47NM7XT1aO6CLCM9ek/s/S7cqdrlIlXFwEb2hhhIOoDNKUq35kyzJuy4BtVHH4+TWeqo7mt+ly0VbmrIOA==
   dependencies:
-    "@sprig/request-client" "0.1.55"
+    "@sprig/request-client" "0.1.56"
     axios "^0.21.1"
-    eventsource "^1.0.7"
+    eventsource "^1.1.0"
     http-status-codes "^1.3.2"
 
-"@sprig/request-client@0.1.55", "@sprig/request-client@^0.1.55":
-  version "0.1.55"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.55.tgz#22832458f1aa507d54cd388447968e1c5f1bdf24"
-  integrity sha512-FP5bm54u0c2vnHWHz3Rcmh2SHCkiOxb1dEnbK7a83Zm5Y/OEmsB+pFU6qliUTtkm9MNk4/lLGrhJf+rCXVf3gw==
+"@sprig/request-client@0.1.56", "@sprig/request-client@^0.1.56":
+  version "0.1.56"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.56.tgz#63decc894edd3dbedf4b4be647526aa62f417ae5"
+  integrity sha512-sO/R9Df/AY6jdrtLdhhyroZWN3vBOIcUnv7jq2uPKQsg1HsZlQYpvjO27QI28WLditvorIoXz/6jBPoYs5wUvA==
   dependencies:
     axios "^0.21.1"
-    eventsource "^1.0.7"
+    eventsource "^1.1.0"
 
-"@sprig/serialization@0.1.55":
-  version "0.1.55"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.55.tgz#04811eb3346cbb3be92880cf39a38234aae87259"
-  integrity sha512-6xElbJvDRKwEpZmxm72ueTmhvFI9N7RwaN0SJsY1j9LdHcYWvtPYcQJc3HpGmTRa+XaIp8i0bP/41FIEjDe/Xg==
+"@sprig/serialization@0.1.56":
+  version "0.1.56"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.56.tgz#dc7d6858ab221737be2644c329a8ed2632751b2d"
+  integrity sha512-TLPzr8rmIS/LxGeZLMcXHYOumsV2rjrtLukE52l//1cizmf++e74FnwDFypq/W15ajvOhXiMy/wY+NArxkbZWw==
 
-"@sprig/unique-id@^0.1.55":
-  version "0.1.55"
-  resolved "https://registry.yarnpkg.com/@sprig/unique-id/-/unique-id-0.1.55.tgz#07c5fef4497872892f8e8011b7fd15a93c103c93"
-  integrity sha512-p5w791vDCpy76wQO5wj/MJz/7OK4Cf3L5H1X8EVW8Qe7PingYQBCQMcuzWLNdQNpfDNcl970owu0Ejut/TgVEQ==
+"@sprig/unique-id@^0.1.56":
+  version "0.1.56"
+  resolved "https://registry.yarnpkg.com/@sprig/unique-id/-/unique-id-0.1.56.tgz#385d2e187832413f91efdee8a1dfe7c3b0b2d0dc"
+  integrity sha512-z1SFfBN0oY+lecwKDiniv6JqDfBYZJYcljBFaeXFgVKGyxd6qEmVwzdmiBfX/AcrrVvrqy+MeBc3oTHLD79lXg==
   dependencies:
     base-x "^3.0.7"
     uuid "^3.3.3"
@@ -3319,10 +3319,10 @@ eventemitter3@^3.1.0:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.2.tgz#2d3d48f9c346698fce83a85d7d664e98535df6e7"
   integrity sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q==
 
-eventsource@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/eventsource/-/eventsource-1.0.7.tgz#8fbc72c93fcd34088090bc0a4e64f4b5cee6d8d0"
-  integrity sha512-4Ln17+vVT0k8aWq+t/bF5arcS3EpT9gYtW66EPacdj/mAFevznsnyoHLPy2BA8gbIQeIHoPsvwmfBftfcG//BQ==
+eventsource@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/eventsource/-/eventsource-1.1.0.tgz#00e8ca7c92109e94b0ddf32dac677d841028cfaf"
+  integrity sha512-VSJjT5oCNrFvCS6igjzPAt5hBzQ2qPBFIbJ03zLI9SE0mxwZpMw6BfJrbFHm1a141AavMEB8JHmBhWAd66PfCg==
   dependencies:
     original "^1.0.0"
 
@@ -7781,10 +7781,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^4.0.5:
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.0.5.tgz#ae9dddfd1069f1cb5beb3ef3b2170dd7c1332389"
-  integrity sha512-ywmr/VrTVCmNTJ6iV2LwIrfG1P+lv6luD8sUJs+2eI9NLGigaN+nUQc13iHqisq7bra9lnmUSYqbJvegraBOPQ==
+typescript@^4.2.4:
+  version "4.2.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.4.tgz#8610b59747de028fda898a8aef0e103f156d0961"
+  integrity sha512-V+evlYHZnQkaz8TRBuxTA92yZBPotr5H+WhQ7bD3hZUndx5tGOa1fuCgeSjxAzM1RiN5IzvadIXTVefuuwZCRg==
 
 uglify-js@^3.1.4:
   version "3.9.4"
@@ -7964,10 +7964,10 @@ vue-class-component@^7.1.0:
   resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-7.2.3.tgz#a5b1abd53513a72ad51098752e2dedd499807cca"
   integrity sha512-oEqYpXKaFN+TaXU+mRLEx8dX0ah85aAJEe61mpdoUrq0Bhe/6sWhyZX1JjMQLhVsHAkncyhedhmCdDVSasUtDw==
 
-vue-i18n@^8.15.4:
-  version "8.18.1"
-  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-8.18.1.tgz#2e683ac93a15617bdcd210f99359d6034e8425dd"
-  integrity sha512-K+hFQJksF8Ph23pnhbwSyoQx+4Y1q/rh2o7GiXI/3rLCCrwanUbzudC8+trp0Mb8rn9y83DYF6RXNrMd+VsuCw==
+vue-i18n@^8.24.3:
+  version "8.24.3"
+  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-8.24.3.tgz#2233ae11ec59e8204df58a28fc41afe9754e3b41"
+  integrity sha512-uKAYzGbwGIJndY7JwhQwIGi1uyvErWkBfFwooOtjcNnIfMbAR49ad5dT/MiykrJ9pCcgvnocFjFsNLtTzyW+rg==
 
 vue-router@^3.1.3:
   version "3.3.2"
