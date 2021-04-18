@@ -2,50 +2,50 @@
 # yarn lockfile v1
 
 
-"@shrub/core@0.5.1", "@shrub/core@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.1.tgz#0003ac2f238cc4ca192f71f5b629fb49c129e350"
-  integrity sha512-ZNyIHrICAZWLR2V12/lN4m2av3K7wMhHWdIY/csE2yFZZ8jTPAkFbNmZhr5lOOmU52r0D2Hz0ievyXxbrhftiw==
+"@shrub/core@0.5.6", "@shrub/core@^0.5.3":
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.6.tgz#b722db1fca52f65bc12d8e8407944487611fa4d6"
+  integrity sha512-ZkKr8irYXZnVG+7mdk3IZ15Tash0uXyi2gq+5rh7RZWvpqeCFRaRET1HQq+XW6J1Yv7yoMp+cVrqR6ALVjxH3A==
 
-"@shrub/express@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.1.tgz#5304a1f908b5172f293e47e0b52e1dbdcc9ee112"
-  integrity sha512-E3BYYV+cDQEWYHeh8gtkxLRQm7cnKmBpAuXpa9gRHQ6ROB2EhNzS8BgkwNTJvsOXl/l/tJ+mNfu9/XdfrewAYw==
+"@shrub/express@^0.5.3":
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.6.tgz#a27a72744a9c2fe8aaa1d7193dbbac59ca644f61"
+  integrity sha512-zLvIofydZGxjzdKow6SjhVfNiOMLn94HZN00wFNSFugYaC94GmpUpyj517MZ3G+0BVVTJu/m0KxKWzGfAKqY9Q==
   dependencies:
-    "@shrub/core" "0.5.1"
-    "@shrub/http" "0.5.1"
+    "@shrub/core" "0.5.6"
+    "@shrub/http" "0.5.6"
     express "^4.17.1"
 
-"@shrub/http@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.1.tgz#0a619d95384cafa7f78c6e60b84923faf5115531"
-  integrity sha512-SGx6ZT3vOm/CYIINpk/pvTsp2w2uZ4pL0LqRV2PKU/Wolt4z7FvMg/LH4x61FQ6inlzld2dNgH45A0sDURmo/A==
+"@shrub/http@0.5.6":
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.6.tgz#d95dc330f56fab4782acbb319029c7581f07abbf"
+  integrity sha512-O9sCJ86kq4LnClJiHWmqpbvZhouB0xQYgZE6xP/Rid3GlmiUv40hIwc7/hK+yug6j7JzMIkmbWbZHthrexOwzw==
   dependencies:
-    "@shrub/core" "0.5.1"
+    "@shrub/core" "0.5.6"
 
-"@shrub/model@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.5.1.tgz#81b7e7d68f47305426d7f7ac67e27c09e762b38d"
-  integrity sha512-kSiDqKbwcDfgI6Bl+TY389vzzoKQYrcHVYnKBeLB5ChO3IHJj4IMFMxoeLbFB1rzCU0FkRWTrMJkRGdpLKadNQ==
+"@shrub/model@0.5.6":
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.5.6.tgz#5addb0fc166d8099d8e09f7bec91805dfc28cf9e"
+  integrity sha512-Nct1ZXnvKuCT4MAdI86xwf+itRXPnqUaqlbNo5ZWmBZMXWqhkoeH7yn8DhrQE2IPHF7gNF5aKWtBINY26xhRPQ==
   dependencies:
-    "@shrub/core" "0.5.1"
-    "@sprig/serialization" "0.1.53"
+    "@shrub/core" "0.5.6"
+    "@sprig/serialization" "0.1.54"
 
-"@shrub/vue@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.5.1.tgz#5780322b9ee2fb4e5748fb6a0fb260756b25ec86"
-  integrity sha512-bI6+ZCIIDsGISL1vrzYJqB9eUoMUIIGOOz5ULvW1O2YbhrEj45SlVrgxfwAKmS4XLPvWbg2mQImks9RB5Dnz/Q==
+"@shrub/vue@^0.5.3":
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.5.6.tgz#3adfcf8abb4955e2917b4aab802c84b1fd6def6d"
+  integrity sha512-eye1/35NkucivFWlH4fznvjAW9WpyATp+AUm4xuzEGdhEEuU00s2p9TAR/wXNvTuoKz2jU6obj3qlqJnzs4z8Q==
   dependencies:
-    "@shrub/core" "0.5.1"
-    "@shrub/model" "0.5.1"
-    "@sprig/serialization" "0.1.53"
+    "@shrub/core" "0.5.6"
+    "@shrub/model" "0.5.6"
+    "@sprig/serialization" "0.1.54"
     vue "^2.6.10"
     vue-class-component "^7.1.0"
 
-"@sprig/serialization@0.1.53":
-  version "0.1.53"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.53.tgz#6647e5740affcf624708e2105811b542e9848957"
-  integrity sha512-P7zRojAKRRYeGTABLeZ5qnrC0ySTRT/b8Pi60S1dhR9hi7WT6nR0EEblch8c2cCy+CnHK7mpBl8IUtC07gKwmA==
+"@sprig/serialization@0.1.54":
+  version "0.1.54"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.54.tgz#5d0606cc48858ed8d3cf6fcb9bfad9f726eaebff"
+  integrity sha512-QH/5X+FLNBQvDm6iZ0PNLHstMEIRbyzMLhClM955uowozgsgMJrEDw0ss/18jR8KK2PeX53r60mJDFVheNbBKA==
 
 "@types/body-parser@*":
   version "1.17.1"
@@ -1375,9 +1375,9 @@ fast-json-stable-stringify@^2.0.0:
   integrity sha1-1RQsDK7msRifh9OnYREGT4bIu/I=
 
 figgy-pudding@^3.5.1:
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/figgy-pudding/-/figgy-pudding-3.5.1.tgz#862470112901c727a0e495a80744bd5baa1d6790"
-  integrity sha512-vNKxJHTEKNThjfrdJwHc7brvM6eVevuO5nTj6ez8ZQ1qbXTvGthucRF7S4vf2cr71QVnT70V34v0S1DyQsti0w==
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/figgy-pudding/-/figgy-pudding-3.5.2.tgz#b4eee8148abb01dcf1d1ac34367d59e12fa61d6e"
+  integrity sha512-0btnI/H8f2pavGMN8w40mlSKOfTK2SVJmBfBeVIj3kNw0swwgzyRq0d5TJVOwodFmtvpPeWPN/MCcfuWF0Ezbw==
 
 fill-range@^4.0.0:
   version "4.0.0"
@@ -3313,9 +3313,9 @@ split-string@^3.0.1, split-string@^3.0.2:
     extend-shallow "^3.0.0"
 
 ssri@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/ssri/-/ssri-6.0.1.tgz#2a3c41b28dd45b62b63676ecb74001265ae9edd8"
-  integrity sha512-3Wge10hNcT1Kur4PDFwEieXSCMCJs/7WvSACcrMYrNp+b8kDL1/0wJch5Ni2WrtwEa2IO8OsVfeKIciKCDx/QA==
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/ssri/-/ssri-6.0.2.tgz#157939134f20464e7301ddba3e90ffa8f7728ac5"
+  integrity sha512-cepbSq/neFK7xB6A50KHN0xHDotYzq58wWCa5LeWqnPrHG8GzfEjO/4O8kpmcGW+oaxkvhEJCWgbgNk4/ZV93Q==
   dependencies:
     figgy-pudding "^3.5.1"
 
