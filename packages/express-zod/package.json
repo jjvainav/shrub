@@ -1,7 +1,7 @@
 {
     "name": "@shrub/express-zod",
     "description": "Express module that provides error middleware for zod validation errors.",
-    "version": "0.5.7",
+    "version": "0.5.8",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -29,8 +29,8 @@
         "@types/express": "^4.17.1"
     },
     "dependencies": {
-        "@shrub/core": "0.5.7",
-        "@shrub/express": "0.5.7",
+        "@shrub/core": "0.5.8",
+        "@shrub/express": "0.5.8",
         "express": "^4.17.1",
         "zod": "^1.11.13"
     }
