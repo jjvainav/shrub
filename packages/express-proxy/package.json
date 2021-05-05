@@ -1,7 +1,7 @@
 {
     "name": "@shrub/express-proxy",
     "description": "Express module that provides support for forwarding requests to other express modules.",
-    "version": "0.5.9",
+    "version": "0.5.10",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -28,9 +28,9 @@
         "@types/express": "^4.17.1"
     },
     "dependencies": {
-        "@shrub/core": "0.5.9",
-        "@shrub/express": "0.5.9",
-        "@sprig/request-client": "^0.1.56",
+        "@shrub/core": "0.5.10",
+        "@shrub/express": "0.5.10",
+        "@sprig/request-client": "^0.1.57",
         "express": "^4.17.1"
     }
 }
