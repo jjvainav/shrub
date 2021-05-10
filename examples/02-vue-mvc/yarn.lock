@@ -2,50 +2,50 @@
 # yarn lockfile v1
 
 
-"@shrub/core@0.5.1", "@shrub/core@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.1.tgz#0003ac2f238cc4ca192f71f5b629fb49c129e350"
-  integrity sha512-ZNyIHrICAZWLR2V12/lN4m2av3K7wMhHWdIY/csE2yFZZ8jTPAkFbNmZhr5lOOmU52r0D2Hz0ievyXxbrhftiw==
+"@shrub/core@0.5.10", "@shrub/core@^0.5.3":
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.10.tgz#bd986d1d3bdb0137a7e218687bf8dc59a58a8af1"
+  integrity sha512-nEUh4my0bZdQTN59YRhTsojA9R+lvwAFDn31upZkBbq9/7KcgO3j571rkqde46SwP6cRfVl9329CFshRSVnstA==
 
-"@shrub/express@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.1.tgz#5304a1f908b5172f293e47e0b52e1dbdcc9ee112"
-  integrity sha512-E3BYYV+cDQEWYHeh8gtkxLRQm7cnKmBpAuXpa9gRHQ6ROB2EhNzS8BgkwNTJvsOXl/l/tJ+mNfu9/XdfrewAYw==
+"@shrub/express@^0.5.3":
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.10.tgz#6b3201f720edd94f5f508f8c92328c2fae23c1c4"
+  integrity sha512-ikqleZayvLTzNCGUpGfzhCwaAC0osvw34AER6M1ENCmhnqcSii/YMqkRNU2CIn52YrxJmGGv07lnARHppySDyA==
   dependencies:
-    "@shrub/core" "0.5.1"
-    "@shrub/http" "0.5.1"
+    "@shrub/core" "0.5.10"
+    "@shrub/http" "0.5.10"
     express "^4.17.1"
 
-"@shrub/http@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.1.tgz#0a619d95384cafa7f78c6e60b84923faf5115531"
-  integrity sha512-SGx6ZT3vOm/CYIINpk/pvTsp2w2uZ4pL0LqRV2PKU/Wolt4z7FvMg/LH4x61FQ6inlzld2dNgH45A0sDURmo/A==
+"@shrub/http@0.5.10":
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.10.tgz#55d8054aed705e9d2896b9f09f77d370cc8499d0"
+  integrity sha512-SdkoUbzhrogbkXhDTBRIkx2Pu6RyON0Iv9jONMGFoLGwzc+FvYHEcqRxQtlkoRwgzCa30o/3vKQjH4ZRSbdZfQ==
   dependencies:
-    "@shrub/core" "0.5.1"
+    "@shrub/core" "0.5.10"
 
-"@shrub/model@0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.5.1.tgz#81b7e7d68f47305426d7f7ac67e27c09e762b38d"
-  integrity sha512-kSiDqKbwcDfgI6Bl+TY389vzzoKQYrcHVYnKBeLB5ChO3IHJj4IMFMxoeLbFB1rzCU0FkRWTrMJkRGdpLKadNQ==
+"@shrub/model@0.5.10":
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.5.10.tgz#f591601e06e5a489868ed9f4338dfb864c0b1131"
+  integrity sha512-D6rq4bdGzBSLsr9ug5tKBLsWzyxBX8857akq2E3zGqY24+GvbArywdO/1BTKPgrSfGL+jDUOlp8VDI0AXuMwng==
   dependencies:
-    "@shrub/core" "0.5.1"
-    "@sprig/serialization" "0.1.53"
+    "@shrub/core" "0.5.10"
+    "@sprig/serialization" "0.1.57"
 
-"@shrub/vue@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.5.1.tgz#5780322b9ee2fb4e5748fb6a0fb260756b25ec86"
-  integrity sha512-bI6+ZCIIDsGISL1vrzYJqB9eUoMUIIGOOz5ULvW1O2YbhrEj45SlVrgxfwAKmS4XLPvWbg2mQImks9RB5Dnz/Q==
+"@shrub/vue@^0.5.3":
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.5.10.tgz#234603b80a150894d746bde0a1111f6f97dfb21a"
+  integrity sha512-lYMkNagq5HPyEjcodgeRv+fUJIk+nBPVWS6birUtYTXHr3h1OGftW3S8U12ApO1lE+TbHZpPKIvkGArRcnPsPA==
   dependencies:
-    "@shrub/core" "0.5.1"
-    "@shrub/model" "0.5.1"
-    "@sprig/serialization" "0.1.53"
+    "@shrub/core" "0.5.10"
+    "@shrub/model" "0.5.10"
+    "@sprig/serialization" "0.1.57"
     vue "^2.6.10"
     vue-class-component "^7.1.0"
 
-"@sprig/serialization@0.1.53":
-  version "0.1.53"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.53.tgz#6647e5740affcf624708e2105811b542e9848957"
-  integrity sha512-P7zRojAKRRYeGTABLeZ5qnrC0ySTRT/b8Pi60S1dhR9hi7WT6nR0EEblch8c2cCy+CnHK7mpBl8IUtC07gKwmA==
+"@sprig/serialization@0.1.57":
+  version "0.1.57"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.57.tgz#aa9f31b10d0efcc24ad3e260536c05c66d7d19a6"
+  integrity sha512-KySiD3Y2LKtcNCzYz+rL33eth3mNnZLKJmWS7AhwnXXzw17OCiyNIrHNuTMrxv98HFUdY0A6WwmpN2yLDJkqDw==
 
 "@types/body-parser@*":
   version "1.17.1"
@@ -2117,9 +2117,9 @@ locate-path@^3.0.0:
     path-exists "^3.0.0"
 
 lodash@^4.17.3:
-  version "4.17.15"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
-  integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
 lower-case@^1.1.1:
   version "1.1.4"
