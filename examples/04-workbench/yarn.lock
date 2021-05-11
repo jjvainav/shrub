@@ -869,14 +869,19 @@
     vue "^2.6.10"
     vue-class-component "^7.1.0"
 
-"@sprig/event-emitter-dom@^0.1.54":
-  version "0.1.54"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.1.54.tgz#f4f97dbd8acfb35608c134cc62556f9604763e13"
-  integrity sha512-vRPJGwIHob8RRaw9mxNJEhSBa+tHz+/bINDaHfVQg/g95DJAAd9aKGlCG3oRYnrE+PTrZTrhTzc5t+MgqF5vnA==
+"@sprig/event-emitter-dom@^0.1.57":
+  version "0.1.57"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.1.57.tgz#4ecf7c82aa4ba02120ee8c42bef10c4b20f7d675"
+  integrity sha512-91b++cXiIAzTvxkJev4T38PssPAxLRVFh+SFHlmAF/sy1z1oM2AjaNuUnT0EHYD942M4sx1dco/etR+t0tuWug==
   dependencies:
-    "@sprig/event-emitter" "0.1.54"
+    "@sprig/event-emitter" "0.1.57"
 
-"@sprig/event-emitter@0.1.54", "@sprig/event-emitter@^0.1.54":
+"@sprig/event-emitter@0.1.57", "@sprig/event-emitter@^0.1.57":
+  version "0.1.57"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.57.tgz#933422c482e05bf7c0efb692cfb21c581e0ccada"
+  integrity sha512-Ko/TjUwu7eJbb+RFDDt5+vogsW1xzlgOhIny23IqddRfffpkjJM1VKl4XO/SHkbcOonYQ9uwTTsJj10QEVPkPw==
+
+"@sprig/event-emitter@^0.1.54":
   version "0.1.54"
   resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.54.tgz#3232c91319dd32968e3e98addfd3a2d8d555e669"
   integrity sha512-FGln1EYzw+jnSfwGMDFoneYuaObTT6/+b/TQGF5e0dnjN3qkS7K2A5ueuK64UsiukmJYAtFdS1ZwLD4xINRIjw==
@@ -4424,9 +4429,9 @@ lodash.uniq@^4.5.0:
   integrity sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=
 
 lodash@^4.0.0, lodash@^4.17.11, lodash@^4.17.12, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.3, lodash@^4.2.1, lodash@~4.17.10:
-  version "4.17.15"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
-  integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
 loud-rejection@^1.0.0:
   version "1.6.0"
