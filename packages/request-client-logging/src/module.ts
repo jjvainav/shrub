@@ -26,6 +26,11 @@ const requestErrorConverter: ILogDataConverter = (arg) => {
             }
         }
 
+        data["request.url"] = arg.request.options.url;
+        if (arg.request.options.method) {
+            data["request.method"] = arg.request.options.method;
+        }
+
         if (arg.response) {
             data["response.status"] = arg.response.status.toString();
             if (arg.response.data) {
