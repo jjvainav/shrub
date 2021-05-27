@@ -39,10 +39,6 @@ export namespace EventMessage {
         export const resourceId = "resource-id";
         /** The type of resource the event is associated with. */
         export const resourceType = "resource-type";
-        /** The id of a child resource if the event is associated with a child of the root resource. */
-        export const childResourceId = "child-resource-id";
-        /** A value identifying the type of child resource. */
-        export const childResourceType = "child-resource-type";
     }
 
     export function isEventMessage(message: IMessage): message is IEventMessage {

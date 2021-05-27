@@ -1,7 +1,7 @@
 import { createService, Singleton } from "@shrub/core";
 import { ILogger } from "@shrub/logging";
 import { IMessage, IMessageChannelConsumer, isChannelNameMatch, ISubscribeOptions, ISubscription, Message, MessageHandler } from "@shrub/messaging";
-import { IRequest, IRequestPromise } from "@sprig/request-client";
+import client, { IRequest, IRequestPromise } from "@sprig/request-client";
 import { IRequestEventStream, jsonValidator, RequestEventStream } from "@sprig/request-client-events";
 import urlJoin from "url-join";
 
@@ -147,6 +147,7 @@ class Subscription implements ISubscription {
         }
 
         this.stream = new RequestEventStream<IMessage>({
+            client,
             url,
             beforeRequest: this.interceptors && this.interceptors.beforeRequest,
             afterRequest: this.interceptors && this.interceptors.afterRequest,

@@ -16,10 +16,6 @@ export interface IEventDetails {
     readonly resourceId: string;
     /** A value identifying the type of resource. */
     readonly resourceType: string;
-    /** The id of a child resource if the event is associated with a child of the root resource. */
-    readonly childResourceId?: string;
-    /** A value identifying the type of child resource. */
-    readonly childResourceType?: string;
     /** Additional metadata to associate with the event message. */
     readonly metadata?: MessageMetadata;
     /** The event data. */
@@ -39,9 +35,7 @@ export class EventPublisher implements IEventPublisher {
                 ...event.metadata,
                 [`${EventMessage.Metadata.eventType}`]: event.eventType,
                 [`${EventMessage.Metadata.resourceId}`]: event.resourceId,
-                [`${EventMessage.Metadata.resourceType}`]: event.resourceType,
-                [`${EventMessage.Metadata.childResourceId}`]: event.childResourceId,
-                [`${EventMessage.Metadata.childResourceType}`]: event.childResourceType
+                [`${EventMessage.Metadata.resourceType}`]: event.resourceType
             },
             data: event.data
         });
