@@ -1,6 +1,6 @@
 import { createService, Singleton } from "@shrub/core";
-import "@shrub/express-tracing";
 import { ChannelWhitelist, IMessage, IMessageChannelProducer, IMessageDetails, isChannelNameMatch, isChannelNamePattern } from "@shrub/messaging";
+import { ISpan } from "@shrub/tracing";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import createId from "@sprig/unique-id";
 import { Request, Response } from "express";
@@ -55,6 +55,7 @@ export class EventStreamProducerService implements IEventStreamProducerService {
             "content-type": "text/event-stream"
         });
 
+        const span = <ISpan | undefined>(<any>req.context).span;
         const stream = this.registerStream(channelNamePattern, subscriptionId, res);
         const close = new EventEmitter("event-stream-close");
 
@@ -63,8 +64,8 @@ export class EventStreamProducerService implements IEventStreamProducerService {
         req.socket.setTimeout(0);
         req.on("close", () => {
             stream.close();
-            if (req.context.span) {
-                req.context.span!.logInfo({
+            if (span) {
+                span.logInfo({
                     name: "event-stream-consumer-disconnected",
                     channel: channelNamePattern,
                     subscriptionId
@@ -74,8 +75,8 @@ export class EventStreamProducerService implements IEventStreamProducerService {
             close.emit();
         });
 
-        if (req.context.span) {
-            req.context.span!.logInfo({
+        if (span) {
+            span.logInfo({
                 name: "event-stream-consumer-connected",
                 channel: channelNamePattern,
                 subscriptionId

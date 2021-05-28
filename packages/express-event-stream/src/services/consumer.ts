@@ -7,10 +7,19 @@ import urlJoin from "url-join";
 
 /** Represents an endpoint and channel mapping for a consumer to connect to. */
 export interface IEventStreamEndpoint {
-    /** A set of patterns the endpoint supports; the default is '*' to represent 'all'.  */
+    /** 
+     * A set of patterns the endpoint is expected to support; the default is '*' to represent 'all'. 
+     * This is useful when registering multiple consumers and is used for filtering/picking the 
+     * consumer to subscribe to for a given channel.
+     */
     readonly channelNamePatterns?: string[];
     /** A url to connect to. */
-    readonly url: string;
+    readonly url: string | IEventStreamEndpointUrlBuilder;
+}
+
+/** A function for building an event stream endpoint url for a given channel for a subscription. */
+export interface IEventStreamEndpointUrlBuilder {
+    (channel: string): string;
 }
 
 /** Interceptors that get passed to the underlying RequestEventStream. */
@@ -83,7 +92,7 @@ export class EventStreamConsumerService implements IEventStreamConsumerService {
     private createChannelConsumer(channelNamePattern: string, endpoint: IEventStreamEndpoint, config: IEventStreamConsumerConfiguration): IMessageChannelConsumer {
         return new EventStreamChannelConsumer({
             channelNamePattern,
-            url: endpoint.url,
+            url: typeof endpoint.url === "string" ? endpoint.url : endpoint.url(channelNamePattern),
             interceptors: config.interceptors,
             retry: config.retry
         });

@@ -49,10 +49,17 @@ export interface IEventStreamChannel {
     open(): void;
 }
 
+/** A callback for building a producer channel pattern for a given request. */
+export interface IEventStreamChannelPatternBuilder {
+    (req: Request): string;
+}
+
 /** Defines options for the EventStreamChannel decorator. */
 export interface IEventStreamChannelOptions {
+    /** A channel name pattern builder used to build producer channel pattern names for a given request. */
+    readonly builder?: IEventStreamChannelPatternBuilder;
     /** A channel name pattern to restrict what channels consumers of the endpoint can subscribe to; the default is '*'. */
-    readonly producerChannelPattern?: string;
+    readonly pattern?: string;
     /** A set of request handlers to execute before the event-stream request handler. */
     readonly handlers?: RequestHandler[];
 }
@@ -90,7 +97,20 @@ export function EventStream(path: PathParams, ...handlers: RequestHandler[]): (t
 
 /** 
  * A controller function decorator that will open an event-stream messaging channel for requesting routes
- * and is the endpoint for event-stream messaging consumers.
+ * and is the endpoint for event-stream messaging consumers. The optional builder parameter allows building
+ * a producer channel pattern from a given request; this is useful when a url has parameters and the 
+ * producer channel needs to be associated with these parameters.
+ * 
+ * IMPORTANT: the stream will not be open unless the function invokes next() or invokes req.context.eventStreamChannel.open(); this allows
+ * the controller function the ability to perform pre-processing of the request before opening the stream.
+ */
+export function EventStreamChannel(path: PathParams, builder?: IEventStreamChannelPatternBuilder): (target: any, propertyKey: string) => void;
+/** 
+ * A controller function decorator that will open an event-stream messaging channel for requesting routes
+ * and is the endpoint for event-stream messaging consumers. The endpoint the EventStreamChannel is
+ * associated with will expect 2 query parameters: subscriptionId - a subscription id for the consumer and
+ * channel - the name of the channel to subscribe to and is expected to match the channel pattern 
+ * defined by the EventStreamChannel.
  * 
  * IMPORTANT: the stream will not be open unless the function invokes next() or invokes req.context.eventStreamChannel.open(); this allows
  * the controller function the ability to perform pre-processing of the request before opening the stream.
@@ -105,11 +125,13 @@ export function EventStreamChannel(path: PathParams, options?: IEventStreamChann
  * the controller function the ability to perform pre-processing of the request before opening the stream.
  */
 export function EventStreamChannel(path: PathParams, producerChannelPattern?: string): (target: any, propertyKey: string) => void;
-export function EventStreamChannel(path: PathParams, optionsOrProducerChannelPattern?: IEventStreamChannelOptions | string): (target: any, propertyKey: string) => void {
-    const options = typeof optionsOrProducerChannelPattern === "string" ? { producerChannelPattern: optionsOrProducerChannelPattern } : optionsOrProducerChannelPattern;
-    const handlers = options && options.handlers || [];
+export function EventStreamChannel(path: PathParams, arg?: IEventStreamChannelPatternBuilder | IEventStreamChannelOptions | string): (target: any, propertyKey: string) => void {
+    const options = toEventStreamChannelOptions(arg);
+    const handlers = options.handlers || [];
+
     return createRouteDecorator((router, handler) => router.get(path, ...handlers, (req, res, next) => {
-        validateConsumerParams(options && options.producerChannelPattern, req, res, (channel, subscriptionId) => {
+        const pattern = options.builder ? options.builder(req) : options.pattern;
+        validateConsumerParams(pattern, req, res, (channel, subscriptionId) => {
             const eventStreamChannel = new EventStreamChannelImplementation(req.context.services.get(IEventStreamProducerService), req, res, channel, subscriptionId);
             req.contextBuilder.addEventStreamChannel(eventStreamChannel);
             
@@ -125,6 +147,12 @@ export function EventStreamChannel(path: PathParams, optionsOrProducerChannelPat
             });
         });
     }));
+}
+
+function toEventStreamChannelOptions(arg?: IEventStreamChannelPatternBuilder | IEventStreamChannelOptions | string): IEventStreamChannelOptions {
+    return typeof arg === "function"
+        ? { builder: arg }
+        : typeof arg === "string" ? { pattern: arg } : arg || {};
 }
 
 /** @internal */
