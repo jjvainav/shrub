@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from "express";
-import * as zod from "zod";
 import { IModule, IModuleConfigurator } from "@shrub/core";
 import { ExpressModule, IExpressConfiguration } from "@shrub/express";
+import { NextFunction, Request, Response } from "express";
+import * as zod from "zod";
 
 function getErrorMessage(error: zod.ZodError): string {
     const messages: string[] = [];

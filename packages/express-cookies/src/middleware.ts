@@ -102,7 +102,7 @@ class Cookie implements ICookie {
 
         // if the value is empty delete the cookie
         if (!this._value) {
-            this.cookies.set(this.name, this.getCookieOptionsForDelete());    
+            this.cookies.set(this.name, undefined, this.getCookieOptionsForDelete());    
         }
         else {
             this.cookies.set(this.name, this._value, this.getCookieOptions()); 
