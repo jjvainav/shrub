@@ -1,4 +1,4 @@
-import client from "@sprig/request-client";
+import client from "@sprig/request-client/dist/native";
 import { RequestEventStream } from "@sprig/request-client-events";
 
 const form = document.getElementById("form");
@@ -33,7 +33,7 @@ client.request({ url: "/api/consumers", method: "GET" }).invoke().then(result =>
     setConsumers(result.data.consumers);
 });
 
-const stream = new RequestEventStream({ method: "GET", url: "/api/consumers/bind" });
+const stream = new RequestEventStream({ client, method: "GET", url: "/api/consumers/bind" });
 stream.onMessage(event => setConsumers(event.data.consumers));
 
 function setConsumers(values) {

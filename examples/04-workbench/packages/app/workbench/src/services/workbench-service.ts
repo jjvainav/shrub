@@ -227,7 +227,7 @@ export class WorkbenchBrowserService implements IWorkbenchService {
 
     private asWorkbenchRoute(route: Route): IWorkbenchRoute {
         return {
-            name: route.name,
+            name: route.name !== null ? route.name : undefined,
             path: route.path,
             params: route.params,
             query: route.query,

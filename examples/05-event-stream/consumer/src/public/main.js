@@ -1,3 +1,4 @@
+import client from "@sprig/request-client/dist/native";
 import { RequestEventStream } from "@sprig/request-client-events";
 
 const form = document.getElementById("form");
@@ -7,7 +8,7 @@ form.addEventListener("submit", event => {
 
     if (channel.value && subscription.value) {
         const url = `/api/messages/bind?channel=${encodeURIComponent(channel.value)}&subscriptionId=${encodeURIComponent(subscription.value)}`
-        const stream = new RequestEventStream({ method: "GET", url });
+        const stream = new RequestEventStream({ client, method: "GET", url });
         const connect = document.getElementById("connect");
         const disconnect = document.getElementById("disconnect");
         const resetForm = () => {

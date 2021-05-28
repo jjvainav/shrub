@@ -14,9 +14,6 @@
         "moduleResolution": "node",
         "module": "ESNext",
         "target": "ESNext",
-        "lib": [
-            "dom",
-            "ESNext"
-        ]
+        "lib": ["dom", "ESNext"]
     }
 }

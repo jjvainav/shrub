@@ -1,4 +1,4 @@
-import *  as express from "express";
+import * as express from "express";
 import * as path from "path";
 import { IModuleConfigurator } from "@shrub/core";
 import { ExpressFactory, ExpressModule, IExpressConfiguration, useController } from "@shrub/express";
