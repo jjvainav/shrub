@@ -1,7 +1,7 @@
 {
     "name": "@shrub/logging-console",
     "description": "A module that provides a simple log writer that writes information to the console.",
-    "version": "0.5.11",
+    "version": "0.5.12",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -21,7 +21,7 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.11",
-        "@shrub/logging": "0.5.11"
+        "@shrub/core": "0.5.12",
+        "@shrub/logging": "0.5.12"
     }
 }
