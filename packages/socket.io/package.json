@@ -16,19 +16,16 @@
         "access": "public"
     },
     "engines": {
-        "node": ">=10.0.0"
+        "node": ">=10.18.0"
     },
     "scripts": {
         "build": "tsc -b .",
         "build:esm": "tsc -p tsconfig.esm.json",
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
-    "devDependencies": {
-        "@types/socket.io": "^1.4.33"
-    },
     "dependencies": {
         "@shrub/core": "0.5.11",
         "@shrub/http": "0.5.11",
-        "socket.io": "^2.2.0"
+        "socket.io": "^4.1.2"
     }
 }
