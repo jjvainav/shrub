@@ -5,8 +5,6 @@ export type EventMessageMetadata = MessageMetadata & {
     readonly "event-type": string;
     readonly "resource-id": string;
     readonly "resource-type": string;
-    readonly "child-resource-id"?: string;
-    readonly "child-resource-type"?: string;
 };
 
 /** Defines a message representing an event against a specific resource. */
