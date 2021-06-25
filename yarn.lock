@@ -1359,47 +1359,47 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@sprig/event-emitter@0.1.61", "@sprig/event-emitter@^0.1.61":
-  version "0.1.61"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.61.tgz#4f77b3edcef0bcd57107edc264342bde27bb3eca"
-  integrity sha512-QRnesQflj/0EYwYhiEQ9f2JhvhW7chxXUbGJ2tpx+8SuwVI4nedOi4wifkPI5EVmxexrMNVKM852FYdUCNAuOw==
+"@sprig/event-emitter@0.1.62", "@sprig/event-emitter@^0.1.62":
+  version "0.1.62"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.62.tgz#dc9df34d9ff9fad0fa4339931312ce1886c67c31"
+  integrity sha512-ClAWxLpFrDpKuoW63yzYpmQkfMyWx2YNk6nfFEgZ3KymquTSjLbnSFokQ54vlvKZVoxXR1xXD4zoTl53sTnJjg==
 
-"@sprig/request-client-events@^0.1.61":
-  version "0.1.61"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client-events/-/request-client-events-0.1.61.tgz#8f600bb9a72f03b07e1942bc28c4a1681ea6e449"
-  integrity sha512-VWjVghlEK0v4eSrHw3u26VsusfxeDr4oTnhzCLYPiVn7HVWYq5OKCJvb3Ze3zewWORvFEsmxdf853VHJWWLoWw==
+"@sprig/request-client-events@^0.1.62":
+  version "0.1.62"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client-events/-/request-client-events-0.1.62.tgz#e371b446f98a1202c1e612705e60d018d8de240c"
+  integrity sha512-x+CPWXK7U9qcRCOpcnI6uUSPlep8uKVTDo8Yu9SLdDDT7pbRd90trn8RTBI6PPrq53ptzEZ/Ws5ry37ldTrrkQ==
   dependencies:
-    "@sprig/event-emitter" "0.1.61"
-    "@sprig/request-client" "0.1.61"
+    "@sprig/event-emitter" "0.1.62"
+    "@sprig/request-client" "0.1.62"
 
-"@sprig/request-client-mock@^0.1.61":
-  version "0.1.61"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client-mock/-/request-client-mock-0.1.61.tgz#01cd3c4103dc7c6e0fd292ed77dbee4c668ba262"
-  integrity sha512-sSg4357Vvy2/elJ97238QuaJRSkVKWN0/JiVVtsyi8qvndI74DIXYACLuH2u5EU4/nKwbc0UXF4I70iHUQfEfg==
+"@sprig/request-client-mock@^0.1.62":
+  version "0.1.62"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client-mock/-/request-client-mock-0.1.62.tgz#2bfbc63eafeaa3730285399214ea1171e32692f7"
+  integrity sha512-bSWjW+nFjybwu7gCF/bf/xLgTwvFwNG0bc87HB4nadboTtc8n1VuAExHzbDZV1cNqr3hhkoFaOJP3lEOQK9yEw==
   dependencies:
-    "@sprig/request-client" "0.1.61"
+    "@sprig/request-client" "0.1.62"
     axios "^0.21.1"
     eventsource "^1.1.0"
     http-status-codes "^1.3.2"
 
-"@sprig/request-client@0.1.61", "@sprig/request-client@^0.1.61":
-  version "0.1.61"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.61.tgz#e653c2d6b100845937b62859fb78f154f2c03d24"
-  integrity sha512-4Pg29tv9ZQAKhiMBMhNwQiGkjroXNykR4OgZLHN/SDET+fLpqSGU8pG0WeoQTZXXvbVIog5Rw+86GBgKEyfLwQ==
+"@sprig/request-client@0.1.62", "@sprig/request-client@^0.1.62":
+  version "0.1.62"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.62.tgz#e05ce8f3bd7138b4231f3b5acf3f61828029e65b"
+  integrity sha512-/AulZaJ5KtA7zKgrHlDcQzk4ZJqr51zCNFN+a958J1G/g9jGfpCjClZ2H5e9yGJBm97agAmuywCSGc2VEVDDGA==
   dependencies:
     axios "^0.21.1"
     core-js "^3.13.0"
     eventsource "^1.1.0"
 
-"@sprig/serialization@0.1.61":
-  version "0.1.61"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.61.tgz#d75cbe4d96b902ff195961dc70db23f65ca6cc34"
-  integrity sha512-Tm/04cyt2e0jnVQyzNIHzNJH54fXqE8vvpghU4+RkGfyDPpxxryjNN9VYuxvOFPVagk11+2GceurDz75eO5i3w==
+"@sprig/serialization@0.1.62":
+  version "0.1.62"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.62.tgz#33f269d79b66603f9b292f42dae771f75019ae51"
+  integrity sha512-oPVALSlZvg1nUAQ/W+5laeI/upiX92eEP3yPVpYnZrKX0PWSKM1qrlH41oqWwtrxpuMQgk4Wsh+zxOAy99iZHA==
 
-"@sprig/unique-id@^0.1.61":
-  version "0.1.61"
-  resolved "https://registry.yarnpkg.com/@sprig/unique-id/-/unique-id-0.1.61.tgz#229242b9d6033142fc938311c451bbf527f18b44"
-  integrity sha512-Ue6eol8smIHlVnqHKdQr2OzJN9E4VX7ckDe/T8+lVLR2uDYftaHCqmO7qsbFBCj94fBWWDLxbMeoe3RqsVvJzA==
+"@sprig/unique-id@^0.1.62":
+  version "0.1.62"
+  resolved "https://registry.yarnpkg.com/@sprig/unique-id/-/unique-id-0.1.62.tgz#26be2f0522db62676665d6c8635e6260cff334c0"
+  integrity sha512-PUkZkPM2jM+9ZP9838gUjWiaFiVVd+jsMaUdSbkKQq/5cDlQoaQOhxZHhu9bgRUi9hWh8hpRGf/dy9kpMxamUw==
   dependencies:
     base-x "^3.0.7"
     uuid "^3.3.3"
