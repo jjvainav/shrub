@@ -1,7 +1,7 @@
 {
     "name": "@shrub/request-client-tracing",
     "description": "Provides functionality for integrating the request-client with the tracing module and service.",
-    "version": "0.5.14",
+    "version": "0.5.15",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -24,9 +24,9 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.14",
-        "@shrub/logging": "0.5.14",
-        "@shrub/tracing": "0.5.14",
+        "@shrub/core": "0.5.15",
+        "@shrub/logging": "0.5.15",
+        "@shrub/tracing": "0.5.15",
         "@sprig/request-client": "^0.1.63"
     }
 }
