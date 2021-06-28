@@ -43,6 +43,7 @@ interface IEventStream {
     send(envelope: IMessageEnvelope): void;
 }
 
+/** @internal */
 export const IEventStreamProducerService = createService<IEventStreamProducerService>("express-event-stream-producer-service");
 
 /** @internal */
