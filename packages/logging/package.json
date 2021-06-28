@@ -1,7 +1,7 @@
 {
     "name": "@shrub/logging",
     "description": "A module that provides basic logging support.",
-    "version": "0.5.18",
+    "version": "0.5.19",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -21,6 +21,6 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.18"
+        "@shrub/core": "0.5.19"
     }
 }
