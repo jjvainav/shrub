@@ -7,7 +7,7 @@ import {
 import { isChannelNameMatch } from "../src/whitelist";
 
 describe("message service", () => {
-    test("send message to consumer from producer", async () => {
+    test("send message to consumer from producer over specific channel", async () => {
         const service = new MessageService();
 
         service.registerBroker(new TestBroker());
@@ -16,13 +16,47 @@ describe("message service", () => {
         const producer = service.getProducer();
 
         let message: IMessage | undefined;
-        await consumer.subscribe("foo", { subscriptionId: "123", handler: m => { message = m } });
+        let channel: string | undefined;
+        await consumer.subscribe("foo", { 
+            subscriptionId: "123", 
+            handler: (m, c) => { 
+                message = m;
+                channel = c;
+            } 
+        });
         producer.send("foo", { 
             data: { foo: "bar" } 
         });
 
          expect(message).toBeDefined();
          expect(message!.data.foo).toBe("bar");
+         expect(channel).toBe("foo");
+    });
+
+    test("send message to consumer from producer using channel pattern", async () => {
+        const service = new MessageService();
+
+        service.registerBroker(new TestBroker());
+
+        const consumer = service.getConsumer();
+        const producer = service.getProducer();
+
+        let message: IMessage | undefined;
+        let channel: string | undefined;
+        await consumer.subscribe("*", { 
+            subscriptionId: "123", 
+            handler: (m, c) => { 
+                message = m;
+                channel = c;
+            } 
+        });
+        producer.send("foo", { 
+            data: { foo: "bar" } 
+        });
+
+         expect(message).toBeDefined();
+         expect(message!.data.foo).toBe("bar");
+         expect(channel).toBe("foo");
     });
 
     test("send message to consumer from multiple producers", async () => {
@@ -88,7 +122,7 @@ class TestBroker implements IMessageBrokerAdapter {
 
                 for (const item of this.consumers) {
                     if (isChannelNameMatch(item[0], channelName)) {
-                        item[1].send(message);
+                        item[1].send(message, channelName);
                     }
                 }      
             }
@@ -99,8 +133,8 @@ class TestBroker implements IMessageBrokerAdapter {
 class TestConsumer implements IMessageChannelConsumer {
     private readonly handlers: MessageHandler[] = [];
 
-    send(message: IMessage): void {
-        this.handlers.forEach(handler => handler(message));
+    send(message: IMessage, channel: string): void {
+        this.handlers.forEach(handler => handler(message, channel));
     }
 
     subscribe(options: ISubscribeOptions): Promise<ISubscription> {

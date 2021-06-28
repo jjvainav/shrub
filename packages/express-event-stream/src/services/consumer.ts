@@ -1,9 +1,10 @@
 import { createService, Singleton } from "@shrub/core";
 import { ILogger } from "@shrub/logging";
-import { IMessage, IMessageChannelConsumer, isChannelNameMatch, ISubscribeOptions, ISubscription, Message, MessageHandler } from "@shrub/messaging";
+import { IMessageChannelConsumer, isChannelNameMatch, ISubscribeOptions, ISubscription, MessageHandler } from "@shrub/messaging";
 import client, { IRequest, IRequestPromise } from "@sprig/request-client";
 import { IRequestEventStream, jsonValidator, RequestEventStream } from "@sprig/request-client-events";
 import urlJoin from "url-join";
+import { IMessageEnvelope } from "./producer";
 
 /** Represents an endpoint and channel mapping for a consumer to connect to. */
 export interface IEventStreamEndpoint {
@@ -120,7 +121,7 @@ class EventStreamChannelConsumer implements IMessageChannelConsumer {
 }
 
 class Subscription implements ISubscription {
-    private stream?: IRequestEventStream<IMessage>;
+    private stream?: IRequestEventStream<IMessageEnvelope>;
     private closed = false;
 
     constructor(
@@ -155,7 +156,7 @@ class Subscription implements ISubscription {
             });
         }
 
-        this.stream = new RequestEventStream<IMessage>({
+        this.stream = new RequestEventStream<IMessageEnvelope>({
             client,
             url,
             beforeRequest: this.interceptors && this.interceptors.beforeRequest,
@@ -163,7 +164,7 @@ class Subscription implements ISubscription {
             validate: (data, resolve, reject) => jsonValidator(
                 data,
                 obj => { 
-                    if (Message.isMessage(obj)) {
+                    if (this.isMessageEnvelope(obj)) {
                         resolve(obj);
                     }
                     else {
@@ -229,6 +230,10 @@ class Subscription implements ISubscription {
 
         // the 'current' promise will block handling the next message until the previous handler returns
         let current = Promise.resolve();
-        this.stream.onMessage(event => current = current.then(() => this.handler(event.data)));
+        this.stream.onMessage(event => current = current.then(() => this.handler(event.data.msg, event.data.ch)));
+    }
+
+    private isMessageEnvelope(data: any): data is IMessageEnvelope {
+        return (<IMessageEnvelope>data).ch !== undefined && (<IMessageEnvelope>data).msg !== undefined;
     }
 }

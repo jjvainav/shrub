@@ -131,7 +131,7 @@ export class Consumer implements IMessageConsumer {
                     : undefined;
 
             if (match) {
-                promises.push(Promise.resolve(match.handler(evt.message)));
+                promises.push(Promise.resolve(match.handler(evt.message, evt.channelName)));
             }
         }
 

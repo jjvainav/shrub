@@ -4,7 +4,7 @@ import createId from "@sprig/unique-id";
 import { IMessage, MessageMetadata } from "./message";
 
 /** Handles a message and optionally returns a promise to support async message handling and prevent the next message from being processed until this handler finishes. */
-export type MessageHandler = (message: IMessage) => void | Promise<void>;
+export type MessageHandler = (message: IMessage, channel: string) => void | Promise<void>;
 
 export interface IMessageService {
     /** Gets a consumer used to subscribe to messaging channels. */

@@ -22,11 +22,17 @@ export interface IEventStreamConsumerConnection {
     readonly onClose: IEvent;
 }
 
+/** @internal An envelope for a message that is sent over a stream to a consumers. */
+export interface IMessageEnvelope {
+    readonly ch: string;
+    readonly msg: IMessage;
+}
+
 interface IEventStream {
     readonly id: number;
     readonly subscriptionId: string;
     close(): void;
-    send(message: IMessage): void;
+    send(envelope: IMessageEnvelope): void;
 }
 
 export const IEventStreamProducerService = createService<IEventStreamProducerService>("express-event-stream-producer-service");
@@ -118,20 +124,22 @@ export class EventStreamProducerService implements IEventStreamProducerService {
             }
         }
 
+        // send the channel name to the subscriber incase they are subscribing using a pattern
+        const envelope: IMessageEnvelope = { msg: message, ch: channelName };
         for (const item of subscriptions.values()) {
             if (item.length === 1) {
-                item[0].send(message);
+                item[0].send(envelope);
                 continue;
             }
 
             // randomly choose a subscription to send the message too
             const stream = item[Math.floor(Math.random() * item.length)];
-            stream.send(message);
+            stream.send(envelope);
         }
     }
 
     private registerStream(channelNamePattern: string, subscriptionId: string, res: Response): IEventStream {
-        const send = (message: IMessage) => res.write(`data: ${JSON.stringify(message)}\n\n`);
+        const send = (envelope: IMessageEnvelope) => res.write(`data: ${JSON.stringify(envelope)}\n\n`);
 
         if (isChannelNamePattern(channelNamePattern)) {
             const id = this.nextId++;
