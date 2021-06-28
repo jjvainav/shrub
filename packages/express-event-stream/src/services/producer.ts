@@ -12,7 +12,7 @@ export interface IEventStreamProducerService {
     /** Gets whether or not a channel with the specified name is supported by the service. */
     isChannelSupported(channelName: string): boolean;
     /** Opens an event-stream for a consumer given the consumer's request and a channel name pattern. */
-    openStream(channelNamePattern: string, subscriptionId: string, req: Request, res: Response): IEventStreamConsumerConnection;
+    openStream(channelNamePattern: string, subscriptionId: string, req: Request, res: Response, filter?: IEventStreamMessageFilter): IEventStreamConsumerConnection;
     /** Adds the specified channel name pattern to the list of supported channel names; if no channels are whitelisted then all channels will be supported. */
     whitelistChannel(channelNamePattern: string): void;
 }
@@ -26,6 +26,14 @@ export interface IEventStreamConsumerConnection {
 export interface IMessageEnvelope {
     readonly ch: string;
     readonly msg: IMessage;
+}
+
+/** 
+ * A callback that allows filtering messages over an event stream channel; if the callback returns true, the message 
+ * will be sent over the stream to registered consumers, but if the callback returns false, the message will not be sent.
+ */
+ export interface IEventStreamMessageFilter {
+    (message: IMessage): boolean;
 }
 
 interface IEventStream {
@@ -55,7 +63,7 @@ export class EventStreamProducerService implements IEventStreamProducerService {
         return this.whitelist.isChannelSupported(channelName);
     }
 
-    openStream(channelNamePattern: string, subscriptionId: string, req: Request, res: Response): IEventStreamConsumerConnection {
+    openStream(channelNamePattern: string, subscriptionId: string, req: Request, res: Response, filter?: IEventStreamMessageFilter): IEventStreamConsumerConnection {
         res.status(200).set({
             "connection": "keep-alive",
             "content-type": "text/event-stream"
@@ -138,8 +146,12 @@ export class EventStreamProducerService implements IEventStreamProducerService {
         }
     }
 
-    private registerStream(channelNamePattern: string, subscriptionId: string, res: Response): IEventStream {
-        const send = (envelope: IMessageEnvelope) => res.write(`data: ${JSON.stringify(envelope)}\n\n`);
+    private registerStream(channelNamePattern: string, subscriptionId: string, res: Response, filter?: IEventStreamMessageFilter): IEventStream {
+        const send = (envelope: IMessageEnvelope) => {
+            if (!filter || filter(envelope.msg)) {
+                res.write(`data: ${JSON.stringify(envelope)}\n\n`);
+            }
+        }
 
         if (isChannelNamePattern(channelNamePattern)) {
             const id = this.nextId++;

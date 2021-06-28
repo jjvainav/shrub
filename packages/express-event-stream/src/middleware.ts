@@ -3,7 +3,7 @@ import { isChannelNameMatch } from "@shrub/messaging";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import { Request, RequestHandler, Response } from "express";
 import { PathParams } from "express-serve-static-core";
-import { IEventStreamProducerService } from "./services/producer";
+import { IEventStreamMessageFilter, IEventStreamProducerService } from "./services/producer";
 
 declare module "@shrub/express/dist/request-context" {
     interface IRequestContext {
@@ -104,7 +104,7 @@ export function EventStream(path: PathParams, ...handlers: RequestHandler[]): (t
  * IMPORTANT: the stream will not be open unless the function invokes next() or invokes req.context.eventStreamChannel.open(); this allows
  * the controller function the ability to perform pre-processing of the request before opening the stream.
  */
-export function EventStreamChannel(path: PathParams, builder?: IEventStreamChannelPatternBuilder): (target: any, propertyKey: string) => void;
+export function EventStreamChannel(path: PathParams, builder?: IEventStreamChannelPatternBuilder, filter?: IEventStreamMessageFilter): (target: any, propertyKey: string) => void;
 /** 
  * A controller function decorator that will open an event-stream messaging channel for requesting routes
  * and is the endpoint for event-stream messaging consumers. The endpoint the EventStreamChannel is
@@ -115,7 +115,7 @@ export function EventStreamChannel(path: PathParams, builder?: IEventStreamChann
  * IMPORTANT: the stream will not be open unless the function invokes next() or invokes req.context.eventStreamChannel.open(); this allows
  * the controller function the ability to perform pre-processing of the request before opening the stream.
  */
-export function EventStreamChannel(path: PathParams, options?: IEventStreamChannelOptions): (target: any, propertyKey: string) => void;
+export function EventStreamChannel(path: PathParams, options?: IEventStreamChannelOptions, filter?: IEventStreamMessageFilter): (target: any, propertyKey: string) => void;
 /** 
  * A controller function decorator that will open an event-stream messaging channel for requesting routes
  * and is the endpoint for event-stream messaging consumers. The producerChannelPattern defines the channels
@@ -124,15 +124,15 @@ export function EventStreamChannel(path: PathParams, options?: IEventStreamChann
  * IMPORTANT: the stream will not be open unless the function invokes next() or invokes req.context.eventStreamChannel.open(); this allows
  * the controller function the ability to perform pre-processing of the request before opening the stream.
  */
-export function EventStreamChannel(path: PathParams, producerChannelPattern?: string): (target: any, propertyKey: string) => void;
-export function EventStreamChannel(path: PathParams, arg?: IEventStreamChannelPatternBuilder | IEventStreamChannelOptions | string): (target: any, propertyKey: string) => void {
+export function EventStreamChannel(path: PathParams, producerChannelPattern?: string, filter?: IEventStreamMessageFilter): (target: any, propertyKey: string) => void;
+export function EventStreamChannel(path: PathParams, arg?: IEventStreamChannelPatternBuilder | IEventStreamChannelOptions | string, filter?: IEventStreamMessageFilter): (target: any, propertyKey: string) => void {
     const options = toEventStreamChannelOptions(arg);
     const handlers = options.handlers || [];
 
     return createRouteDecorator((router, handler) => router.get(path, ...handlers, (req, res, next) => {
         const pattern = options.builder ? options.builder(req) : options.pattern;
         validateConsumerParams(pattern, req, res, (channel, subscriptionId) => {
-            const eventStreamChannel = new EventStreamChannelImplementation(req.context.services.get(IEventStreamProducerService), req, res, channel, subscriptionId);
+            const eventStreamChannel = new EventStreamChannelImplementation(req.context.services.get(IEventStreamProducerService), req, res, channel, subscriptionId, filter);
             req.contextBuilder.addEventStreamChannel(eventStreamChannel);
             
             handler(req, res, (err?: any) => {
@@ -250,7 +250,8 @@ class EventStreamChannelImplementation implements IEventStreamChannel {
         private readonly req: Request, 
         private readonly res: Response,
         readonly channelNamePattern: string,
-        readonly subscriptionId: string) {
+        readonly subscriptionId: string,
+        readonly filter?: IEventStreamMessageFilter) {
     }
 
     get onClose(): IEvent {
@@ -267,7 +268,7 @@ class EventStreamChannelImplementation implements IEventStreamChannel {
 
     open(): void {
         if (!this._isOpen) {
-            const connection = this.service.openStream(this.channelNamePattern, this.subscriptionId, this.req, this.res);
+            const connection = this.service.openStream(this.channelNamePattern, this.subscriptionId, this.req, this.res, this.filter);
             connection.onClose(() => {
                 this._isOpen = false;
                 this._close.emit();
