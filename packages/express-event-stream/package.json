@@ -31,11 +31,11 @@
         "@shrub/logging": "0.5.19",
         "@shrub/messaging": "0.5.19",
         "@shrub/tracing": "0.5.19",
-        "@sprig/event-emitter": "^0.1.64",
-        "@sprig/request-client": "^0.1.64",
-        "@sprig/request-client-events": "^0.1.64",
-        "@sprig/request-client-mock": "^0.1.64",
-        "@sprig/unique-id": "^0.1.64",
+        "@sprig/event-emitter": "^0.1.65",
+        "@sprig/request-client": "^0.1.65",
+        "@sprig/request-client-events": "^0.1.65",
+        "@sprig/request-client-mock": "^0.1.65",
+        "@sprig/unique-id": "^0.1.65",
         "url-join": "^4.0.1"
     },
     "devDependencies": {

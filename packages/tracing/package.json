@@ -27,6 +27,6 @@
     "dependencies": {
         "@shrub/core": "0.5.19",
         "@shrub/logging": "0.5.19",
-        "@sprig/unique-id": "^0.1.64"
+        "@sprig/unique-id": "^0.1.65"
     }
 }

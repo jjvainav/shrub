@@ -26,7 +26,7 @@
     },
     "dependencies": {
         "@shrub/core": "0.5.19",
-        "@sprig/event-emitter": "^0.1.64",
-        "@sprig/unique-id": "^0.1.64"
+        "@sprig/event-emitter": "^0.1.65",
+        "@sprig/unique-id": "^0.1.65"
     }
 }
