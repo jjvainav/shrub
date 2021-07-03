@@ -1,7 +1,7 @@
 {
     "name": "@shrub/express-yup",
     "description": "Express module that provides error middleware for yup validation errors.",
-    "version": "0.5.23",
+    "version": "0.5.24",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -30,9 +30,10 @@
         "@types/yup": "^0.26.24"
     },
     "dependencies": {
-        "@shrub/core": "0.5.23",
-        "@shrub/express": "0.5.23",
+        "@shrub/core": "0.5.24",
+        "@shrub/express": "0.5.24",
         "express": "^4.17.1",
         "yup": "^0.27.0"
-    }
+    },
+    "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
 }
