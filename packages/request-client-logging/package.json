@@ -23,6 +23,6 @@
     "dependencies": {
         "@shrub/core": "0.5.22",
         "@shrub/logging": "0.5.22",
-        "@sprig/request-client": "^0.1.67"
+        "@sprig/request-client": "^0.1.68"
     }
 }

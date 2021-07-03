@@ -30,7 +30,7 @@
     "dependencies": {
         "@shrub/core": "0.5.22",
         "@shrub/express": "0.5.22",
-        "@sprig/request-client": "^0.1.67",
+        "@sprig/request-client": "^0.1.68",
         "express": "^4.17.1"
     }
 }
