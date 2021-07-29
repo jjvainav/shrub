@@ -18,6 +18,7 @@ describe("channel whitelist", () => {
         expect(isChannelNameMatch("foo*", "foo")).toBe(true);
         expect(isChannelNameMatch("foo:*", "foo")).toBe(false);
         expect(isChannelNameMatch("foo:*", "foo:bar")).toBe(true);
+        expect(isChannelNameMatch("foo:*", "foo:bar:1")).toBe(true);
         expect(isChannelNameMatch("foo:*:*", "foo:bar:1")).toBe(true);
         expect(isChannelNameMatch("foo:*:1", "foo:bar:1")).toBe(true);
         expect(isChannelNameMatch("foo:*:1", "foo:bar:*")).toBe(false);
