@@ -934,14 +934,19 @@
     vue "^2.6.10"
     vue-class-component "^7.1.0"
 
-"@sprig/event-emitter-dom@^0.1.59":
-  version "0.1.59"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.1.59.tgz#9d6cff015e3f2566f7b88d11c954e1ce54bea844"
-  integrity sha512-tLMDB+OBoCydmDcRLdj0NfeNZF6L9SJkyEMTNwM+D36h5V3DTRLFIvVejOEQfvI2AGjNTjwPIJeiAJG8QFmqDQ==
+"@sprig/event-emitter-dom@^0.1.69":
+  version "0.1.69"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.1.69.tgz#3fad0caba8606fb6a9061684628724e8f8f9adff"
+  integrity sha512-5KUSMNVTN+A0FLirmr6+Fit5VcF+dyfTrc0iCTxRgeqe/hIK3bpMgL932tyZK+cvAF2CRfYIC4V7o0f9foF2/Q==
   dependencies:
-    "@sprig/event-emitter" "0.1.59"
+    "@sprig/event-emitter" "0.1.69"
 
-"@sprig/event-emitter@0.1.59", "@sprig/event-emitter@^0.1.58", "@sprig/event-emitter@^0.1.59":
+"@sprig/event-emitter@0.1.69", "@sprig/event-emitter@^0.1.69":
+  version "0.1.69"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.69.tgz#8d78971fa4d4f291fb1ba697406fb2a7f65697dd"
+  integrity sha512-ISLDki8zn2COWzfcDwD0//VFyBYQicSK/Sx/AQEmMkUQzonPwYETWUh6CvwGvytHkL87qkJInMiULr/YyGmfBQ==
+
+"@sprig/event-emitter@^0.1.58":
   version "0.1.59"
   resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.59.tgz#1a6250219f9a558285abf14befc880e3cc11329f"
   integrity sha512-5Bvg8JdQ/Ob25B6hb/ds9PMrYUB1tJstPNLDubwTtLSZ3+f2Vl6i2XH0p7mBmcfUXSAoSHPkBZJXWDOpqIKq9A==
@@ -1107,11 +1112,6 @@
   dependencies:
     "@types/mime" "^1"
     "@types/node" "*"
-
-"@types/socket.io-client@^1.4.32":
-  version "1.4.36"
-  resolved "https://registry.yarnpkg.com/@types/socket.io-client/-/socket.io-client-1.4.36.tgz#e4f1ca065f84c20939e9850e70222202bd76ff3f"
-  integrity sha512-ZJWjtFBeBy1kRSYpVbeGYTElf6BqPQUkXDlHHD4k/42byCN5Rh027f4yARHCink9sKAkbtGZXEAmR0ZCnc2/Ag==
 
 "@vue/component-compiler-utils@^3.1.0":
   version "3.2.0"
@@ -5951,9 +5951,9 @@ tapable@^2.0.0, tapable@^2.1.1, tapable@^2.2.0:
   integrity sha512-FBk4IesMV1rBxX2tfiK8RAmogtWn53puLOQlvO8XuwlgxcYbP4mVPS9Ph4aeamSyyVjOl24aYWAuc8U5kCVwMw==
 
 tar@^4.4.12:
-  version "4.4.13"
-  resolved "https://registry.yarnpkg.com/tar/-/tar-4.4.13.tgz#43b364bc52888d555298637b10d60790254ab525"
-  integrity sha512-w2VwSrBoHa5BsSyH+KxEqeQBAllHhccyMFVHtGtdMpF4W7IRWfZjFiQceJPChOeTsSDVUpER2T8FA93pr0L+QA==
+  version "4.4.15"
+  resolved "https://registry.yarnpkg.com/tar/-/tar-4.4.15.tgz#3caced4f39ebd46ddda4d6203d48493a919697f8"
+  integrity sha512-ItbufpujXkry7bHH9NpQyTXPbJ72iTlXgkBAYsAjDXk3Ds8t/3NfO5P4xZGy7u+sYuQUbimgzswX4uQIEeNVOA==
   dependencies:
     chownr "^1.1.1"
     fs-minipass "^1.2.5"
