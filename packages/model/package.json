@@ -1,7 +1,7 @@
 {
     "name": "@shrub/model",
     "description": "A module that adds a service for managing shared model objects.",
-    "version": "0.5.26",
+    "version": "0.5.27",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -22,7 +22,7 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.26",
+        "@shrub/core": "0.5.27",
         "@sprig/serialization": "0.1.69"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
