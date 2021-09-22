@@ -1,6 +1,6 @@
 import { createService, Transient } from "@shrub/core";
 import { IMessageProducer, MessageMetadata } from "@shrub/messaging";
-import { EventMessage } from "./event";
+import { EntityEventMessage, EventMessage } from "./event";
 
 /** Handles publishing events against a message producer. */
 export interface IEventPublisher {
@@ -12,10 +12,10 @@ export interface IEventPublisher {
 export interface IEventDetails {
     /** The type of event being published. */
     readonly eventType: string;
-    /** The id of the resource the event is associated with. */
-    readonly resourceId: string;
-    /** A value identifying the type of resource. */
-    readonly resourceType: string;
+    /** The id of the entity the event is associated with. */
+    readonly entityId?: string;
+    /** A value identifying the type of entity. */
+    readonly entityType?: string;
     /** Additional metadata to associate with the event message. */
     readonly metadata?: MessageMetadata;
     /** The event data. */
@@ -30,12 +30,20 @@ export class EventPublisher implements IEventPublisher {
     }
 
     publish(channel: string, event: IEventDetails): void {
+        if (event.entityId && !event.entityType) {
+            throw new Error("entityType is required if an entity id is provided.");
+        }
+
+        if (!event.entityId && event.entityType) {
+            throw new Error("entityId is required if an entity type is provided.");
+        }
+
         this.producer.send(channel, {
             metadata: {
                 ...event.metadata,
                 [`${EventMessage.Metadata.eventType}`]: event.eventType,
-                [`${EventMessage.Metadata.resourceId}`]: event.resourceId,
-                [`${EventMessage.Metadata.resourceType}`]: event.resourceType
+                [`${EntityEventMessage.Metadata.entityId}`]: event.entityId,
+                [`${EntityEventMessage.Metadata.entityType}`]: event.entityType
             },
             data: event.data
         });

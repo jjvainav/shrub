@@ -3,23 +3,32 @@ import { IMessage, MessageMetadata } from "@shrub/messaging";
 /** Defines required and known metadata for an event. */
 export type EventMessageMetadata = MessageMetadata & {
     readonly "event-type": string;
-    readonly "resource-id": string;
-    readonly "resource-type": string;
 };
 
-/** Defines a message representing an event against a specific resource. */
+/** Defines required and known metadata for an entity event. */
+export type EntityEventMessageMetadata = EventMessageMetadata & {
+    readonly "entity-id": string;
+    readonly "entity-type": string;
+};
+
+/** Defines a message for an event. */
 export interface IEventMessage extends IMessage {
     readonly metadata: EventMessageMetadata;
 }
 
+/** Defines a message representing an event against a specific entity. */
+export interface IEntityEventMessage extends IEventMessage {
+    readonly metadata: EntityEventMessageMetadata;
+}
+
 /** Defines a handler for an event message. */
-export interface IEventMessageHandler {
-    (message: IEventMessage): Promise<void>;
+export interface IEventMessageHandler<TEventMessage extends IEventMessage = IEventMessage> {
+    (message: TEventMessage): Promise<void>;
 }
 
 /** A callback that returns a key for an event message. */
-export interface IEventMessageKeySelector {
-    (message: IEventMessage): string;
+export interface IEventMessageKeySelector<TEventMessage extends IEventMessage = IEventMessage> {
+    (message: TEventMessage): string;
 }
 
 /** Represents a registered route for a router. */
@@ -33,10 +42,6 @@ export namespace EventMessage {
     export namespace Metadata {
         /** The type of event. */
         export const eventType = "event-type";
-        /** The id of the resource the event is associated with. */
-        export const resourceId = "resource-id";
-        /** The type of resource the event is associated with. */
-        export const resourceType = "resource-type";
     }
 
     export function isEventMessage(message: IMessage): message is IEventMessage {
@@ -44,18 +49,32 @@ export namespace EventMessage {
     }
 }
 
-/** A utility class that will handle routing messages to event message handlers based on a routing key. */
-export class EventMessageRouter {
-    private readonly handlers = new Map<string, Set<IEventMessageHandler>>();
-
-    constructor(private readonly keySelector: IEventMessageKeySelector) {
+export namespace EntityEventMessage {
+    /** Defines common metadata for an event message. */
+    export namespace Metadata {
+        /** The id of the entity the event is associated with. */
+        export const entityId = "entity-id";
+        /** The type of entity the event is associated with. */
+        export const entityType = "entity-type";
     }
 
-    addRoute(key: string, handler: IEventMessageHandler): IEventMessageRoute {
+    export function isEntityEventMessage(message: IMessage): message is IEntityEventMessage {
+        return message.metadata[Metadata.entityId] !== undefined;
+    }
+}
+
+/** A utility class that will handle routing messages to event message handlers based on a routing key. */
+export class EventMessageRouter<TEventMessage extends IEventMessage = IEventMessage> {
+    private readonly handlers = new Map<string, Set<IEventMessageHandler<TEventMessage>>>();
+
+    constructor(private readonly keySelector: IEventMessageKeySelector<TEventMessage>) {
+    }
+
+    addRoute(key: string, handler: IEventMessageHandler<TEventMessage>): IEventMessageRoute {
         let handlers = this.handlers.get(key);
 
         if (!handlers) {
-            handlers = new Set<IEventMessageHandler>();
+            handlers = new Set<IEventMessageHandler<TEventMessage>>();
             this.handlers.set(key, handlers);
         }
 
@@ -63,7 +82,7 @@ export class EventMessageRouter {
         return { remove: () => this.removeHandler(key, handler) };
     }
 
-    async handle(message: IEventMessage): Promise<void> {
+    async handle(message: TEventMessage): Promise<void> {
         const handlers = this.handlers.get(this.keySelector(message));
 
         if (handlers) {
@@ -76,7 +95,7 @@ export class EventMessageRouter {
         }
     }
 
-    private removeHandler(key: string, handler: IEventMessageHandler): void {
+    private removeHandler(key: string, handler: IEventMessageHandler<TEventMessage>): void {
         const handlers = this.handlers.get(key);
         // delete the handler and delete the handler set if empty
         if (handlers && handlers.delete(handler) && handlers.size === 0) {
