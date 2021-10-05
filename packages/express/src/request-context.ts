@@ -1,5 +1,4 @@
 import { createService, IServiceCollection, Singleton, Transient } from "@shrub/core";
-import { IControllerRequestService } from "./internal";
 
 declare global {
     namespace Express {
@@ -30,7 +29,7 @@ type Mutable<T> = { -readonly[P in keyof T]: T[P] };
 export interface IRequestContext {
     /** Available to express middleware for associating arbitrary state with a request. */
     readonly bag: { [key: string]: any };
-    /** A reference to the service collection avaible to the request. */
+    /** A reference to the service collection available to the request. */
     readonly services: IServiceCollection;
 }
 
@@ -75,14 +74,8 @@ export interface IRequestContextBuilderMap {
     readonly [name: string]: IRequestContextBuilderCallback;
 }
 
-/** 
- * A service that provides access to the current request context. 
- * 
- * Caution needs to used with this service. It is intended for internal API services that need access 
- * to the current request context and any API service that depends on this service must be transient.
- */
+/** A service that provides access to the builder for the current request context. */
 export interface IRequestContextService {
-    readonly current?: IRequestContext;
     getBuilder(): IRequestContextBuilder;
 }
 
@@ -113,20 +106,15 @@ export class RequestContextBuilderRegistration implements IRequestContextBuilder
 /** @internal */
 @Transient
 export class RequestContextService implements IRequestContextService {
-    readonly current?: IRequestContext;
-
     constructor(
         @IServiceCollection private readonly services: IServiceCollection,
-        @IRequestContextBuilderRegistration private readonly builders: IRequestContextBuilderRegistration,
-        @IControllerRequestService service: IControllerRequestService) {
-        const req = service.getCurrentRequest();
-        this.current = req && req.context;
+        @IRequestContextBuilderRegistration private readonly builders: IRequestContextBuilderRegistration) {
     }
 
     getBuilder(): IRequestContextBuilder {
         let context: IRequestContext = {
             bag: {},
-            services: this.services
+            services: this.services.createScope()
         };
 
         const builder: any = { instance: () => context };

@@ -1,34 +1,48 @@
+import { createService } from "@shrub/core";
 import { NextFunction, Request, Response } from "express";
 import request from "supertest";
-import { IInstantiationService } from "@shrub/core";
-import { ExpressFactory, Get, IRequestContext, IRequestContextService, Route, useController } from "../src";
+import { ExpressFactory, Get, Route, useController } from "../src";
 
-describe("request context service", () => {
-    test("ensure request context instance is the same assigned to the current request", async () => {
-        const app = await ExpressFactory.create();
+describe("request context service", () => { 
+    test("ensure scoped service state between multiple invocations", async () => {
+        const app = await ExpressFactory.useModules([{
+            name: "test",
+            configureServices: registration => registration.registerScoped(ITestService, TestService)
+        }])
+        .create();
+
         app.use(useController(FooController));
 
-        const response = await request(app).get("/foo");
-        expect(response.body.areEqual).toBe(true);
+        const responses = await Promise.all([
+            request(app).get("/foo"),
+            request(app).get("/foo")
+        ]);
+
+        expect(responses[0].body.before).toBe(responses[0].body.after);
+        expect(responses[1].body.before).toBe(responses[1].body.after);
+
+        expect(responses[0].body.before).not.toBe(responses[1].body.before);
     });   
 });
 
-class CaptureRequestContext {
-    constructor(@IRequestContextService private readonly service: IRequestContextService) {
-    }
+interface ITestService {
+    readonly value: number;
+}
 
-    getContext(): IRequestContext | undefined {
-        return this.service.current;
-    }
+let counter = 1;
+const ITestService = createService<ITestService>("test-service");
+
+class TestService implements ITestService {
+    readonly value = counter++;
 }
 
 @Route("/foo")
 class FooController {
     @Get("/")
     getFoo(req: Request, res: Response, next: NextFunction): void {
-        // the request context service will get injected into the CaptureRequestContext
-        // the request context is expected to be the same as the one associated with the Request
-        const test = req.context.services.get(IInstantiationService).createInstance(CaptureRequestContext);
-        res.json({ areEqual: test.getContext() === req.context });
+        // scoped services allow maintaining state between async calls while handling a request
+        // capture the value before and after the 'async' call to verify the state is unchanged
+        const before = req.context.services.get(ITestService).value;
+        setTimeout(() => res.json({ before, after: req.context.services.get(ITestService).value }), 0);
     }
 }

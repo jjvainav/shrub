@@ -231,10 +231,35 @@ describe("service lifetime", () => {
         const instance1 = services.get(ISingletonService);
         const instance2 = services.get(ISingletonService);
         const instance3 = services.createScope().get(ISingletonService);
+        const instance4 = services.createScope().get(ISingletonService);
 
         expect(instance1).toBeInstanceOf(SingletonService);
         expect(instance1).toBe(instance2);
         expect(instance1).toBe(instance3);
+        expect(instance1).toBe(instance4);
+    });
+
+    test("register singleton and create a chain of scoped collections", () => {
+        const services = new ServiceMap();
+
+        services.register(ISingletonService, SingletonService);
+
+        const scope1 = services.createScope();
+        const scope2 = scope1.createScope();
+        const scope3 = scope2.createScope();
+        const scope4 = scope3.createScope();
+
+        const instance1 = scope4.get(ISingletonService);
+        const instance2 = scope3.get(ISingletonService);
+        const instance3 = scope2.get(ISingletonService);
+        const instance4 = scope1.get(ISingletonService);
+        const instance5 = services.get(ISingletonService);
+
+        expect(instance1).toBeInstanceOf(SingletonService);
+        expect(instance1).toBe(instance2);
+        expect(instance1).toBe(instance3);
+        expect(instance1).toBe(instance4);
+        expect(instance1).toBe(instance5);
     });
 
     test("register scoped", () => {
@@ -599,6 +624,16 @@ describe("service disposal", () => {
 
         // the service collection does not maintain a reference to transient instances and are thus not tied to the scopes lifecycle
         expect(instance.isDisposed).toBeFalsy();
+    });
+
+    test("ensure instance of self is ignored when disposing", () => {
+        const services = new ServiceMap();
+
+        const scope = services.createScope();
+        scope.get(IServiceCollection);
+        scope.dispose();
+
+        // no need to assert, simply verifying the call to dispose does not cause a stack overflow
     });
 });
 

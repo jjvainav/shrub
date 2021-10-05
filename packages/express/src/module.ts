@@ -1,7 +1,9 @@
 import express from "express";
-import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration, IServiceCollection } from "@shrub/core";
+import { 
+    createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, 
+    IScopedServiceCollection, IServiceRegistration, IServiceCollection 
+} from "@shrub/core";
 import { HttpModule, IHttpModuleConfiguration, IHttpServer } from "@shrub/http";
-import { ControllerRequestService, IControllerRequestService } from "./internal";
 import { 
     IRequestContextBuilderCallback, IRequestContextBuilderRegistration, IRequestContextService, 
     RequestContextBuilderRegistration, RequestContextService 
@@ -30,7 +32,6 @@ export class ExpressModule implements IModule {
     }
 
     configureServices(registration: IServiceRegistration): void {
-        registration.register(IControllerRequestService, ControllerRequestService);
         registration.register(IRequestContextBuilderRegistration, RequestContextBuilderRegistration);
         registration.register(IRequestContextService, RequestContextService);
         registration.registerSingleton(IExpressApplication, {
@@ -40,6 +41,8 @@ export class ExpressModule implements IModule {
 
                 app.use((req, res, next) => {
                     const builder = services.get(IRequestContextService).getBuilder();
+
+                    res.on("finish", () => (<IScopedServiceCollection>builder.instance().services).dispose());
 
                     // note: these properties need to be configurable to support express sub apps
                     // when loading a set of modules as an independent sub app the root app will

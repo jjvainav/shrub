@@ -1,7 +1,6 @@
 import { RequestHandler, Router } from "express";
 import { PathParams } from "express-serve-static-core";
 import { IInstantiationService } from "@shrub/core";
-import { IControllerRequestService } from "./internal";
 
 export type Constructor<T> = { new(...args: any[]): T };
 
@@ -113,7 +112,6 @@ function registerRoute(path: PathParams, handlers: RequestHandler[], cb: (router
 /** Middleware that creates a new Controller instance for a request. */
 function createController<T>(ctor: Constructor<T>): RequestHandler {
     return (req, _, next) => {
-        req.context.services.get(IControllerRequestService).captureRequest(req);
         (<any>req)[controllerKey] = req.context.services.get(IInstantiationService).createInstance(ctor);
         next();
     };

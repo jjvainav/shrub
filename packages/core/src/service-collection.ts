@@ -97,7 +97,6 @@ interface IServiceEntry<T = any> {
     readonly scope: ServiceScope;
     readonly ctor?: Constructor<T>;
     readonly factory?: IServiceFactory<T>;
-    instance?: T;
 }
 
 export const IInstantiationService = createService<IInstantiationService>("instantiation-service");
@@ -248,10 +247,11 @@ export class SingletonServiceFactory<T> implements IServiceFactory<T> {
 }
 
 export class ServiceMap implements IServiceRegistration, IServiceCollection, IOptionsService, IInstantiationService {
-    private readonly services = new Map<string, IServiceEntry>();
+    private readonly instances = new Map<string, any>();
     private isFrozen?: boolean;
 
-    constructor() {
+    /** Creates a new ServiceMap instance; note: the services parameter is for internal purposes and should not be used. */
+    constructor(private readonly services = new Map<string, IServiceEntry>()) {
         // the thisFactory is necessary for scoped collections
         const thisFactory = { create: () => this };
         this.registerService(IInstantiationService, ServiceScope.scoped, thisFactory);
@@ -273,39 +273,33 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
 
     createScope(): IScopedServiceCollection {
         const parent = this;
+        const getOrCreateServiceInstanceFromParent = this.getOrCreateServiceInstance.bind(this);
         return new class extends ServiceMap implements IDisposable {
             constructor() {
-                super();
-
-                // The service map registers a few built-in services that need to be handled a little differently
-                // -- if the service is singleton/instance it gets copied from the parent
-                // -- if the service is scoped/transient do not overwrite the entry from the parent
-
-                for (const entry of parent.services.values()) {
-                    if (entry.scope === ServiceScope.singleton || entry.scope === ServiceScope.instance) {
-                        // copy the singleton entry directly to the scoped collection - it's possible the instance has not yet been created so the entire entry gets copied down
-                        this.registerEntry(entry);
-                    }
-                    else if (!this.services.has(entry.service.key)) {
-                        // create a new entry for scoped/transient services
-                        this.registerEntry({ ...entry, instance: undefined })
-                    }
-                }
-
+                super(parent.services);
                 this.freeze();
             }
 
             dispose(): void {
-                for (const service of this.services.values()) {
-                    // only dispose scoped service instances that were instantiated by the current service scope
-                    if (service.instance &&
-                        service.scope === ServiceScope.scoped &&
-                        isDisposable(service.instance)) {
-                        service.instance.dispose();
+                for (const instance of this.instances.values()) {
+                    // dispose instances created and referenced by the scope; this will be scoped and transient instances
+                    // also make sure we don't dispose the current instance as that will cause a stack overflow
+                    if (instance !== this && isDisposable(instance)) {
+                        instance.dispose();
                     }
                 }
 
-                this.services.clear();
+                this.instances.clear();
+            }
+
+            protected getOrCreateServiceInstance(key: string, ancestors?: Constructor<any>[]): any {
+                const entry = this.services.get(key);
+                if (entry !== undefined && (entry.scope === ServiceScope.singleton || entry.scope === ServiceScope.instance)) {
+                    // if the service is an instance or singleton call up the parent chain and get the instance from the root
+                    return getOrCreateServiceInstanceFromParent(key, ancestors);
+                }
+
+                return super.getOrCreateServiceInstance(key, ancestors);
             }
         }
     }
@@ -325,11 +319,8 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
 
         // TODO: check if the instance constructor has a required scope - if so, verify its a singleton
 
-        this.services.set(service.key, {
-            service,
-            scope: ServiceScope.instance,
-            instance
-        });
+        this.instances.set(service.key, instance);
+        this.services.set(service.key, { service, scope: ServiceScope.instance });
     }
 
     registerScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): void {
@@ -412,6 +403,26 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         this.isFrozen = true;
     }
 
+    protected getOrCreateServiceInstance(key: string, ancestors?: Constructor<any>[]): any {
+        const entry = this.services.get(key);
+
+        if (!entry) {
+            throw new Error(`Service not registered for key '${key}'.`);
+        }
+
+        let current = this.instances.get(key);
+        if (current) {
+            return current;
+        }
+
+        const instance = this.createServiceInstance(entry, ancestors);
+        if (entry.scope === ServiceScope.scoped || entry.scope === ServiceScope.singleton) {
+            this.instances.set(key, instance);
+        }
+
+        return instance;
+    }
+
     private registerService(service: IService<any>, scope: ServiceScope, ctorOrFactory: Constructor<any> | IServiceFactory<any>): void {
         this.registerEntry({
             service,
@@ -448,25 +459,6 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         if (requiredScope && requiredScope !== scope) {
             throw new Error("Registered service scope is different than the instance required scope");
         }
-    }
-
-    private getOrCreateServiceInstance(key: string, ancestors?: Constructor<any>[]): any {
-        const entry = this.services.get(key);
-
-        if (!entry) {
-            throw new Error(`Service not registered for key '${key}'.`);
-        }
-
-        if (entry.instance) {
-            return entry.instance;
-        }
-
-        const instance = this.createServiceInstance(entry, ancestors);
-        if (entry.scope === ServiceScope.scoped || entry.scope === ServiceScope.singleton) {
-            entry.instance = instance;
-        }
-
-        return instance;
     }
 
     private getOrCreateInjectable<T>(injectable: IInjectable<T>, ancestors?: Constructor<any>[]): T {
