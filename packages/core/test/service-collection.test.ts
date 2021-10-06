@@ -640,9 +640,13 @@ describe("service disposal", () => {
 describe("service scope", () => {
     test("service collection is same instance as scope", () => {
         const parent = new ServiceMap();
-        const scope = parent.createScope();
-        const services = scope.get(IServiceCollection);
-        expect(services).toBe(scope);
+        const scope1 = parent.createScope();
+        const scope2 = scope1.createScope();
+        const services = scope2.get(IServiceCollection);
+
+        expect(services).not.toBe(parent);
+        expect(services).not.toBe(scope1);
+        expect(services).toBe(scope2);
     });
 
     test("instantiation service is same instance as scope", () => {

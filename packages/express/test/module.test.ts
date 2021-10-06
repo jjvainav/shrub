@@ -1,5 +1,16 @@
+import { createService } from "@shrub/core";
 import request from "supertest";
 import { ExpressFactory, ExpressModule, IExpressConfiguration, IRequestContext } from "../src";
+
+const IScopedService = createService<IScopedService>("scoped-service");
+
+interface IScopedService {
+}
+
+class ScopedService implements IScopedService {
+    constructor() {
+    }
+}
 
 describe("express module", () => {
     test("ensure request context is added to express request", async () => {
@@ -20,6 +31,36 @@ describe("express module", () => {
 
         expect(context).toBeDefined();
         expect(context!.services).toBeDefined();
+    });
+
+    test("ensure request context uses a scoped service per request", async () => {
+        const instances: IScopedService[] = [];
+        const app = await ExpressFactory.useModules([{
+            name: "test",
+            dependencies: [ExpressModule],
+            configureServices: registration => registration.registerScoped(IScopedService, ScopedService),
+            configure: ({ config }) => {
+                // add a couple middleware functions to capture an instance of the scoped service
+                config.get(IExpressConfiguration).use((req, res, next) => {
+                    instances.push(req.context.services.get(IScopedService));
+                    next();
+                });
+                config.get(IExpressConfiguration).use("/", (req, res, next) => {
+                    instances.push(req.context.services.get(IScopedService));
+                    res.sendStatus(200);
+                });
+            }
+        }])
+        .create();
+
+        // invoke the endpoint a couple of times to test the scoped service is a different instance
+        await request(app).get("/");
+        await request(app).get("/");
+
+        expect(instances).toHaveLength(4);
+        expect(instances[0]).toBe(instances[1]);
+        expect(instances[2]).toBe(instances[3]);
+        expect(instances[0]).not.toBe(instances[2]);
     });
 
     test("using express module as a sub-app", async () => {

@@ -13,6 +13,6 @@ describe("express zod middleware", () => {
         const result = await request(app).get("/test");
 
         expect(result.status).toBe(400);
-        expect(result.body.message).toBe("foo: required");
+        expect(result.body.message).toBe("foo - Required");
     });
 });

@@ -11,7 +11,7 @@ export class ExpressZodModule implements IModule {
         await next();
         config.get(IExpressConfiguration).use((err: Error, req: Request, res: Response, next: NextFunction) => {
             if (err instanceof zod.ZodError) {
-                res.status(400).json({ message: err.message });
+                res.status(400).json({ message: err.issues.map(issue => `${issue.path.join("/")} - ${issue.message}`).join("/n") });
             }
             else {
                 next(err);

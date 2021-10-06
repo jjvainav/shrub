@@ -1,8 +1,5 @@
 import express from "express";
-import { 
-    createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, 
-    IScopedServiceCollection, IServiceRegistration, IServiceCollection 
-} from "@shrub/core";
+import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration, IServiceCollection } from "@shrub/core";
 import { HttpModule, IHttpModuleConfiguration, IHttpServer } from "@shrub/http";
 import { 
     IRequestContextBuilderCallback, IRequestContextBuilderRegistration, IRequestContextService, 
@@ -40,9 +37,11 @@ export class ExpressModule implements IModule {
                 this.overrideListen(services, app);
 
                 app.use((req, res, next) => {
-                    const builder = services.get(IRequestContextService).getBuilder();
+                    // use a scoped service collection for the request
+                    const requestServices = services.createScope();
+                    const builder = requestServices.get(IRequestContextService).getBuilder();
 
-                    res.on("finish", () => (<IScopedServiceCollection>builder.instance().services).dispose());
+                    res.on("finish", () => requestServices.dispose());
 
                     // note: these properties need to be configurable to support express sub apps
                     // when loading a set of modules as an independent sub app the root app will

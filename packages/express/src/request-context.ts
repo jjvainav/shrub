@@ -1,4 +1,4 @@
-import { createService, IServiceCollection, Singleton, Transient } from "@shrub/core";
+import { createService, IServiceCollection, Scoped, Singleton } from "@shrub/core";
 
 declare global {
     namespace Express {
@@ -74,7 +74,7 @@ export interface IRequestContextBuilderMap {
     readonly [name: string]: IRequestContextBuilderCallback;
 }
 
-/** A service that provides access to the builder for the current request context. */
+/** @internal */
 export interface IRequestContextService {
     getBuilder(): IRequestContextBuilder;
 }
@@ -87,6 +87,7 @@ export interface IRequestContextBuilderRegistration {
 
 /** @internal */
 export const IRequestContextBuilderRegistration = createService<IRequestContextBuilderRegistration>("request-context-registration");
+/** @internal */
 export const IRequestContextService = createService<IRequestContextService>("request-context-service");
 
 /** @internal */
@@ -104,25 +105,23 @@ export class RequestContextBuilderRegistration implements IRequestContextBuilder
 }
 
 /** @internal */
-@Transient
+@Scoped
 export class RequestContextService implements IRequestContextService {
+    private context: IRequestContext;
+
     constructor(
-        @IServiceCollection private readonly services: IServiceCollection,
-        @IRequestContextBuilderRegistration private readonly builders: IRequestContextBuilderRegistration) {
+        @IRequestContextBuilderRegistration private readonly builders: IRequestContextBuilderRegistration,
+        @IServiceCollection services: IServiceCollection) {
+            this.context = { bag: {}, services };
     }
 
     getBuilder(): IRequestContextBuilder {
-        let context: IRequestContext = {
-            bag: {},
-            services: this.services.createScope()
-        };
-
-        const builder: any = { instance: () => context };
+        const builder: any = { instance: () => this.context };
         const map = this.builders.getCallbacks();
 
         for (const name in map) {
             builder[name] = (...args: any[]) => {
-                context = map[name](context, ...args);
+                this.context = map[name](this.context, ...args);
                 return builder;
             };
         }
