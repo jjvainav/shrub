@@ -55,8 +55,6 @@ export interface IRequestContext {
  * express module. See IRequestContextBuilderCallback for more details.
  */
 export interface IRequestContextBuilder {
-    /** Gets an instance of the request context. */
-    instance(): IRequestContext;
 }
 
 /** 
@@ -74,9 +72,8 @@ export interface IRequestContextBuilderMap {
     readonly [name: string]: IRequestContextBuilderCallback;
 }
 
-/** @internal */
 export interface IRequestContextService {
-    getBuilder(): IRequestContextBuilder;
+    readonly context: IRequestContext;
 }
 
 /** @internal */
@@ -86,8 +83,9 @@ export interface IRequestContextBuilderRegistration {
 }
 
 /** @internal */
-export const IRequestContextBuilderRegistration = createService<IRequestContextBuilderRegistration>("request-context-registration");
+export const IRequestContextBuilder = createService<IRequestContextBuilder>("request-context-builder");
 /** @internal */
+export const IRequestContextBuilderRegistration = createService<IRequestContextBuilderRegistration>("request-context-registration");
 export const IRequestContextService = createService<IRequestContextService>("request-context-service");
 
 /** @internal */
@@ -104,28 +102,45 @@ export class RequestContextBuilderRegistration implements IRequestContextBuilder
     }
 }
 
+// the request context service is responsible for holding a reference to the current request context
+// and making it available publicly through the service
+
+// the request builder is responsible for building/modifying the request context and is used by
+// express middleware that handle extending the request context
+
 /** @internal */
 @Scoped
 export class RequestContextService implements IRequestContextService {
-    private context: IRequestContext;
+    private current: IRequestContext;
 
-    constructor(
-        @IRequestContextBuilderRegistration private readonly builders: IRequestContextBuilderRegistration,
-        @IServiceCollection services: IServiceCollection) {
-            this.context = { bag: {}, services };
+    constructor(@IServiceCollection services: IServiceCollection) {
+        this.current = { bag: {}, services };
     }
 
-    getBuilder(): IRequestContextBuilder {
-        const builder: any = { instance: () => this.context };
-        const map = this.builders.getCallbacks();
+    get context(): IRequestContext {
+        return this.current;
+    }
 
-        for (const name in map) {
-            builder[name] = (...args: any[]) => {
-                this.context = map[name](this.context, ...args);
-                return builder;
-            };
-        }
+    setCurrentContext(current: IRequestContext): void {
+        this.current = current;
+    }
+}
 
-        return builder;
+/** @internal */
+@Scoped
+export class RequestContextBuilder implements IRequestContextBuilder {
+    constructor(
+        @IRequestContextBuilderRegistration builders: IRequestContextBuilderRegistration,
+        @IRequestContextService service: RequestContextService) {
+            const map = builders.getCallbacks();
+
+            // TODO: can this be more efficient? -- is there a better way than to loop through and copy each function?
+            // extend the current instance to include the registered builder callbacks
+            for (const name in map) {
+                (<any>this)[name] = (...args: any[]) => {
+                    service.setCurrentContext(map[name](service.context, ...args));
+                    return this;
+                };
+            }
     }
 }

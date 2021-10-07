@@ -3,6 +3,7 @@ export type ValidateOptionsFailCallback = (err: OptionsValidationError) => void;
 
 type Constructor<T> = { new(...args: any[]): T };
 type NonOptionalKeys<T> = { [K in keyof T]-?: undefined extends T[K] ? never : K }[keyof T];
+type RegistrationResult = "success" | "frozen" | "sealed";
 
 /** Defines an object that supports a dispose function; scoped service instances that implement dispose will get invoked when the scoped container is cleaned up. */
 export interface IDisposable {
@@ -47,27 +48,33 @@ export interface IOptionsProvider {
     tryGet<T>(id: IOptions<T>): T | undefined;
 }
 
+/** Defines options when registering a service. */
+export interface IServiceRegistrationOptions {
+    /** True if the service entry cannot be overriden; the default is false. */
+    readonly sealed?: boolean;
+}
+
 export interface IServiceRegistration {
     /** Registers a service using its required scope. Note: a service class must define a required scope decorator. */
-    register<T, TInstance extends T>(service: IService<T>, ctor: Constructor<TInstance>): void;
+    register<T, TInstance extends T>(service: IService<T>, ctor: Constructor<TInstance>, options?: IServiceRegistrationOptions): void;
     /** Registers a singleton instance that lives within the collection and is available to all child scopes. Note: if the instance implements IDisposable it will not be disposed automatically. */
-    registerInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance): void;
+    registerInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance, options?: IServiceRegistrationOptions): void;
     /** Registers a service that gets created once per service collection scope. */
-    registerScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): void;
+    registerScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): void;
     /** Registers a service that gets created once and is available to all child scopes. */
-    registerSingleton<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): void;
+    registerSingleton<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): void;
     /** Registers a service that gets created each time the service is requested from a collection. */
-    registerTransient<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): void;
+    registerTransient<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): void;
     /** Attempts to register a service using its required scope but only if a service has not already been registered. Note: a service class must define a required scope decorator. */
-    tryRegister<T, TInstance extends T>(service: IService<T>, ctor: Constructor<TInstance>): boolean;
+    tryRegister<T, TInstance extends T>(service: IService<T>, ctor: Constructor<TInstance>, options?: IServiceRegistrationOptions): boolean;
     /** Attempts to register a singleton instance that lives within the collection and is available to all child scopes. Note: if the instance implements IDisposable it will not be disposed automatically. */
-    tryRegisterInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance): boolean;
+    tryRegisterInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance, options?: IServiceRegistrationOptions): boolean;
     /** Attempts to register a service that gets created once per service collection scope. */
-    tryRegisterScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): boolean;
+    tryRegisterScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): boolean;
     /** Attempts to register a service that gets created once and is available to all child scopes. */
-    tryRegisterSingleton<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): boolean;
+    tryRegisterSingleton<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): boolean;
     /** Attempts to register a service that gets created each time the service is requested from a collection. */
-    tryRegisterTransient<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): boolean;
+    tryRegisterTransient<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): boolean;
 }
 
 export interface IServiceCollection {
@@ -97,6 +104,7 @@ interface IServiceEntry<T = any> {
     readonly scope: ServiceScope;
     readonly ctor?: Constructor<T>;
     readonly factory?: IServiceFactory<T>;
+    readonly sealed?: boolean;
 }
 
 export const IInstantiationService = createService<IInstantiationService>("instantiation-service");
@@ -252,11 +260,14 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
 
     /** Creates a new ServiceMap instance; note: the services parameter is for internal purposes and should not be used. */
     constructor(private readonly services = new Map<string, IServiceEntry>()) {
-        // the thisFactory is necessary for scoped collections
-        const thisFactory = { create: () => this };
-        this.registerService(IInstantiationService, ServiceScope.scoped, thisFactory);
-        this.registerService(IServiceCollection, ServiceScope.scoped, thisFactory);
-        this.registerSingleton(IOptionsService, OptionsService);
+        // assume this is a scoped service if the provided map already has entries
+        if (!services.size) {
+            // the thisFactory is used to return the appropriate ServiceMap instance since the IInstantiationService and IServiceCollection services need to be scoped
+            const thisFactory: IServiceFactory<IServiceCollection> = { create: service => service };
+            this.registerService(IInstantiationService, ServiceScope.scoped, thisFactory, { sealed: true });
+            this.registerService(IServiceCollection, ServiceScope.scoped, thisFactory, { sealed: true });
+            this.registerSingleton(IOptionsService, OptionsService, { sealed: true });
+        }
     }
 
     addOptionsProvider(provider: IOptionsProvider): void {
@@ -292,14 +303,14 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
                 this.instances.clear();
             }
 
-            protected getOrCreateServiceInstance(key: string, ancestors?: Constructor<any>[]): any {
+            protected getOrCreateServiceInstance(key: string, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): any {
                 const entry = this.services.get(key);
                 if (entry !== undefined && (entry.scope === ServiceScope.singleton || entry.scope === ServiceScope.instance)) {
                     // if the service is an instance or singleton call up the parent chain and get the instance from the root
-                    return getOrCreateServiceInstanceFromParent(key, ancestors);
+                    return getOrCreateServiceInstanceFromParent(key, rootScope, ancestors);
                 }
 
-                return super.getOrCreateServiceInstance(key, ancestors);
+                return super.getOrCreateServiceInstance(key, rootScope, ancestors);
             }
         }
     }
@@ -308,11 +319,11 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         return this.get(IOptionsService).getOptions(options);
     }
 
-    register<T, TInstance extends T>(service: IService<T>, ctor: Constructor<TInstance>): void {
-        this.registerService(service, getServiceScope(ctor), ctor);
+    register<T, TInstance extends T>(service: IService<T>, ctor: Constructor<TInstance>, options?: IServiceRegistrationOptions): void {
+        this.registerService(service, getServiceScope(ctor), ctor, options);
     }
 
-    registerInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance): void {
+    registerInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance, options?: IServiceRegistrationOptions): void {
         if (instance === undefined) {
             throw new Error("instance undefined");
         }
@@ -320,64 +331,46 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         // TODO: check if the instance constructor has a required scope - if so, verify its a singleton
 
         this.instances.set(service.key, instance);
-        this.services.set(service.key, { service, scope: ServiceScope.instance });
+        this.services.set(service.key, { service, scope: ServiceScope.instance, sealed: options && options.sealed });
     }
 
-    registerScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): void {
-        this.registerService(service, ServiceScope.scoped, ctorOrFactory);
+    registerScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): void {
+        this.registerService(service, ServiceScope.scoped, ctorOrFactory, options);
     }
 
-    registerSingleton<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): void {
-        this.registerService(service, ServiceScope.singleton, ctorOrFactory);
+    registerSingleton<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): void {
+        this.registerService(service, ServiceScope.singleton, ctorOrFactory, options);
     }
 
-    registerTransient<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): void {
-        this.registerService(service, ServiceScope.transient, ctorOrFactory);
+    registerTransient<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): void {
+        this.registerService(service, ServiceScope.transient, ctorOrFactory, options);
     }
 
-    tryRegister<T, TInstance extends T>(service: IService<T>, ctor: Constructor<TInstance>): boolean {
-        if (!this.services.has(service.key)) {
-            this.register(service, ctor);
+    tryRegister<T, TInstance extends T>(service: IService<T>, ctor: Constructor<TInstance>, options?: IServiceRegistrationOptions): boolean {
+        return this.tryRegisterService(service, getServiceScope(ctor), ctor, options) === "success";
+    }
+
+    tryRegisterInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance, options?: IServiceRegistrationOptions): boolean{
+        try {
+            // TODO: refactor -- need to invoke registerInstance because it registers the instance
+            this.registerInstance(service, instance, options);
             return true;
         }
-
-        return false;
+        catch {
+            return false;
+        }
     }
 
-    tryRegisterInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance): boolean{
-        if (!this.services.has(service.key)) {
-            this.registerInstance(service, instance);
-            return true;
-        }
-
-        return false;
+    tryRegisterScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): boolean{
+        return this.tryRegisterService(service, ServiceScope.scoped, ctorOrFactory, options) === "success";
     }
 
-    tryRegisterScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): boolean{
-        if (!this.services.has(service.key)) {
-            this.registerScoped(service, ctorOrFactory);
-            return true;
-        }
-
-        return false;
+    tryRegisterSingleton<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): boolean{
+        return this.tryRegisterService(service, ServiceScope.singleton, ctorOrFactory, options) === "success";
     }
 
-    tryRegisterSingleton<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): boolean{
-        if (!this.services.has(service.key)) {
-            this.registerSingleton(service, ctorOrFactory);
-            return true;
-        }
-
-        return false;
-    }
-
-    tryRegisterTransient<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>): boolean{
-        if (!this.services.has(service.key)) {
-            this.registerTransient(service, ctorOrFactory);
-            return true;
-        }
-
-        return false;
+    tryRegisterTransient<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): boolean{
+        return this.tryRegisterService(service, ServiceScope.transient, ctorOrFactory, options) === "success";
     }
 
     get<T>(serviceOrKey: IService<T> | string): T {
@@ -403,7 +396,7 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         this.isFrozen = true;
     }
 
-    protected getOrCreateServiceInstance(key: string, ancestors?: Constructor<any>[]): any {
+    protected getOrCreateServiceInstance(key: string, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): any {
         const entry = this.services.get(key);
 
         if (!entry) {
@@ -415,7 +408,7 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
             return current;
         }
 
-        const instance = this.createServiceInstance(entry, ancestors);
+        const instance = this.createServiceInstance(entry, rootScope, ancestors);
         if (entry.scope === ServiceScope.scoped || entry.scope === ServiceScope.singleton) {
             this.instances.set(key, instance);
         }
@@ -423,25 +416,38 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         return instance;
     }
 
-    private registerService(service: IService<any>, scope: ServiceScope, ctorOrFactory: Constructor<any> | IServiceFactory<any>): void {
-        this.registerEntry({
-            service,
-            scope,
-            ctor: isConstructor(ctorOrFactory) ? ctorOrFactory : undefined,
-            factory: isServiceFactory(ctorOrFactory)  ? ctorOrFactory : undefined
-        });
-    }
+    private registerService(service: IService<any>, scope: ServiceScope, ctorOrFactory: Constructor<any> | IServiceFactory<any>, options?: IServiceRegistrationOptions): void {
+        const result = this.tryRegisterService(service, scope, ctorOrFactory, options);
 
-    private registerEntry(entry: IServiceEntry): void {
-        if (this.isFrozen === true) {
+        if (result === "frozen") {
             throw new Error("Service collection is frozen");
         }
 
-        if (entry.ctor) {
-            this.checkInstanceScope(entry.ctor, entry.scope);
+        if (result === "sealed") {
+            throw new Error(`Service with key (${service.key}) cannot be overridden.`);
+        }
+    }
+
+    private tryRegisterService(service: IService<any>, scope: ServiceScope, ctorOrFactory: Constructor<any> | IServiceFactory<any>, options?: IServiceRegistrationOptions): RegistrationResult {
+        if (this.isFrozen === true) {
+            return "frozen";
         }
 
-        this.services.set(entry.service.key, entry);
+        const current = this.services.get(service.key);
+        if (current && current.sealed) {
+            return "sealed";
+        }
+
+        const ctor = isConstructor(ctorOrFactory) ? ctorOrFactory : undefined;
+        const factory = isServiceFactory(ctorOrFactory)  ? ctorOrFactory : undefined;
+        const sealed = options && options.sealed;
+        
+        if (ctor) {
+            this.checkInstanceScope(ctor, scope);
+        }
+
+        this.services.set(service.key, { service, scope, ctor, factory, sealed });
+        return "success";
     }
 
     private checkFactoryInstance(instance: any, scope: ServiceScope): void {
@@ -461,9 +467,17 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         }
     }
 
-    private getOrCreateInjectable<T>(injectable: IInjectable<T>, ancestors?: Constructor<any>[]): T {
+    private checkParentChildScopes(parentScope: ServiceScope | undefined, childScope: ServiceScope | undefined): void {
+        if (!parentScope || parentScope === ServiceScope.instance || parentScope === ServiceScope.singleton) {
+            if (childScope === ServiceScope.scoped) {
+                throw new Error("Scoped services should only be referenced by Transient or other Scoped services.");
+            }
+        }
+    }
+
+    private getOrCreateInjectable<T>(injectable: IInjectable<T>, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): T {
         if (this.services.has(injectable.key)) {
-            return this.getOrCreateServiceInstance(injectable.key, ancestors);
+            return this.getOrCreateServiceInstance(injectable.key, rootScope, ancestors);
         }
 
         if (injectable.factory) {
@@ -473,7 +487,7 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         throw new Error(`Invalid injectable (${injectable.key}), either a service has not been registered or the injectable does not define a factory.`);
     }
 
-    private createServiceInstance<T>(entry: IServiceEntry<T>, ancestors?: Constructor<any>[]): T {
+    private createServiceInstance<T>(entry: IServiceEntry<T>, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): T {
         if (entry.factory) {
             const instance = entry.factory.create(this);
             // even though the scope cannot be verified until now it is still a good idea to check that the service instance is being properly scoped
@@ -482,13 +496,13 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         }
 
         if (entry.ctor) {
-            return this.createObjectInstance(entry.ctor, ancestors);
+            return this.createObjectInstance(entry.ctor, rootScope, ancestors);
         }
 
         throw new Error("Invalid service entry.");
     }
 
-    private createObjectInstance<T>(ctor: Constructor<T>, ancestors?: Constructor<any>[]): T {
+    private createObjectInstance<T>(ctor: Constructor<T>, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): T {
         if (ancestors && ancestors.includes(ctor)) {
             const path = [...ancestors.map(ctor => ctor.name), ctor.name].join(" -> ");
             throw new Error("Circular dependency detected: " + path);
@@ -502,11 +516,20 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         }
 
         try {
+            // root scope is used to ensure service dependecies are properly scoped -- mainly, singleton services should not reference scoped services
+            rootScope = rootScope || (<any>ctor)[scope];
+ 
+            // ancestors is used to track circular dependencies
             ancestors = ancestors || [];
             ancestors.push(ctor);
 
             // create/get instances for all the object's constructor parameters
-            const args = keys.map(key => this.getOrCreateInjectable(dependencies[<any>key], ancestors));
+            const args = keys.map(key => {
+                const injectable = dependencies[<any>key];
+                const entry = this.services.get(injectable.key);
+                this.checkParentChildScopes(rootScope, entry && entry.scope);
+                return this.getOrCreateInjectable(injectable, rootScope, ancestors);
+            });
 
             ancestors.splice(ancestors.indexOf(ctor), 1);
 

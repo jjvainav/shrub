@@ -1,6 +1,6 @@
 import { 
     createOptions, createService, IDisposable, IInstantiationService, IServiceCollection,
-    OptionsValidationError, ServiceMap, Singleton, SingletonServiceFactory 
+    OptionsValidationError, Scoped, ServiceMap, Singleton, SingletonServiceFactory 
 } from "../src/service-collection";
 
 const IFooService = createService<IFooService>("foo-service");
@@ -12,6 +12,9 @@ const ICompositeService = createService<ICompositeService>("composite-service");
 const ICompositeService2 = createService<ICompositeService>("composite-service2");
 const ISingletonService = createService<ISingletonService>("singleton-service");
 const ITestService = createService<ITestService>("test-service");
+
+const IChildScopedService = createService<IChildScopedService>("child-scoped-service");
+const IParentSingletonService = createService<IParentSingletonService>("parent-singleton-service");
 
 const ITestOptions = createOptions<ITestOptions>("test", { 
     foo: "default-foo",
@@ -77,6 +80,12 @@ interface ITestOptionsWithValidation {
 interface ITestServiceWithOptions {
     getFoo(): string;
     getBar(): string;
+}
+
+interface IChildScopedService {
+}
+
+interface IParentSingletonService {
 }
 
 class BarServiceThatThrows implements IBarService {
@@ -177,6 +186,16 @@ class TestServiceWithOptions implements ITestServiceWithOptions {
 
     getBar(): string {
         return this.options.bar;
+    }
+}
+
+@Scoped
+class ChildScopedService implements IChildScopedService {
+}
+
+@Singleton
+class ParentSingletonService implements IParentSingletonService {
+    constructor(@IChildScopedService scopedService: IChildScopedService) {
     }
 }
 
@@ -303,6 +322,17 @@ describe("service lifetime", () => {
         expect(instance1).not.toBe(instance2);
 
         expect(instance1.name).toBe("test-service2");
+    });
+
+    test("register service that attempts to override a sealed service", () => {
+        const services = new ServiceMap();
+
+        services.registerSingleton(ITestService, TestService, { sealed: true });
+        const result = services.tryRegisterTransient(ITestService, TestService2);
+        const instance = services.get(ITestService);
+
+        expect(result).toBe(false);
+        expect(instance).toBeInstanceOf(TestService);
     });
 });
 
@@ -529,6 +559,21 @@ describe("service dependency injection", () => {
         }
         catch (err) {
             expect((<string>err.message).indexOf("Circular dependency detected")).toBeGreaterThan(-1);
+        }        
+    });
+
+    test("inject scoped service into a singleton service", () => {
+        const services = new ServiceMap();
+
+        services.register(IChildScopedService, ChildScopedService);
+        services.register(IParentSingletonService, ParentSingletonService);
+
+        try {
+            services.get(IParentSingletonService);
+            fail();
+        }
+        catch (err) {
+            expect((<string>err.message).indexOf("Scoped services should only be referenced by Transient or other Scoped services.")).toBeGreaterThan(-1);
         }        
     });
 

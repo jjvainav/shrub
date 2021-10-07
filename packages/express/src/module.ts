@@ -2,8 +2,8 @@ import express from "express";
 import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration, IServiceCollection } from "@shrub/core";
 import { HttpModule, IHttpModuleConfiguration, IHttpServer } from "@shrub/http";
 import { 
-    IRequestContextBuilderCallback, IRequestContextBuilderRegistration, IRequestContextService, 
-    RequestContextBuilderRegistration, RequestContextService 
+    IRequestContextBuilder, IRequestContextBuilderCallback, IRequestContextBuilderRegistration, IRequestContextService, 
+    RequestContextBuilder, RequestContextBuilderRegistration, RequestContextService 
 } from "./request-context";
 
 export const IExpressConfiguration = createConfig<IExpressConfiguration>();
@@ -30,7 +30,9 @@ export class ExpressModule implements IModule {
 
     configureServices(registration: IServiceRegistration): void {
         registration.register(IRequestContextBuilderRegistration, RequestContextBuilderRegistration);
-        registration.register(IRequestContextService, RequestContextService);
+        registration.register(IRequestContextService, RequestContextService, { sealed: true });
+        registration.register(IRequestContextBuilder, RequestContextBuilder, { sealed: true });
+        
         registration.registerSingleton(IExpressApplication, {
             create: services => {
                 const app = express();
@@ -39,7 +41,8 @@ export class ExpressModule implements IModule {
                 app.use((req, res, next) => {
                     // use a scoped service collection for the request
                     const requestServices = services.createScope();
-                    const builder = requestServices.get(IRequestContextService).getBuilder();
+                    const requestContextService = requestServices.get(IRequestContextService);
+                    const requestContextBuilder = requestServices.get(IRequestContextBuilder);
 
                     res.on("finish", () => requestServices.dispose());
 
@@ -49,12 +52,12 @@ export class ExpressModule implements IModule {
                     // it using the context configured for this specific domain
                     Object.defineProperty(req, "context", {
                         configurable: true,
-                        get() { return builder.instance(); }
+                        get() { return requestContextService.context; }
                     });
 
                     Object.defineProperty(req, "contextBuilder", {
                         configurable: true,
-                        get() { return builder; }
+                        get() { return requestContextBuilder; }
                     });
 
                     next();

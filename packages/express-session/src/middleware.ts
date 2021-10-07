@@ -32,7 +32,8 @@ export const addCookieSessionRequestBuilder = (context: IRequestContext, options
 
 export function cookieSession(options: ICookieSessionOptions): RequestHandler {
     return (req, res, next) => {
-        const session = <CookieSession>req.contextBuilder.addCookieSession(options).instance().session;
+        req.contextBuilder.addCookieSession(options);
+        const session = <CookieSession>req.context.session;
         const ref = res.writeHead;
 
         res.writeHead = function writeHead() {

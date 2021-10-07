@@ -195,7 +195,8 @@ export const addIdentityRequestBuilder = (context: IRequestContext, options: IId
 
 /** @internal Identity middleware for adding the identity and authenticating the current request. */
 export const identityMiddleware = (options: IIdentityOptions) => (req: Request, res: Response, next: NextFunction) => {
-    const identity = req.contextBuilder.addIdentity(options).instance().identity!;
+    req.contextBuilder.addIdentity(options);
+    const identity = req.context.identity!;
     identity.authenticate().then(result => {
         if (result.isChallenged) {
             identity.challenge(req, res, next);
