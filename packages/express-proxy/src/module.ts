@@ -1,6 +1,6 @@
 import { createConfig, IModule, IModuleInitializer, IServiceRegistration } from "@shrub/core";
 import { ExpressModule } from "@shrub/express";
-import { IProxyFactory, IProxyService, IProxyType, ProxyService } from "./proxy";
+import { IProxyFactory, IProxyRegistrationService, IProxyService, IProxyType, ProxyRegistrationService, ProxyService } from "./proxy";
 
 export const IExpressProxyConfiguration = createConfig<IExpressProxyConfiguration>();
 export interface IExpressProxyConfiguration {
@@ -15,11 +15,12 @@ export class ExpressProxyModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(IExpressProxyConfiguration).register(({ services }) => ({
-            useProxy: (proxyType, factory) => services.get(IProxyService).registerProxy(proxyType.key, factory)
+            useProxy: (proxyType, factory) => services.get(IProxyRegistrationService).registerProxy(proxyType.key, factory)
         }));
     }
 
     configureServices(registration: IServiceRegistration): void {
+        registration.register(IProxyRegistrationService, ProxyRegistrationService);
         registration.register(IProxyService, ProxyService);
     }
 }

@@ -1,7 +1,33 @@
-import { ILogEntry, ILogEvent, isError, LoggingService } from "@shrub/logging";
-import { ISpan, ITags, ITraceWriter, TracingService } from "../src";
+import { ModuleLoader } from "@shrub/core";
+import { ILogDataConverter, ILogEntry, ILogEvent, ILoggingConfiguration, isError } from "@shrub/logging";
+import { ISpan, ITags, ITracingRegistrationService, ITracingService, ITraceWriter, TracingModule } from "../src";
 
 type Mutable<T> = { -readonly[P in keyof T]: T[P] };
+
+interface ITestContext {
+    readonly tracingService: ITracingService;
+    readonly tracingRegistrationService: ITracingRegistrationService;
+}
+
+interface ITestContextOptions {
+    readonly logDataConverter?: ILogDataConverter;
+}
+
+function createTestContext(options?: ITestContextOptions): Promise<ITestContext> {
+    return ModuleLoader.load([{
+        name: "test",
+        dependencies: [TracingModule],
+        configure: ({ config }) => {
+            if (options && options.logDataConverter) {
+                config.get(ILoggingConfiguration).useConverter(options.logDataConverter)
+            }
+        }
+    }])
+    .then(collection => ({
+        tracingService: collection.services.get(ITracingService),
+        tracingRegistrationService: collection.services.get(ITracingRegistrationService)
+    }));
+}
 
 function mockDateNow(now: number): () => void {
     const nowfn = Date.now;
@@ -36,13 +62,13 @@ class MockTraceWriter implements ITraceWriter {
     }
 }
 
-describe("tracing", () => {
-    test("create root span", () => {
+describe("tracing", async () => {
+    test("create root span", async () => {
         const now = 1562602719878;
         const unmock = mockDateNow(now);
 
-        const service = new TracingService(new LoggingService());
-        const tracer = service.getTracer();
+        const context = await createTestContext();
+        const tracer = context.tracingService.getTracer();
         const span = tracer.startSpan("test");
 
         unmock();
@@ -55,15 +81,15 @@ describe("tracing", () => {
         expect(span.endTime).toBeUndefined();
     });
 
-    test("create root span with tags", () => {
+    test("create root span with tags", async () => {
         const now = 1562602719878;
         const unmock = mockDateNow(now);
 
-        const service = new TracingService(new LoggingService());
+        const context = await createTestContext();
         const writer = new MockTraceWriter();
-        service.useTraceWriter(writer);
+        context.tracingRegistrationService.useTraceWriter(writer);
 
-        const tracer = service.getTracer();
+        const tracer = context.tracingService.getTracer();
         const span = tracer.startSpan("test", { tag: "foo" });
 
         unmock();
@@ -77,12 +103,12 @@ describe("tracing", () => {
         expect(writer.tags.get(span)!.tag).toBe("foo");
     });
 
-    test("create and finish root span", () => {
+    test("create and finish root span", async () => {
         const start = 1562602719878;
         const unmockStart = mockDateNow(start);
 
-        const service = new TracingService(new LoggingService());
-        const tracer = service.getTracer();
+        const context = await createTestContext();
+        const tracer = context.tracingService.getTracer();
         const span = tracer.startSpan("test");
 
         unmockStart();
@@ -102,12 +128,12 @@ describe("tracing", () => {
         expect(span.endTime).toBe(end);
     });
 
-    test("create and finish root span with error", () => {
-        const service = new TracingService(new LoggingService());
+    test("create and finish root span with error", async () => {
+        const context = await createTestContext();
         const writer = new MockTraceWriter();
-        service.useTraceWriter(writer);
+        context.tracingRegistrationService.useTraceWriter(writer);
 
-        const tracer = service.getTracer();
+        const tracer = context.tracingService.getTracer();
         const span = tracer.startSpan("test");
         const err = new Error("An error occurred.");
 
@@ -128,24 +154,24 @@ describe("tracing", () => {
         expect(tags.error).toBe(true);
     });
     
-    test("create and finish root span with error using custom converter", () => {
-        const loggingService = new LoggingService();
-        const tracingService = new TracingService(loggingService);
-        const writer = new MockTraceWriter();
-
-        tracingService.useTraceWriter(writer);
-        loggingService.useConverter(obj => {
-            return isError(obj) 
-                ? ({
-                    name: "FooError",
-                    message: obj.message, 
-                    stack: obj.stack,
-                    foo: "foo"
-                })
-                : undefined;
+    test("create and finish root span with error using custom converter", async () => {
+        const context = await createTestContext({
+            logDataConverter: obj => {
+                return isError(obj) 
+                    ? ({
+                        name: "FooError",
+                        message: obj.message, 
+                        stack: obj.stack,
+                        foo: "foo"
+                    })
+                    : undefined;
+            }
         });
 
-        const tracer = tracingService.getTracer();
+        const writer = new MockTraceWriter();
+        context.tracingRegistrationService.useTraceWriter(writer);
+        
+        const tracer = context.tracingService.getTracer();
         const span = tracer.startSpan("test");
         const err = new Error("An error occurred.");
 
@@ -160,9 +186,9 @@ describe("tracing", () => {
         expect((<ILogEvent>logs[0].data).foo).toBe("foo");
     });  
 
-    test("create multiple root spans", () => {
-        const service = new TracingService(new LoggingService());
-        const tracer = service.getTracer();
+    test("create multiple root spans", async () => {
+        const context = await createTestContext();
+        const tracer = context.tracingService.getTracer();
 
         const span1 = tracer.startSpan("test 1");
         const span2 = tracer.startSpan("test 2");
@@ -181,11 +207,11 @@ describe("tracing", () => {
         expect(span1.traceId).not.toBe(span2.traceId);
     });  
     
-    test("create child span", () => {
-        const service = new TracingService(new LoggingService());
+    test("create child span", async () => {
+        const context = await createTestContext();
 
-        const root = service.getTracer().startSpan("root");
-        const child = service.getTracer(root).startSpan("child");
+        const root = context.tracingService.getTracer().startSpan("root");
+        const child = context.tracingService.getTracer(root).startSpan("child");
 
         expect(root.id).toBeDefined();
         expect(root.traceId).toBeDefined();
@@ -200,18 +226,18 @@ describe("tracing", () => {
         expect(child.traceId).toBe(root.traceId);
     });
 
-    test("create child span from custom scope", () => {
-        const service = new TracingService(new LoggingService());
+    test("create child span from custom scope", async () => {
+        const context = await createTestContext();
         const scope = { parentId: "1", traceId: "2" };
 
-        service.useContextProvider({
+        context.tracingRegistrationService.useContextProvider({
             getSpanContext: scope => ({
                 getParentSpanId: () => scope.parentId,
                 getTraceId: () => scope.traceId
             })
         });
 
-        const child = service.getTracer(scope).startSpan("child");
+        const child = context.tracingService.getTracer(scope).startSpan("child");
 
         expect(child.id).toBeDefined();
         expect(child.traceId).toBe("2");
@@ -219,13 +245,13 @@ describe("tracing", () => {
         expect(child.name).toBe("child");
     });
 
-    test("create root and child spans with start/done writer", () => {
-        const service = new TracingService(new LoggingService());
+    test("create root and child spans with start/done writer", async () => {
+        const context = await createTestContext();
         const writer = new MockTraceWriter();
-        service.useTraceWriter(writer);
+        context.tracingRegistrationService.useTraceWriter(writer);
 
-        const root = service.getTracer().startSpan("root");
-        const child = service.getTracer(root).startSpan("child");
+        const root = context.tracingService.getTracer().startSpan("root");
+        const child = context.tracingService.getTracer(root).startSpan("child");
 
         child.done();
         root.done();
@@ -237,38 +263,38 @@ describe("tracing", () => {
         expect(writer.done.has(child)).toBe(true);
     }); 
     
-    test("create span with context provider that doesn't recognize scope", () => {
-        const service = new TracingService(new LoggingService());
+    test("create span with context provider that doesn't recognize scope", async () => {
+        const context = await createTestContext();
 
-        service.useContextProvider({
+        context.tracingRegistrationService.useContextProvider({
             getSpanContext: () => undefined
         });
 
-        const root = service.getTracer().startSpan("root");
+        const root = context.tracingService.getTracer().startSpan("root");
 
         expect(root.id).toBeDefined();
         expect(root.traceId).toBeDefined();
         expect(root.parentId).toBeUndefined();
     });
 
-    test("create span with multiple context providers", () => {
-        const service = new TracingService(new LoggingService());
+    test("create span with multiple context providers", async () => {
+        const context = await createTestContext();
 
-        service.useContextProvider({
+        context.tracingRegistrationService.useContextProvider({
             getSpanContext: () => ({
                 getParentSpanId: () => "a",
                 getTraceId: () => "b"
             })
         });
 
-        service.useContextProvider({
+        context.tracingRegistrationService.useContextProvider({
             getSpanContext: () => ({
                 getParentSpanId: () => "1",
                 getTraceId: () => "2"
             })
         });
 
-        const child = service.getTracer().startSpan("child");
+        const child = context.tracingService.getTracer().startSpan("child");
 
         // the first context provider to return a span context wins
         expect(child.id).toBeDefined();
@@ -276,15 +302,15 @@ describe("tracing", () => {
         expect(child.parentId).toBe("a");
     });
 
-    test("add event object info log to span", () => {
+    test("add event object info log to span", async () => {
         const now = 1562602719878;
         const unmock = mockDateNow(now);
 
-        const service = new TracingService(new LoggingService());
+        const context = await createTestContext();
         const writer = new MockTraceWriter();
-        service.useTraceWriter(writer);
+        context.tracingRegistrationService.useTraceWriter(writer);
 
-        const tracer = service.getTracer();
+        const tracer = context.tracingService.getTracer();
         const span = tracer.startSpan("test");
 
         span.logInfo({ 
@@ -302,12 +328,12 @@ describe("tracing", () => {
         expect(logs[0].timestamp).toBe(now);
     });   
     
-    test("add error log to span", () => {
-        const service = new TracingService(new LoggingService());
+    test("add error log to span", async () => {
+        const context = await createTestContext();
         const writer = new MockTraceWriter();
-        service.useTraceWriter(writer);
+        context.tracingRegistrationService.useTraceWriter(writer);
 
-        const tracer = service.getTracer();
+        const tracer = context.tracingService.getTracer();
         const span = tracer.startSpan("test");
 
         span.logError(new Error("Error test."));
@@ -325,12 +351,12 @@ describe("tracing", () => {
         expect(tags.error).toBe(true);        
     });
 
-    test("add error log to span for error that does not properly extend the Error class", () => {
-        const service = new TracingService(new LoggingService());
+    test("add error log to span for error that does not properly extend the Error class", async () => {
+        const context = await createTestContext();
         const writer = new MockTraceWriter();
-        service.useTraceWriter(writer);
+        context.tracingRegistrationService.useTraceWriter(writer);
 
-        const tracer = service.getTracer();
+        const tracer = context.tracingService.getTracer();
         const span = tracer.startSpan("test");
 
         span.logError(new class extends Error {
@@ -354,12 +380,12 @@ describe("tracing", () => {
         expect(tags.error).toBe(true);     
     });  
 
-    test("add log to span with custom level", () => {
-        const service = new TracingService(new LoggingService());
+    test("add log to span with custom level", async () => {
+        const context = await createTestContext();
         const writer = new MockTraceWriter();
-        service.useTraceWriter(writer);
+        context.tracingRegistrationService.useTraceWriter(writer);
 
-        const tracer = service.getTracer();
+        const tracer = context.tracingService.getTracer();
         const span = tracer.startSpan("test");
 
         span.log(11, { 
@@ -374,12 +400,12 @@ describe("tracing", () => {
         expect((<ILogEvent>logs[0].data).foo).toBe("foo");
     });
 
-    test("add log to span with string data", () => {
-        const service = new TracingService(new LoggingService());
+    test("add log to span with string data", async () => {
+        const context = await createTestContext();
         const writer = new MockTraceWriter();
-        service.useTraceWriter(writer);
+        context.tracingRegistrationService.useTraceWriter(writer);
 
-        const tracer = service.getTracer();
+        const tracer = context.tracingService.getTracer();
         const span = tracer.startSpan("test");
 
         span.logInfo("foo");
@@ -390,12 +416,12 @@ describe("tracing", () => {
         expect(logs[0].data).toBe("foo");
     });  
     
-    test("extend tracer with custom builder and writer", () => {
-        const service = new TracingService(new LoggingService());
+    test("extend tracer with custom builder and writer", async () => {
+        const context = await createTestContext();
         const writer = new MockTraceWriter();
 
-        const tracer1 = service.getBuilder().build();
-        const tracer2 = service.getBuilder().useTraceWriter(writer).build();
+        const tracer1 = context.tracingService.getBuilder().build();
+        const tracer2 = context.tracingService.getBuilder().useTraceWriter(writer).build();
 
         tracer1.startSpan("tracer1").done();
         tracer2.startSpan("tracer2").done();

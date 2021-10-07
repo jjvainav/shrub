@@ -1,5 +1,5 @@
 import { createConfig, IModule, IModuleInitializer, IServiceRegistration } from "@shrub/core";
-import { ILogDataConverter, ILogWriter, ILoggingService, LoggingService } from "./service";
+import { ILogDataConverter, ILogWriter, ILoggingRegistrationService, ILoggingService, LoggingRegistrationService, LoggingService } from "./service";
 
 export const ILoggingConfiguration = createConfig<ILoggingConfiguration>();
 export interface ILoggingConfiguration {
@@ -14,12 +14,13 @@ export class LoggingModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(ILoggingConfiguration).register(({ services }) => ({
-            useConverter: converter => (<LoggingService>services.get(ILoggingService)).useConverter(converter),
-            useWriter: writer => (<LoggingService>services.get(ILoggingService)).useWriter(writer)
+            useConverter: converter => services.get(ILoggingRegistrationService).useConverter(converter),
+            useWriter: writer => services.get(ILoggingRegistrationService).useWriter(writer)
         }));
     }    
 
     configureServices(registration: IServiceRegistration): void {
+        registration.register(ILoggingRegistrationService, LoggingRegistrationService);
         registration.register(ILoggingService, LoggingService);
     }
 }

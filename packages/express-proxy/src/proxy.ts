@@ -1,4 +1,4 @@
-import { createInjectable, createService, IInjectable, IServiceCollection, Singleton } from "@shrub/core";
+import { createInjectable, createService, IInjectable, IServiceCollection, Singleton, Transient } from "@shrub/core";
 import { IRequestContext } from "@shrub/express";
 import { Request, RequestHandler, Response } from "express";
 
@@ -27,10 +27,17 @@ export interface IProxyFactory<T> {
 /** A service for registering and managing proxies. */
 export interface IProxyService {
     getProxy<T>(key: string): T;
+}
+
+/** @internal */
+export interface IProxyRegistrationService {
+    getFactory<T>(key: string): IProxyFactory<T> | undefined;
     registerProxy<T>(key: string, factory: IProxyFactory<T>): void;
 }
 
 export const IProxyService = createService<IProxyService>("proxy-service");
+/** @internal */
+export const IProxyRegistrationService = createService<IProxyRegistrationService>("proxy-registration-service");
 
 /** Creates an injectable proxy used to define proxy interfaces and can be used as a decorator to inject proxies into service instances. */
 export function createProxyType<T>(key: string): IProxyType<T> {
@@ -87,21 +94,30 @@ export abstract class LocalProxy {
     }
 }
 
-@Singleton
+/** @internal */
+@Transient
 export class ProxyService implements IProxyService {
-    private readonly proxies = new Map<string, IProxyFactory<any>>();
-
     constructor(@IServiceCollection private readonly services: IServiceCollection) {
     }
 
     getProxy<T>(key: string): T {
-        const factory = this.proxies.get(key);
+        const factory = this.services.get(IProxyRegistrationService).getFactory<T>(key);
 
         if (!factory) {
             throw new Error(`Proxy for key (${key}) not registered, proxy types must be registered with the express-proxy module to be used.`);
         }
 
         return factory(this.services);
+    }
+}
+
+/** @internal */
+@Singleton
+export class ProxyRegistrationService implements IProxyRegistrationService {
+    private readonly proxies = new Map<string, IProxyFactory<any>>();
+
+    getFactory<T>(key: string): IProxyFactory<T> | undefined {
+        return this.proxies.get(key);
     }
 
     registerProxy<T>(key: string, factory: IProxyFactory<T>): void {

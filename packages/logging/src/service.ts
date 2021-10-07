@@ -1,4 +1,4 @@
-import { createInjectable, createService, Singleton } from "@shrub/core";
+import { createInjectable, createService, Singleton, Transient } from "@shrub/core";
 
 type ErrorLogLevel = 40;
 type WarnLogLevel = 30;
@@ -73,13 +73,19 @@ export interface ILoggerOptions {
 export interface ILoggingService {
     /** Creates a logger instance using the specified options or use the globally registered data converters and writers. */
     createLogger(options?: ILoggerOptions): ILogger;
-    /** Registers a log data converter that will be available to loggers created by the service. */
+}
+
+/** @internal */
+export interface ILoggingRegistrationService {
+    getConverters(): ILogDataConverter[];
+    getWriters(): ILogWriter[];
     useConverter(converter: ILogDataConverter): void;
-    /** Registers a log writer with the service. */
     useWriter(writer: ILogWriter): void;
 }
 
 export const ILoggingService = createService<ILoggingService>("logging-service");
+/** @internal */
+export const ILoggingRegistrationService = createService<ILoggingRegistrationService>("logging-registration-service");
 
 /** A decorator for injecting a global logger. */
 export const ILogger = createInjectable<ILogger>({
@@ -116,22 +122,15 @@ export function isError(arg: LogDataArg): arg is Error {
         (<Error><unknown>arg).stack !== undefined);
 }
 
-@Singleton
+/** @internal */
+@Transient
 export class LoggingService implements ILoggingService {
-    private readonly converters: ILogDataConverter[] = [];
-    private readonly writers: ILogWriter[] = [];
+    constructor(@ILoggingRegistrationService private readonly registration: ILoggingRegistrationService) {
+    }
 
     createLogger(options?: ILoggerOptions): ILogger {
-        const global = this;
+        const self = this;
         return new class Logger implements ILogger {
-            private readonly converters: ILogDataConverter[];
-            private readonly writers: ILogWriter[];
-
-            constructor() {
-                this.converters = options && options.converters || global.converters;
-                this.writers = options && options.writers || global.writers;
-            }
-
             log(level: number, data: LogDataArg): void {
                 if (typeof level !== "number") {
                     throw new Error(`Invalid level (${level}), must be a number.`);
@@ -161,13 +160,21 @@ export class LoggingService implements ILoggingService {
             logWarn(data: LogDataArg): void {
                 this.log(LogLevel.warn, data);
             }
+
+            private getConverters(): ILogDataConverter[] {
+                return options && options.converters || self.registration.getConverters();
+            }
+            
+            private getWriters(): ILogWriter[] {
+                return options && options.writers || self.registration.getWriters();
+            }
         
             private write(entry: ILogEntry): void {
-                this.writers.forEach(writer => writer.writeLog(entry));
+                this.getWriters().forEach(writer => writer.writeLog(entry));
             }
         
             private convertLogDataArg(arg: LogDataArg): LogData {
-                for (const converter of this.converters) {
+                for (const converter of this.getConverters()) {
                     const data = converter(arg);
                     if (data) {
                         return data;
@@ -177,6 +184,21 @@ export class LoggingService implements ILoggingService {
                 return defaultLogDataConverter(arg);
             };
         };
+    }
+}
+
+/** @internal */
+@Singleton
+export class LoggingRegistrationService implements ILoggingRegistrationService {
+    private readonly converters: ILogDataConverter[] = [];
+    private readonly writers: ILogWriter[] = [];
+
+    getConverters(): ILogDataConverter[] {
+        return this.converters;
+    }
+    
+    getWriters(): ILogWriter[] {
+        return this.writers;
     }
 
     useConverter(converter: ILogDataConverter): void {

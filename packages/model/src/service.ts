@@ -1,4 +1,4 @@
-import { createOptions, createService, IInstantiationService, Singleton } from "@shrub/core";
+import { createOptions, createService, IInstantiationService, Scoped } from "@shrub/core";
 import { JSONSerializer } from "@sprig/serialization";
 
 export const IModelService = createService<IModelService>("model-service");
@@ -34,7 +34,8 @@ export interface IModelService {
     set(key: string, model: object): void;
 }
 
-@Singleton
+// TODO: need to handle singletons that reference scoped services...
+@Scoped
 export class ModelService implements IModelService {
     /** Used for data injection and will be used when initializing a new model object. */
     private readonly initialState?: any;

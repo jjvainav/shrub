@@ -1,4 +1,4 @@
-import { createService, Singleton } from "@shrub/core";
+import { createService, Scoped, Singleton } from "@shrub/core";
 import { ILogEntry, ILogger, ILoggingService, LogLevel } from "@shrub/logging";
 import createId from "@sprig/unique-id";
 
@@ -58,6 +58,15 @@ export interface ITracingService {
     getTracer(scope?: any): ITracer;
 }
 
+/** @internal */
+export interface ITracingRegistrationService {
+    getContextProviders(): ISpanContextProvider[];
+    getTraceWriters(): ITraceWriter[];
+
+    useContextProvider(provider: ISpanContextProvider): void;
+    useTraceWriter(writer: ITraceWriter): void;
+}
+
 /** A set of key/value pairs for a span. */
 export interface ITags { 
     readonly [key: string]: TagValue | undefined;
@@ -92,6 +101,8 @@ export interface ISpanContext {
 }
 
 export const ITracingService = createService<ITracingService>("tracing-service");
+/** @internal */
+export const ITracingRegistrationService = createService<ITracingRegistrationService>("tracing-registration-service");
 
 function isSpan(scope: any): scope is ISpan {
     return (<ISpan>scope).id !== undefined && (<ISpan>scope).traceId !== undefined; 
@@ -116,26 +127,42 @@ function newTraceId(): string {
     return createId();
 }
 
-@Singleton
+/** @internal */
+@Scoped
 export class TracingService implements ITracingService {
-    private readonly providers: ISpanContextProvider[] = [];
-    private readonly writers: ITraceWriter[] = [];
     private readonly defaultBuilder: TracerBuilder;
 
-    constructor(@ILoggingService private readonly loggingService: ILoggingService) {
-        this.defaultBuilder = new TracerBuilder(loggingService, this.providers, this.writers);
+    constructor(
+        @ITracingRegistrationService private readonly registrationService: ITracingRegistrationService,
+        @ILoggingService private readonly loggingService: ILoggingService) {
+        this.defaultBuilder = new TracerBuilder(loggingService, this.registrationService.getContextProviders(), this.registrationService.getTraceWriters());
     }
 
     getBuilder(): ITracerBuilder {
         // the builder is immutable so pass new arrays for the global items
         return new TracerBuilder(
             this.loggingService,
-            [...this.providers], 
-            [...this.writers]);
+            [...this.registrationService.getContextProviders()], 
+            [...this.registrationService.getTraceWriters()]);
     }
 
     getTracer(scope?: any): ITracer {
         return this.defaultBuilder.build(scope);
+    }   
+}
+
+/** @internal */
+@Singleton
+export class TracingRegistrationService implements ITracingRegistrationService {
+    private readonly providers: ISpanContextProvider[] = [];
+    private readonly writers: ITraceWriter[] = [];
+
+    getContextProviders(): ISpanContextProvider[] {
+        return this.providers;
+    }
+
+    getTraceWriters(): ITraceWriter[] {
+        return this.writers;
     }
 
     useContextProvider(provider: ISpanContextProvider): void {
@@ -148,7 +175,7 @@ export class TracingService implements ITracingService {
         if (!this.writers.includes(writer)) {
             this.writers.push(writer);
         }
-    }     
+    }  
 }
 
 class TracerBuilder implements ITracerBuilder {

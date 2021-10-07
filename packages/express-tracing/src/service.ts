@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createService, Singleton } from "@shrub/core";
+import { createService, Scoped } from "@shrub/core";
 import { IRequestContext } from "@shrub/express";
 import { ISpan, ITags, ITracerBuilder, ITracingService } from "@shrub/tracing";
 
@@ -34,7 +34,7 @@ function isRequestScope(scope: any): scope is Request {
     return (<Request>scope).url !== undefined && (<Request>scope).method !== undefined;
 }
 
-@Singleton
+@Scoped
 export class ExpressTracingService implements IExpressTracingService {
     private externalBuilder?: ITracerBuilder;
     private internalBuilder?: ITracerBuilder;

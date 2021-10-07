@@ -1,6 +1,6 @@
 import { createConfig, IModule, IModuleInitializer, IServiceRegistration } from "@shrub/core";
 import { LoggingModule } from "@shrub/logging";
-import { ISpanContextProvider, ITraceWriter, ITracingService, TracingService } from "./service";
+import { ISpanContextProvider, ITraceWriter, ITracingRegistrationService, ITracingService, TracingRegistrationService, TracingService } from "./service";
 
 export const ITracingConfiguration = createConfig<ITracingConfiguration>();
 export interface ITracingConfiguration {
@@ -16,12 +16,13 @@ export class TracingModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(ITracingConfiguration).register(({ services }) => ({
-            useContextProvider: provider => (<TracingService>services.get(ITracingService)).useContextProvider(provider),
-            useTraceWriter: writer => (<TracingService>services.get(ITracingService)).useTraceWriter(writer)
+            useContextProvider: provider => services.get(ITracingRegistrationService).useContextProvider(provider),
+            useTraceWriter: writer => services.get(ITracingRegistrationService).useTraceWriter(writer)
         }));
     }    
 
     configureServices(registration: IServiceRegistration): void {
+        registration.register(ITracingRegistrationService, TracingRegistrationService);
         registration.register(ITracingService, TracingService);
     }
 }
