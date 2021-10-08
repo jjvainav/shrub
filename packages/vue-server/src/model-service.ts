@@ -1,8 +1,8 @@
-import { Singleton } from "@shrub/core";
+import { Scoped } from "@shrub/core";
 import { ModelService } from "@shrub/model";
 import { JSONSerializer } from "@sprig/serialization";
 
-@Singleton
+@Scoped
 export class ServerModelService extends ModelService {
     get hasModels(): boolean {
         for (const key of Object.keys(this.models)) {

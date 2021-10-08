@@ -34,7 +34,6 @@ export interface IModelService {
     set(key: string, model: object): void;
 }
 
-// TODO: need to handle singletons that reference scoped services...
 @Scoped
 export class ModelService implements IModelService {
     /** Used for data injection and will be used when initializing a new model object. */
