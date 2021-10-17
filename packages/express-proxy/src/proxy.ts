@@ -1,5 +1,7 @@
 import { createInjectable, createService, IInjectable, IServiceCollection, Singleton, Transient } from "@shrub/core";
 import { IRequestContext } from "@shrub/express";
+import client, { IRequest, IRequestClient } from "@sprig/request-client";
+import { RequestClientGatewayConstructor } from "@sprig/request-client-gateway";
 import { Request, RequestHandler, Response } from "express";
 
 export interface IExpressRequestOptions {
@@ -13,6 +15,11 @@ export interface IExpressRequestOptions {
 export interface IExpressResponse {
     readonly status: number;
     readonly data: any;
+}
+
+/** A callback responsible for preparing a request to be invoked on behalf of a current request context. */
+export interface IPrepareClientRequest {
+    (context: IRequestContext, request: IRequest): IRequest;
 }
 
 /** Defines an injectable proxy that represents proxy instances of type T. */
@@ -41,13 +48,10 @@ export const IProxyRegistrationService = createService<IProxyRegistrationService
 
 /** Creates an injectable proxy used to define proxy interfaces and can be used as a decorator to inject proxies into service instances. */
 export function createProxyType<T>(key: string): IProxyType<T> {
-    return createInjectable({
-        key,
-        factory: services => services.get(IProxyService).getProxy<T>(key)
-    });
+    return createInjectable({ key, factory: services => services.get(IProxyService).getProxy<T>(key) });
 }
 
-/** Base class for a local proxy that act as a gateway between hosted in the same process. */
+/** Base class for a local proxy where the API module is hosted in the same process. */
 export abstract class LocalProxy {
     /** Invokes an express request handler directly and returns a result. */
     protected invokeRequest(options: IExpressRequestOptions): Promise<IExpressResponse> {
@@ -91,6 +95,26 @@ export abstract class LocalProxy {
                 return this;
             }
         };
+    }
+}
+
+/** Base class for a remote proxy where the API is accessed via an external REST endpoint. */
+export abstract class RemoteProxy<TGateway> {
+    constructor(
+        private readonly url: string, 
+        private readonly gatewayConstructor: RequestClientGatewayConstructor<TGateway>,
+        private readonly prepareRequest?: IPrepareClientRequest) {
+    }
+
+    /** Creates a new request client gateway instance for the proxy. */
+    protected createGateway(context: IRequestContext): TGateway {
+        const prepareRequest = this.prepareRequest;
+        const gatewayClient: IRequestClient = {
+            stream: client.stream,
+            request: prepareRequest && (options => prepareRequest(context, client.request(options))) || client.request
+        };
+
+        return new this.gatewayConstructor({ url: this.url, client: gatewayClient });
     }
 }
 
