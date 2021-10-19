@@ -1359,54 +1359,54 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@sprig/event-emitter@0.1.70", "@sprig/event-emitter@^0.1.70":
-  version "0.1.70"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.70.tgz#5ff3ae983e6e1d9a882ab4508ccf20facb76b156"
-  integrity sha512-wHQjdZZNXXkSbwoixAWrcZo57vqYRK8mD2lF/sLIHpjXqKvhjadS0h2d8ccIsa+yOchPMN8h/feE1X4U4uzR/A==
+"@sprig/event-emitter@0.1.71", "@sprig/event-emitter@^0.1.71":
+  version "0.1.71"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.71.tgz#78071cfa5e069c35253a9b24730b9610fe60dd95"
+  integrity sha512-hN2dtBxVIIAG4lWYSpxuISLRoMx6+HIu5A6u7ROuVxGFnZ3rexgYscnyIeFRVjPOISBVvY3AkZU6j7f63+mjpA==
 
-"@sprig/request-client-events@^0.1.70":
-  version "0.1.70"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client-events/-/request-client-events-0.1.70.tgz#e90f61c2ae87907bf96242fc33e96d4d29e99f3a"
-  integrity sha512-KcjxlUgYmdLvVuBV7EIH0XC4E4B5UA/k9OXGxvgba2Z6kepgUDVdNeZFrX8lGpAC2gaZOrCOGV+/OYi8nw/gYg==
+"@sprig/request-client-class@^0.1.71":
+  version "0.1.71"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client-class/-/request-client-class-0.1.71.tgz#f952b58ffeb3740b8287284ceaf57e5ea180f0fe"
+  integrity sha512-vQwTHvAQq5bd8Cb8NoLZUnj8Hvft2GaxcoTL3yAg40iM/ogXOy/QRqQ5MkhQi31LXZJe4T9FEAt17nQ/yZLGOg==
   dependencies:
-    "@sprig/event-emitter" "0.1.70"
-    "@sprig/request-client" "0.1.70"
+    "@sprig/request-client" "0.1.71"
 
-"@sprig/request-client-gateway@^0.1.70":
-  version "0.1.70"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client-gateway/-/request-client-gateway-0.1.70.tgz#cd68ce8162c6245bc144de7457c8d53d1d8dddc0"
-  integrity sha512-YH1MQ1eLc6ThX3JQW/AwJwswoukFIhfQ66gpPLjFoy/Z0PvgmC7w8IiW1931KaorTHD/7i4pXbUKb/5hpiilJA==
+"@sprig/request-client-events@^0.1.71":
+  version "0.1.71"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client-events/-/request-client-events-0.1.71.tgz#86d35dc72db25604586eea3d4ec81889d87300c7"
+  integrity sha512-uS4mqCQ5p0FvHnL5GumYxstECBd8kcy3uMc8G8CNmfHdJtVPhNnOT9FLL3TJjfSMjTvzMdA4mmFFkxnd8zHycg==
   dependencies:
-    "@sprig/request-client" "0.1.70"
+    "@sprig/event-emitter" "0.1.71"
+    "@sprig/request-client" "0.1.71"
 
-"@sprig/request-client-mock@^0.1.70":
-  version "0.1.70"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client-mock/-/request-client-mock-0.1.70.tgz#10031871882df75ed9c7f54097bac34254bb4a4e"
-  integrity sha512-17Pnk6HPNn1TXZAIOSW8LLCXzJnLTQcNk5udxRY9OiwnYimFuiZccRBXNIUHwUgeI9AMhnJaRpZqlZ6SwtROxQ==
+"@sprig/request-client-mock@^0.1.71":
+  version "0.1.71"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client-mock/-/request-client-mock-0.1.71.tgz#6215bae67b22df4b168de4c1cc716f9573d05dd5"
+  integrity sha512-SUwZbOp74NnfinRR/fzLdBfDccywsxVT865ittvxcIsAeLba5aP8gCqmPzgfoy/54VhAxFElHc/jyaJ/AZEP0g==
   dependencies:
-    "@sprig/request-client" "0.1.70"
-    axios "^0.21.1"
+    "@sprig/request-client" "0.1.71"
+    axios "^0.23.0"
     eventsource "^1.1.0"
     http-status-codes "^1.3.2"
 
-"@sprig/request-client@0.1.70", "@sprig/request-client@^0.1.70":
-  version "0.1.70"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.70.tgz#7edc14df089fa2ce45d27b4f5de609f4daa743f1"
-  integrity sha512-/HoVau4w+G3PkPeuPwWZHUXbsrViTpkk+9lV+YMfihSZ+C+5CmdC4M5ByGtwiS1fjrbclKF89sZMS6zqTsrO3g==
+"@sprig/request-client@0.1.71", "@sprig/request-client@^0.1.71":
+  version "0.1.71"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.1.71.tgz#18788f4f3a19ee69aa41cdfa1db97c2af70ceec1"
+  integrity sha512-zZKjfSUt4TJgrfi6SqIvo6a1Xsj7G5GH0LLF2AsfYrCEtkfLhmdqSVsdup3xTrshY1GpZH1mO/kYSaqXLiwKeA==
   dependencies:
-    axios "^0.21.1"
+    axios "^0.23.0"
     core-js "^3.13.0"
     eventsource "^1.1.0"
 
-"@sprig/serialization@0.1.70":
-  version "0.1.70"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.70.tgz#28c0101eabb49b67e17ffb823e3f10cf53650876"
-  integrity sha512-PAZUVbEwSOKKloVXJnkPNS2X6h3ZxIwGmhPplJRAR0w33F+OBPV58YzniZqmDLgX+J1MuzN7+6X1psZzTCXTHA==
+"@sprig/serialization@0.1.71":
+  version "0.1.71"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.71.tgz#e4770d67f41d5ea486d1df3448293ded6bdbde67"
+  integrity sha512-TaGCBTknLIWJVuEhCoIn7hLBPoujS5Oszpae0jBHOw+PltZqY7UaKFSZQU0ANdCqwGXnFkj4MciLVqdm2A/oRg==
 
-"@sprig/unique-id@^0.1.70":
-  version "0.1.70"
-  resolved "https://registry.yarnpkg.com/@sprig/unique-id/-/unique-id-0.1.70.tgz#698d031bf75ded64d27871e33522e99dd4de3b83"
-  integrity sha512-8baM0ftlPbc8RafamU7KG8sU6iqQjrNBkHl3blwa45DMirWKIv0CFV8gevi4XnwHV+DX6LxuugrGW85biMql9A==
+"@sprig/unique-id@^0.1.71":
+  version "0.1.71"
+  resolved "https://registry.yarnpkg.com/@sprig/unique-id/-/unique-id-0.1.71.tgz#62f89513e6bb867a98df39b01ede7fad7adf1f14"
+  integrity sha512-CO+3BZvHrzTJXpiQNwIhTsY8xHocrlX9XUAl735OaMfjIVmPMAe05fy43lkZIjeMi1n4zzbW1h0k4osTzi3vsg==
   dependencies:
     base-x "^3.0.7"
     uuid "^3.3.3"
@@ -2003,12 +2003,12 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
 
-axios@^0.21.1:
-  version "0.21.1"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.1.tgz#22563481962f4d6bde9a76d516ef0e5d3c09b2b8"
-  integrity sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==
+axios@^0.23.0:
+  version "0.23.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.23.0.tgz#b0fa5d0948a8d1d75e3d5635238b6c4625b05149"
+  integrity sha512-NmvAE4i0YAv5cKq8zlDoPd1VLKAqX5oLuZKs8xkJa4qi6RGn0uhCYFjWtHHC9EM/MwOwYWOs53W+V0aqEXq1sg==
   dependencies:
-    follow-redirects "^1.10.0"
+    follow-redirects "^1.14.4"
 
 babel-jest@^26.6.3:
   version "26.6.3"
@@ -3449,10 +3449,10 @@ fn-name@~2.0.1:
   resolved "https://registry.yarnpkg.com/fn-name/-/fn-name-2.0.1.tgz#5214d7537a4d06a4a301c0cc262feb84188002e7"
   integrity sha1-UhTXU3pNBqSjAcDMJi/rhBiAAuc=
 
-follow-redirects@^1.10.0:
-  version "1.14.1"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.1.tgz#d9114ded0a1cfdd334e164e6662ad02bfd91ff43"
-  integrity sha512-HWqDgT7ZEkqRzBvc2s64vSZ/hfOceEol3ac/7tKwzuvEyWx3/4UegXh5oBOIotkGsObyk3xznnSRVADBgWSQVg==
+follow-redirects@^1.14.4:
+  version "1.14.4"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.4.tgz#838fdf48a8bbdd79e52ee51fb1c94e3ed98b9379"
+  integrity sha512-zwGkiSXC1MUJG/qmeIFH2HBJx9u0V46QGUe3YR1fXG8bXQxq7fLj0RjLZQ5nubr9qNJUZrH+xUcwXEoXNpfS+g==
 
 for-in@^1.0.2:
   version "1.0.2"

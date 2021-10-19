@@ -10,8 +10,8 @@
         "start": "node dist/server.js"
     },
     "dependencies": {
-        "@sprig/request-client": "^0.1.70",
-        "@sprig/request-client-events": "^0.1.70",
+        "@sprig/request-client": "^0.1.71",
+        "@sprig/request-client-events": "^0.1.71",
         "express": "^4.17.1"
     },
     "devDependencies": {

@@ -1,7 +1,7 @@
 import { createInjectable, createService, IInjectable, IServiceCollection, Singleton, Transient } from "@shrub/core";
 import { IRequestContext } from "@shrub/express";
 import client, { IRequest, IRequestClient } from "@sprig/request-client";
-import { RequestClientGatewayConstructor } from "@sprig/request-client-gateway";
+import { RequestClientConstructor } from "@sprig/request-client-class";
 import { Request, RequestHandler, Response } from "express";
 
 export interface IExpressRequestOptions {
@@ -99,22 +99,25 @@ export abstract class LocalProxy {
 }
 
 /** Base class for a remote proxy where the API is accessed via an external REST endpoint. */
-export abstract class RemoteProxy<TGateway> {
+export abstract class RemoteProxy<TClient> {
     constructor(
         private readonly url: string, 
-        private readonly gatewayConstructor: RequestClientGatewayConstructor<TGateway>,
-        private readonly prepareRequest?: IPrepareClientRequest) {
+        private readonly requestClientConstructor: RequestClientConstructor<TClient>,
+        private readonly prepareRequest?: IPrepareClientRequest,
+        private readonly prepareStream?: IPrepareClientRequest) {
     }
 
-    /** Creates a new request client gateway instance for the proxy. */
-    protected createGateway(context: IRequestContext): TGateway {
+    /** Creates a new request client class instance for the proxy. */
+    protected createClient(context: IRequestContext): TClient {
         const prepareRequest = this.prepareRequest;
-        const gatewayClient: IRequestClient = {
-            stream: client.stream,
-            request: prepareRequest && (options => prepareRequest(context, client.request(options))) || client.request
+        const prepareStream = this.prepareStream;
+        
+        const requestClient: IRequestClient = {
+            request: prepareRequest && (options => prepareRequest(context, client.request(options))) || client.request,
+            stream: prepareStream && (options => prepareStream(context, client.stream(options))) || client.stream,
         };
 
-        return new this.gatewayConstructor({ url: this.url, client: gatewayClient });
+        return new this.requestClientConstructor({ url: this.url, client: requestClient });
     }
 }
 

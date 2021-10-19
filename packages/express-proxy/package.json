@@ -30,8 +30,8 @@
     "dependencies": {
         "@shrub/core": "0.5.32",
         "@shrub/express": "0.5.32",
-        "@sprig/request-client": "^0.1.70",
-        "@sprig/request-client-gateway": "^0.1.70",
+        "@sprig/request-client": "^0.1.71",
+        "@sprig/request-client-class": "^0.1.71",
         "express": "^4.17.1"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
