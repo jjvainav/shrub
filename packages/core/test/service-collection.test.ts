@@ -1,7 +1,22 @@
 import { 
-    createOptions, createService, IDisposable, IInstantiationService, IServiceCollection,
+    createInjectable, createOptions, createService, IDisposable, IInstantiationService, IServiceCollection,
     OptionsValidationError, Scoped, ServiceMap, Singleton, SingletonServiceFactory 
 } from "../src/service-collection";
+
+class ConstructorInjectable implements IConstructorInjectable {
+    constructor (@ISingletonService readonly singleton?: ISingletonService) {
+    }
+}
+
+const IConstructorInjectable = createInjectable<IConstructorInjectable>({ 
+    key: "constructor-injectable",
+    ctor: ConstructorInjectable
+})
+
+const IFactoryInjectable = createInjectable<IFactoryInjectable>({ 
+    key: "factory-injectable",
+    factory: services => ({ singleton: services.tryGet(ISingletonService) })
+});
 
 const IFooService = createService<IFooService>("foo-service");
 const IBarService = createService<IBarService>("bar-service");
@@ -29,6 +44,14 @@ ITestOptionsWithValidation.register((obj, fail) => {
         fail(new OptionsValidationError("Value must be 'value'."));
     }
 });
+
+interface IConstructorInjectable {
+    readonly singleton?: ISingletonService;
+}
+
+interface IFactoryInjectable {
+    readonly singleton?: ISingletonService;
+}
 
 interface IFooService {
     readonly foo: string;
@@ -699,5 +722,11 @@ describe("service scope", () => {
         const scope = parent.createScope();
         const instantiation = scope.get(IInstantiationService);
         expect(instantiation).toBe(scope);
+    });
+});
+
+describe("injectable", () => {
+    test("instance created from factory", () => {
+        const 
     });
 });

@@ -12,12 +12,18 @@ export interface IDisposable {
 
 export interface IInjectable<T> {
     readonly key: string;
+    readonly ctor?: Constructor<T>;
     readonly factory?: (services: IServiceCollection) => T;
     (...args: any[]): void;
 }
 
+/** Defines options for creating an injectable object. */
 export interface IInjectableOptions<T> {
+    /** A unique key for the injectable. */
     readonly key: string;
+    /** A constructor for a concrete class that will be created when injected. */
+    readonly ctor?: Constructor<T>;
+    /** A factory function responsible for creating an instances of the injectable. */
     readonly factory?: (services: IServiceCollection) => T;
 }
 
@@ -149,6 +155,7 @@ export function createInjectable<T>(keyOrOptions: string | IInjectableOptions<T>
     };
 
     injectable.key = options.key;
+    injectable.ctor = options.ctor;
     injectable.factory = options.factory;
     injectable.toString = () => options.key;
 
@@ -484,7 +491,11 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
             return injectable.factory(this);
         }
 
-        throw new Error(`Invalid injectable (${injectable.key}), either a service has not been registered or the injectable does not define a factory.`);
+        if (injectable.ctor) {
+            return this.createInstance(injectable.ctor);
+        }
+
+        throw new Error(`Invalid injectable (${injectable.key}), either a service has not been registered or the injectable does not define a factory or constructor.`);
     }
 
     private createServiceInstance<T>(entry: IServiceEntry<T>, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): T {
