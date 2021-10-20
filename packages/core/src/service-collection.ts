@@ -234,7 +234,7 @@ function isServiceFactory<T>(target: any): target is IServiceFactory<T> {
 
 /** Represents an error that has occurred while trying to create an object instance. */
 export class ObjectCreateError extends Error {
-    constructor(message: string, readonly inner: Error) {
+    constructor(message: string, readonly inner?: Error) {
         super(message);
         Object.setPrototypeOf(this, ObjectCreateError.prototype);
     }
@@ -547,7 +547,11 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
             return new ctor(...args);
         }
         catch (err) {
-            throw new ObjectCreateError(`Failed to get dependencies for Constructor (${ctor.name}): ${err.message}`, err);
+            if (err instanceof Error) {
+                throw new ObjectCreateError(`Failed to get dependencies for Constructor (${ctor.name}): ${err.message}`, err);
+            }
+
+            throw new ObjectCreateError(`Failed to get dependencies for Constructor (${ctor.name}): ${err}`);
         }
     }
 }
