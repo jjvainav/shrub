@@ -15,7 +15,7 @@ declare module "@shrub/express/dist/request-context" {
 
 attachErrorListener();
 
-/** @internal */
+/** Adds a span to the request context. */
 export const addSpanRequestBuilder = (context: IRequestContext, span: ISpan) => ({ ...context, span });
 
 /** Request tracing middleware that will start a new span for a request. */

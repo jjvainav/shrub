@@ -36,7 +36,7 @@ interface IAuthenticateHeaderOptions {
     readonly scope?: string | string[];
 }
 
-/** @internal */
+/** Adds a token to the specified request context. */
 export const addTokenRequestBuilder = (context: IRequestContext, token: string) => ({ ...context, token });
 
 /** @internal Express middleware for parsing bearer tokens for a request. */

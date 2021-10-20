@@ -15,7 +15,7 @@ declare module "@shrub/express/dist/request-context" {
     }
 }
 
-/** @internal */
+/** Adds a cookie session to the request context and requires cookies to be installed against the provided request context. */
 export const addCookieSessionRequestBuilder = (context: IRequestContext, options: ICookieSessionOptions) => {
     if (context.session) {
         throw new Error("A Session is already in use.");
@@ -30,6 +30,7 @@ export const addCookieSessionRequestBuilder = (context: IRequestContext, options
     return context;
 };
 
+/** @internal */
 export function cookieSession(options: ICookieSessionOptions): RequestHandler {
     return (req, res, next) => {
         req.contextBuilder.addCookieSession(options);

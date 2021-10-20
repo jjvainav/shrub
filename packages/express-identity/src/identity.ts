@@ -68,7 +68,7 @@ export interface IIdentityOptions {
     readonly authenticationObservers?: IAuthenticationObserver[];
 }
 
-/** @internal */
+/** Adds an identity to the specified request context. */
 export const addIdentityRequestBuilder = (context: IRequestContext, options: IIdentityOptions) => {
     const handlers = options.authenticationHandlers;
     let result: IAuthenticateResult | undefined;

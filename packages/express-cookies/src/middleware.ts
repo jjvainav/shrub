@@ -43,7 +43,7 @@ export interface IGetCookieOptions {
     readonly signed?: boolean;
 }
 
-/** @internal */
+/** Adds a cookies object to the request context. */
 export const addCookiesRequestBuilder = (context: IRequestContext, cookies: Cookies) => {
     const instance: ICookies = {
         get: (name, options) => {
