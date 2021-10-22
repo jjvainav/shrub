@@ -1,6 +1,6 @@
 {
     "name": "@shrub/express-controller-invoker",
-    "description": "A module that provides support for wrapping/exposing controllers through invoker classes.",
+    "description": "A module that provides support for manually invoking controllers through invoker classes.",
     "version": "0.5.34",
     "license": "MIT",
     "repository": {

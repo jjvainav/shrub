@@ -1,4 +1,4 @@
-import { createInjectable, createService, IInjectable, Singleton, Transient } from "@shrub/core";
+import { createService, Transient } from "@shrub/core";
 import { controller, Constructor, IExpressApplication } from "@shrub/express";
 import { Request, RequestHandler, Response } from "express";
 import { PathParams } from "express-serve-static-core";
@@ -11,24 +11,9 @@ export interface IControllerInvokerOptions {
     readonly handler?: RequestHandler;
 }
 
-/** @internal Factory function for creating controller invoker instances. */
-export interface IControllerInvokerFactory<T> {
-    (): T;
-}
-
-/** Defines an injectable controller invoker that represents controller invoker instances of type T. */
-export interface IControllerInvokerType<T> extends IInjectable<T> {
-}
-
-/** A service for registering and managing controller invokers. */
+/** A service for creating controller invokers. */
 export interface IControllerInvokerService {
-    getControllerInvoker<T>(key: string): T;
-}
-
-/** @internal */
-export interface IControllerInvokerRegistrationService {
-    getFactory<T>(key: string): IControllerInvokerFactory<T> | undefined;
-    registerControllerInvoker<T>(key: string, factory: IControllerInvokerFactory<T>): void;
+    createControllerInvoker<T>(ctor: ControllerInvokerConstructor<T>, handler?: RequestHandler): T;
 }
 
 /** Defines options for invoking a controller action. */
@@ -46,13 +31,6 @@ export interface IControllerResponse {
 }
 
 export const IControllerInvokerService = createService<IControllerInvokerService>("controller-invoker-service");
-/** @internal */
-export const IControllerInvokerRegistrationService = createService<IControllerInvokerRegistrationService>("controller-invoker-registration-service");
-
-/** Creates an injectable controller-invoker used to define controller invoker interfaces and can be used as a decorator to inject controller invokers into service instances. */
-export function createControllerInvokerType<T>(key: string): IControllerInvokerType<T> {
-    return createInjectable({ key, factory: services => services.get(IControllerInvokerService).getControllerInvoker<T>(key) });
-}
 
 /** A class that is responsible for exposing and invoking controller actions. */
 export abstract class ControllerInvoker {
@@ -146,30 +124,10 @@ export abstract class ControllerInvoker {
 /** @internal */
 @Transient
 export class ControllerInvokerService implements IControllerInvokerService {
-    constructor(@IControllerInvokerRegistrationService private readonly registry: IControllerInvokerRegistrationService) {
+    constructor(@IExpressApplication private readonly app: IExpressApplication) {
     }
 
-    getControllerInvoker<T>(key: string): T {
-        const factory = this.registry.getFactory<T>(key);
-
-        if (!factory) {
-            throw new Error(`ControllerInvoker for key (${key}) not registered, invoker types must be registered with the express-controller-invoker module to be used.`);
-        }
-
-        return factory();
-    }
-}
-
-/** @internal */
-@Singleton
-export class ControllerInvokerRegistrationService implements IControllerInvokerRegistrationService {
-    private readonly invokers = new Map<string, IControllerInvokerFactory<any>>();
-
-    getFactory<T>(key: string): IControllerInvokerFactory<T> | undefined {
-        return this.invokers.get(key);
-    }
-
-    registerControllerInvoker<T>(key: string, factory: IControllerInvokerFactory<T>): void {
-        this.invokers.set(key, factory);
+    createControllerInvoker<T>(ctor: ControllerInvokerConstructor<T>, handler?: RequestHandler): T {
+        return new ctor({ app: this.app, handler });
     }
 }

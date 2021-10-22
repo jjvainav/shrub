@@ -1,30 +1,21 @@
-import { IModule, ModuleLoader } from "@shrub/core";
-import { ExpressModule, Get, IExpressApplication, Route } from "@shrub/express";
+import { ModuleLoader } from "@shrub/core";
+import { Get, Route } from "@shrub/express";
 import { authorization, ExpressIdentityModule, IExpressIdentityConfiguration } from "@shrub/express-identity";
 import { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
-import { ControllerInvoker, createControllerInvokerType, ExpressControllerInvokerModule, IExpressControllerInvokerConfiguration } from "../src";
+import { ControllerInvoker, ExpressControllerInvokerModule, IControllerInvokerService } from "../src";
 
-interface IInvokerTestContext {
-    readonly app: IExpressApplication;
+interface IInvokerTestContext extends IControllerInvokerService {
     allow: boolean;
 }
 
-interface IFooControllerInvoker {
-    getFoo(): Promise<string>;
-    getFooById(id: number): Promise<string>;
-    getSecureFoo(): Promise<string>;
-}
-
-function createTestContext(modules?: IModule[]): Promise<IInvokerTestContext> {
+function createTestContext(): Promise<IInvokerTestContext> {
     let context: IInvokerTestContext;
-    modules = modules || [];
     return new Promise(resolve => ModuleLoader.useModules([{
         name: "test",
         dependencies: [
-            ExpressModule, 
-            ExpressIdentityModule,
-            ...modules!
+            ExpressControllerInvokerModule,
+            ExpressIdentityModule
         ],
         configure: ({ services, config }) => {
             config.get(IExpressIdentityConfiguration).useAuthentication({
@@ -39,7 +30,8 @@ function createTestContext(modules?: IModule[]): Promise<IInvokerTestContext> {
                 }
             });
 
-            context = { app: services.get(IExpressApplication), allow: true };
+            const service = services.get(IControllerInvokerService);
+            context = { createControllerInvoker: service.createControllerInvoker.bind(service), allow: true };
             resolve(context);
         }
     }])
@@ -50,8 +42,6 @@ function isHttpError(err: unknown): err is HttpError {
     return (<HttpError>err).status !== undefined && (<HttpError>err).statusCode !== undefined;
 }
 
-const IFooControllerInvoker = createControllerInvokerType<IFooControllerInvoker>("foo-controller-invoker");
-
 describe("invoker", () => {
     let context: IInvokerTestContext;
 
@@ -60,7 +50,7 @@ describe("invoker", () => {
     });
 
     test("for basic GET action", async () => {
-        const invoker = new FooControllerInvoker({ app: context.app });
+        const invoker = context.createControllerInvoker(FooControllerInvoker);
 
         const result = await invoker.getFoo();
         
@@ -68,7 +58,7 @@ describe("invoker", () => {
     });
 
     test("for basic GET action that requires a url param", async () => {
-        const invoker = new FooControllerInvoker({ app: context.app });
+        const invoker = context.createControllerInvoker(FooControllerInvoker);
 
         const result = await invoker.getFooById(1);
         
@@ -76,7 +66,7 @@ describe("invoker", () => {
     });
 
     test("for basic GET action that requires authorization and is allowed", async () => {
-        const invoker = new FooControllerInvoker({ app: context.app });
+        const invoker = context.createControllerInvoker(FooControllerInvoker);
 
         const result = await invoker.getSecureFoo();
         
@@ -85,7 +75,7 @@ describe("invoker", () => {
 
     test("for basic GET action that requires authorization and is not allowed", async () => {
         context.allow = false;
-        const invoker = new FooControllerInvoker({ app: context.app });
+        const invoker = context.createControllerInvoker(FooControllerInvoker);
 
         try {
             await invoker.getSecureFoo();
@@ -99,30 +89,6 @@ describe("invoker", () => {
                 fail("Unexpected error.");
             }
         }
-    });
-});
-
-describe("invoker factory", () => {
-    // TODO: create tests to test registering invoker factories
-    // -- update createTestContext to accept a module that will handler registering the context
-    // -- need to then test injecting the controller invoker or getting it from services
-
-    test("for basic GET action", async () => {
-        const context = await createTestContext([{
-            name: "test",
-            dependencies: [ExpressControllerInvokerModule],
-            configure: ({ config }) => {
-                config.get(IExpressControllerInvokerConfiguration).useControllerInvoker(IFooControllerInvoker);
-            }
-
-        }]);
-
-
-        const invoker = new FooControllerInvoker({ app: context.app });
-
-        const result = await invoker.getFoo();
-        
-        expect(result).toBe("foo");
     });
 });
 
