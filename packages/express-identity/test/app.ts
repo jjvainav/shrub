@@ -1,8 +1,8 @@
 import express from "express";
 import { HttpError } from "http-errors";
 import { IModule } from "@shrub/core";
-import { ExpressFactory, ExpressModule, IExpressApplication, IExpressConfiguration } from "@shrub/express";
-import { IExpressSessionConfiguration, ISession, ISessionValueCollection } from "@shrub/express-session";
+import { ExpressFactory, IExpressApplication, IExpressConfiguration } from "@shrub/express";
+import { ExpressSessionModule, IExpressSessionConfiguration, ISession, ISessionValueCollection } from "@shrub/express-session";
 import { IAuthenticationHandler } from "../src/authentication";
 import { IAuthorizationOptions, useAuthorization } from "../src/authorization";
 import { ExpressIdentityModule, IExpressIdentityConfiguration } from "../src/module";
@@ -34,7 +34,7 @@ export const session = new class implements ISession {
 
 const sessionModule: IModule = {
     name: "session-test",
-    dependencies: [ExpressModule],
+    dependencies: [ExpressSessionModule],
     configure: ({ config }) => {
         // clear the session for each test
         delete session.isDeleted;
@@ -42,7 +42,7 @@ const sessionModule: IModule = {
         session.values = {};
 
         config.get(IExpressConfiguration).use((req, res, next) => {
-            // manually create a test session as the only sessions currently supported are cookie sessions
+            // overwrite the session with a test/mock session
             (<any>req).context.session = session;
             next();
         });
@@ -54,7 +54,7 @@ export function createTestApp(authenticationHandlers: IAuthenticationHandler[], 
         name: "test",
         dependencies: [
             // sessionModule needs to go first so it can inject the test session before the express identity middleware
-            //sessionModule,
+            sessionModule,
             ExpressIdentityModule
         ],
         configure: ({ config }) => {
@@ -107,7 +107,6 @@ export function createTestApp(authenticationHandlers: IAuthenticationHandler[], 
             config.get(IExpressConfiguration).use(router);
             config.get(IExpressConfiguration).use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
                 if (!isHttpError(err)) {
-                    console.log("TEST", err);
                     res.status(500).json({
                         error: err.name,
                         message: err.message
