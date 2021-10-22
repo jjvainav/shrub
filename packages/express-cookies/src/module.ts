@@ -1,7 +1,7 @@
 import Cookies from "cookies";
 import { createOptions, IModule, IModuleConfigurator, IModuleInitializer, IOptionsService } from "@shrub/core";
 import { ExpressModule, IExpressConfiguration } from "@shrub/express";
-import { addCookiesRequestBuilder, cookies } from "./middleware";
+import { cookies } from "./middleware";
 
 export const ICookiesOptions = createOptions<ICookiesOptions>("cookies-middleware");
 export interface ICookiesOptions {
@@ -19,8 +19,6 @@ export class ExpressCookiesModule implements IModule {
     }
 
     configure({ config, services }: IModuleConfigurator): void {
-        config.get(IExpressConfiguration).useRequestBuilder("addCookies", addCookiesRequestBuilder);
-
         const options = services.get(IOptionsService).getOptions(ICookiesOptions);
         config.get(IExpressConfiguration).use(Cookies.express(options.keys));
         config.get(IExpressConfiguration).use(cookies);

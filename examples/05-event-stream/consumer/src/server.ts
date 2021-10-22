@@ -1,7 +1,7 @@
 import { IModuleConfigurator } from "@shrub/core";
 import { ExpressFactory, ExpressModule, IExpressConfiguration, useController } from "@shrub/express";
 import { ExpressEventStreamModule, IExpressEventStreamConfiguration } from "@shrub/express-event-stream";
-import { ExpressTracingModule, useRequestTracing } from "@shrub/express-tracing";
+import { ExpressTracingModule } from "@shrub/express-tracing";
 import { TracingConsoleModule } from "@shrub/tracing-console";
 import * as express from "express";
 import * as path from "path";
@@ -32,7 +32,6 @@ async function start() {
                 app.get(/\/public(.*)/, express.static(__dirname, { fallthrough: false }));
 
                 app.use(express.json());
-                app.use(useRequestTracing());
                 app.use(useController(Controller));
             }
         }])

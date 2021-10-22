@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
 
+/** Express middleware installed by the module. */
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
     if (!isHttpError(err)) {
         return next(err);

@@ -2,7 +2,7 @@ import express from "express";
 import { HttpError } from "http-errors";
 import { IModule } from "@shrub/core";
 import { ExpressFactory, ExpressModule, IExpressApplication, IExpressConfiguration } from "@shrub/express";
-import { ISession, ISessionValueCollection } from "@shrub/express-session";
+import { IExpressSessionConfiguration, ISession, ISessionValueCollection } from "@shrub/express-session";
 import { IAuthenticationHandler } from "../src/authentication";
 import { IAuthorizationOptions, useAuthorization } from "../src/authorization";
 import { ExpressIdentityModule, IExpressIdentityConfiguration } from "../src/module";
@@ -54,7 +54,7 @@ export function createTestApp(authenticationHandlers: IAuthenticationHandler[], 
         name: "test",
         dependencies: [
             // sessionModule needs to go first so it can inject the test session before the express identity middleware
-            sessionModule,
+            //sessionModule,
             ExpressIdentityModule
         ],
         configure: ({ config }) => {
@@ -99,12 +99,15 @@ export function createTestApp(authenticationHandlers: IAuthenticationHandler[], 
                 config.get(IExpressIdentityConfiguration).useTokenOptions(tokenOptions);
             }
 
+            config.get(IExpressSessionConfiguration).useCookieSession({ secure: false, signed: false });
+
             // register the authentication handlers
             authenticationHandlers.forEach(handler => config.get(IExpressIdentityConfiguration).useAuthentication(handler));
 
             config.get(IExpressConfiguration).use(router);
             config.get(IExpressConfiguration).use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
                 if (!isHttpError(err)) {
+                    console.log("TEST", err);
                     res.status(500).json({
                         error: err.name,
                         message: err.message

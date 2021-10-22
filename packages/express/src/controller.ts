@@ -1,6 +1,6 @@
+import { IInstantiationService } from "@shrub/core";
 import { RequestHandler, Router } from "express";
 import { PathParams } from "express-serve-static-core";
-import { IInstantiationService } from "@shrub/core";
 
 export type Constructor<T> = { new(...args: any[]): T };
 
@@ -16,22 +16,6 @@ interface IRouteAttribute {
 const controllerKey = "__controller";
 const routerKey = "__router";
 const routesKey = "__routes";
-
-const routeHandler: (proto: any, propertyKey: string) => RequestHandler = (proto, propertyKey) => (req, res, next) => {
-    const controller = (<any>req)[controllerKey];
-    if (!controller) {
-        return next(new Error(`Controller '${proto.constructor.name}' not found for request '${req.path}'.`));
-    }
-
-    const handler: RequestHandler = controller[propertyKey];
-    if (!handler) {
-        return next(new Error(`Request handler method '${propertyKey}' not found on controller '${proto.constructor.name}'.`));
-    }
-
-    // a request handler may return a promise or not; if the request handler is async capture unhandled errors and pass them to next
-    // this can easly be done by wrapping the result in a Promise.resolve() and handling catch 
-    Promise.resolve(handler.call(controller, req, res, next)).catch(err => next(err));
-};
 
 /** A class decorator for a Controller identifying the request route the controller handles. */
 export const Route: IRouteAttribute = function () {
@@ -101,7 +85,25 @@ export function useController<T>(ctor: Constructor<T>): RequestHandler {
 export function createRouteDecorator(register: (router: Router, handler: RequestHandler) => void): (target: any, propertyKey: string) => void {
     return (target, propertyKey) => {
         target[routesKey] = target[routesKey] || Router();
-        register(target[routesKey], routeHandler(target, propertyKey));
+        register(target[routesKey], getControllerActionRouteHandler(target, propertyKey));
+    };
+}
+
+function getControllerActionRouteHandler(proto: any, propertyKey: string): RequestHandler { 
+    return (req, res, next) => {
+        const controller = (<any>req)[controllerKey];
+        if (!controller) {
+            return next(new Error(`Controller '${proto.constructor.name}' not found for request '${req.path}'.`));
+        }
+
+        const handler: RequestHandler = controller[propertyKey];
+        if (!handler) {
+            return next(new Error(`Request handler method '${propertyKey}' not found on controller '${proto.constructor.name}'.`));
+        }
+
+        // a request handler may return a promise or not; if the request handler is async capture unhandled errors and pass them to next
+        // this can easly be done by wrapping the result in a Promise.resolve() and handling catch 
+        Promise.resolve(handler.call(controller, req, res, next)).catch(err => next(err));
     };
 }
 

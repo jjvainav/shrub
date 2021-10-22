@@ -3,7 +3,7 @@ import { ILogEntry } from "@shrub/logging";
 import { ISpan, ITags, ITraceWriter, ITracingConfiguration, TracingModule } from "@shrub/tracing";
 import { EventEmitter } from "@sprig/event-emitter";
 import { Request, Response, NextFunction } from "express";
-import { ExpressTracingModule, IRequestTracingOptions, useRequestTracing } from "../src";
+import { ExpressTracingModule, IExpressSessionConfiguration, IRequestTracingOptions } from "../src";
 
 type Mutable<T> = { -readonly[P in keyof T]: T[P] };
 
@@ -32,11 +32,10 @@ export function createApp(options?: ITestContextOptions): Promise<ITestContext> 
                 TracingModule
             ],
             configure: ({ config }) => {
+                config.get(IExpressSessionConfiguration).useRequestTracing(options && options.tracing || {});
                 config.get(ITracingConfiguration).useTraceWriter(traceWriter);
-                const app = config.get(IExpressConfiguration);
                 
-                app.use(useRequestTracing(options && options.tracing));
-
+                const app = config.get(IExpressConfiguration);
                 app.get(
                     "/test",
                     (req: Request, res: Response, next: NextFunction) => {

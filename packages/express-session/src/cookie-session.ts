@@ -2,8 +2,6 @@ import { createOptions } from "@shrub/core";
 import { ICookie, ICookies } from "@shrub/express-cookies";
 import { ISession, ISessionOptions, ISessionValueCollection } from "./session";
 
-export const ICookieSessionOptions = createOptions<ICookieSessionOptions>("cookie-session");
-
 export interface ICookieSessionOptions extends ISessionOptions {
     /** The name of the cookie used for a session; the default is '_sess'. */
     readonly cookieName?: string;
@@ -13,10 +11,13 @@ export interface ICookieSessionOptions extends ISessionOptions {
     readonly signed?: boolean;
 }
 
+export const ICookieSessionOptions = createOptions<ICookieSessionOptions>("cookie-session");
+
 const defaultSecure = true;
 const defaultSigned = true;
 const defaultCookieName = "_sess";
 
+/** @internal */
 export class CookieSession implements ISession {
     private readonly context = new SessionContext();
     private readonly cookie: ICookie;

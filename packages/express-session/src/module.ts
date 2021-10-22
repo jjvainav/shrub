@@ -1,9 +1,8 @@
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer, IOptionsService } from "@shrub/core";
 import { ExpressModule, IExpressConfiguration } from "@shrub/express";
 import { ExpressCookiesModule } from "@shrub/express-cookies";
-import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ICookieSessionOptions } from "./cookie-session";
-import { addCookieSessionRequestBuilder, cookieSession } from "./middleware";
+import { cookieSession } from "./middleware";
 
 export const IExpressSessionConfiguration = createConfig<IExpressSessionConfiguration>();
 export interface IExpressSessionConfiguration {
@@ -15,7 +14,7 @@ export interface IExpressSessionConfiguration {
 }
 
 export class ExpressSessionModule implements IModule {
-    private middleware?: RequestHandler;
+    private options?: ICookieSessionOptions;
 
     readonly name = "express-session";
     readonly dependencies = [
@@ -25,22 +24,14 @@ export class ExpressSessionModule implements IModule {
 
     initialize({ config, settings }: IModuleInitializer): void {
         settings.bindToOptions(ICookieSessionOptions);
-        config(IExpressSessionConfiguration).register(({ services }) => ({
-            useCookieSession: options => {
-                if (this.middleware) {
-                    throw new Error("Cookie session has already been initialized.");
-                }
-
-                options = options || services.get(IOptionsService).getOptions(ICookieSessionOptions);
-                this.middleware = cookieSession(options);
-            }
+        config(IExpressSessionConfiguration).register(() => ({
+            useCookieSession: options => this.options = options
         }));
     }
 
-    configure({ config }: IModuleConfigurator): void {
-        config.get(IExpressConfiguration).useRequestBuilder("addCookieSession", addCookieSessionRequestBuilder);
-        config.get(IExpressConfiguration).use((req: Request, res: Response, next: NextFunction) => {
-            return this.middleware ? this.middleware(req, res, next) : next();
-        });
+    configure({ config, next, services }: IModuleConfigurator): void {
+        config.get(IExpressConfiguration).use((req, res, next) => cookieSession(this.options || {})(req, res, next));
+        // invoke next to allow modules downstream the ability to configure the cookie session middleware
+        next().then(() => this.options = this.options || services.get(IOptionsService).getOptions(ICookieSessionOptions));
     }
 }

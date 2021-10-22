@@ -5,15 +5,7 @@ import { AuthenticationVerifyResult, IAuthenticationHandler, IAuthenticationObse
 
 declare module "@shrub/express/dist/request-context" {
     interface IRequestContext {
-        readonly identity?: IIdentity;
-    }
-
-    interface IRequestContextBuilder {
-        /** 
-         * Adds the identity to the request context with an optional set of properties. 
-         * The options are optional; by default, the options configured with the module will be used.
-         */
-        addIdentity(options?: IIdentityOptions): IRequestContextBuilder;
+        identity?: IIdentity;
     }
 }
 
@@ -68,14 +60,31 @@ export interface IIdentityOptions {
     readonly authenticationObservers?: IAuthenticationObserver[];
 }
 
-/** Adds an identity to the specified request context. */
-export const addIdentityRequestBuilder = (context: IRequestContext, options: IIdentityOptions) => {
+/** Identity middleware for adding the identity and authenticating the current request. */
+export const identityMiddleware = (options: IIdentityOptions) => (req: Request, res: Response, next: NextFunction) => {
+    const identity = createIdentity(req.context, options);
+    req.context.identity = identity
+    identity.authenticate().then(result => {
+        if (result.isChallenged) {
+            identity.challenge(req, res, next);
+        }
+        else if (result.isDenied) {
+            identity.deny(req, res, next);
+        }
+        else {
+            next(result.error);
+        }
+    })
+    .catch(err => next(err));
+};
+
+function createIdentity(context: IRequestContext, options: IIdentityOptions): IIdentity {
     const handlers = options.authenticationHandlers;
     let result: IAuthenticateResult | undefined;
     let scheme: string | undefined;
     let claims: any;
 
-    const identity: IIdentity = {
+    return {
         get claims(): string | undefined {
             return claims;
         },
@@ -186,30 +195,7 @@ export const addIdentityRequestBuilder = (context: IRequestContext, options: IId
             }
         }
     };
-
-    // set a new instance of the request context so that the identity and authentication handlers have the updated context with the identity
-    context = <IRequestContext>{ ...context, identity };
-
-    return context;
-};
-
-/** @internal Identity middleware for adding the identity and authenticating the current request. */
-export const identityMiddleware = (options: IIdentityOptions) => (req: Request, res: Response, next: NextFunction) => {
-    req.contextBuilder.addIdentity(options);
-    const identity = req.context.identity!;
-    identity.authenticate().then(result => {
-        if (result.isChallenged) {
-            identity.challenge(req, res, next);
-        }
-        else if (result.isDenied) {
-            identity.deny(req, res, next);
-        }
-        else {
-            next(result.error);
-        }
-    })
-    .catch(err => next(err));
-};
+}
 
 function on<TFunction extends Function>(
     observers: IAuthenticationObserver[] | undefined, 

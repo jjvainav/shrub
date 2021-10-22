@@ -1,4 +1,3 @@
-import { IRequestContext } from "@shrub/express";
 import Cookies from "cookies";
 import { RequestHandler } from "express";
 
@@ -6,12 +5,7 @@ export { Cookies };
 
 declare module "@shrub/express/dist/request-context" {
     interface IRequestContext {
-        readonly cookies?: ICookies;
-    }
-
-    interface IRequestContextBuilder {
-        /** Adds cookies to the request context for the specified express request. */
-        addCookies(cookies: Cookies): IRequestContextBuilder;
+        cookies?: ICookies;
     }
 }
 
@@ -43,9 +37,10 @@ export interface IGetCookieOptions {
     readonly signed?: boolean;
 }
 
-/** Adds a cookies object to the request context. */
-export const addCookiesRequestBuilder = (context: IRequestContext, cookies: Cookies) => {
-    const instance: ICookies = {
+/** Express middleware that gets installed by the module. */
+export const cookies: RequestHandler = (req, res, next) => {
+    const cookies = <Cookies>req.cookies;
+    req.context.cookies = {
         get: (name, options) => {
             const value = cookies.get(name, {
                 signed: options.signed || true
@@ -57,13 +52,6 @@ export const addCookiesRequestBuilder = (context: IRequestContext, cookies: Cook
         }
     };
 
-    context = <IRequestContext>{ ...context, cookies: instance };
-
-    return context;
-};
-
-export const cookies: RequestHandler = (req, res, next) => {
-    req.contextBuilder.addCookies(<Cookies>req.cookies);
     next();
 };
 

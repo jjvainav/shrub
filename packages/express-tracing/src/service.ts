@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createService, Scoped } from "@shrub/core";
+import { createOptions, createService, Scoped } from "@shrub/core";
 import { IRequestContext } from "@shrub/express";
 import { ISpan, ITags, ITracerBuilder, ITracingService } from "@shrub/tracing";
 
@@ -24,6 +24,7 @@ export enum TraceHeaders {
     spanId = "X-Span-ID"
 }
 
+export const IRequestTracingOptions = createOptions<IRequestTracingOptions>("request-tracing");
 export const IExpressTracingService = createService<IExpressTracingService>("express-tracing-service");
 
 function isRequestContextScope(scope: any): scope is IRequestContext {

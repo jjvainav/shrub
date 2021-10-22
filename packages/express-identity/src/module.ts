@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
-import { ExpressModule, IExpressConfiguration, IRequestContext } from "@shrub/express";
+import { ExpressModule, IExpressConfiguration } from "@shrub/express";
 import { ExpressSessionModule } from "@shrub/express-session";
 import { IAuthenticationHandler, IAuthenticationObserver } from "./authentication";
-import { addIdentityRequestBuilder, identityMiddleware, IIdentityOptions } from "./identity";
-import { addTokenRequestBuilder, ITokenOptions, tokenMiddleware } from "./token";
+import { identityMiddleware, IIdentityOptions } from "./identity";
+import { ITokenOptions, tokenMiddleware } from "./token";
 
 export const IExpressIdentityConfiguration = createConfig<IExpressIdentityConfiguration>();
 export interface IExpressIdentityConfiguration {
@@ -52,11 +52,6 @@ export class ExpressIdentityModule implements IModule {
     }
 
     configure({ config }: IModuleConfigurator): void {
-        config.get(IExpressConfiguration).useRequestBuilder("addToken", addTokenRequestBuilder);
-        config.get(IExpressConfiguration).useRequestBuilder("addIdentity", (context: IRequestContext, options?: IIdentityOptions) => {
-            return addIdentityRequestBuilder(context, options || this.options);
-        });
-
         config.get(IExpressConfiguration).use((req: Request, res: Response, next: NextFunction) => {
             return tokenMiddleware(this.tokenOptions || {})(req, res, next);
         });

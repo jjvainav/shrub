@@ -1,15 +1,10 @@
-import { IRequestContext } from "@shrub/express";
 import { NextFunction, Request, Response } from "express";
 import createError, { HttpError } from "http-errors";
 import { IAuthenticationHandler } from "./authentication";
 
 declare module "@shrub/express/dist/request-context" {
     interface IRequestContext {
-        readonly token?: string;
-    }
-
-    interface IRequestContextBuilder {
-        addToken(token: string): IRequestContextBuilder;
+        token?: string;
     }
 }
 
@@ -36,10 +31,7 @@ interface IAuthenticateHeaderOptions {
     readonly scope?: string | string[];
 }
 
-/** Adds a token to the specified request context. */
-export const addTokenRequestBuilder = (context: IRequestContext, token: string) => ({ ...context, token });
-
-/** @internal Express middleware for parsing bearer tokens for a request. */
+/** Express middleware for parsing bearer tokens for a request. */
 export const tokenMiddleware = (options: ITokenOptions) => (req: Request, res: Response, next: NextFunction) => {
     // TODO: the OAuth Bearer Token spec allows the token to be sent via header, body, or query but we are only going to support header for now
     // https://tools.ietf.org/html/rfc6750#section-2
@@ -73,9 +65,7 @@ export const tokenMiddleware = (options: ITokenOptions) => (req: Request, res: R
             }
         }
 
-        if (token) {
-            req.contextBuilder.addToken(token);
-        }
+        req.context.token = token;
     }
 
     next();
