@@ -1,5 +1,5 @@
 import * as express from "express";
-import { useController } from "@shrub/express";
+import { controller } from "@shrub/express";
 import { WorkbenchController } from "./controllers";
 
 export function createRoutes(): express.Router {
@@ -7,7 +7,7 @@ export function createRoutes(): express.Router {
 
     router.get("/favicon.ico", (req, res) => res.status(204).end());
     router.get(/\/public(.*)/, express.static(__dirname, { fallthrough: false }));
-    router.use(useController(WorkbenchController));
+    router.use(controller(WorkbenchController));
 
     return router;
 }

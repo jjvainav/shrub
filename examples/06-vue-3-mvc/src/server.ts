@@ -1,6 +1,6 @@
 import * as express from "express";
 import * as path from "path";
-import { ExpressFactory, useController } from "@shrub/express";
+import { controller, ExpressFactory } from "@shrub/express";
 import { Controller } from "./controllers";
 
 async function start() {
@@ -10,7 +10,7 @@ async function start() {
     app.set("views", path.resolve(__dirname, "views"));
     
     app.get(/\/public(.*)/, express.static(__dirname, { fallthrough: false }));
-    app.use(useController(Controller));
+    app.use(controller(Controller));
     
     app.listen(app.get("port"), () => {
         console.log("  App started at http://localhost:%d", app.get("port"));
