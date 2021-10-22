@@ -13,6 +13,11 @@ export interface IExpressIdentityConfiguration {
     useTokenOptions(options: ITokenOptions): void;
 }
 
+/** 
+ * Express module that installs identity and token middleware. Note, the package also supports authorization 
+ * but this is not installed by default and needs to be added via the authorization middleware; this allows
+ * better control over the endpoints that require and do not require authorization.
+ */
 export class ExpressIdentityModule implements IModule {
     private options: IIdentityOptions = { authenticationHandlers: [] };
     private tokenOptions?: ITokenOptions;

@@ -1,7 +1,7 @@
 import { createService } from "@shrub/core";
 import { NextFunction, Request, Response } from "express";
 import request from "supertest";
-import { ExpressFactory, Get, Route, useController } from "../src";
+import { controller, ExpressFactory, Get, Route } from "../src";
 
 describe("request context service", () => { 
     test("ensure scoped service state between multiple invocations", async () => {
@@ -11,7 +11,7 @@ describe("request context service", () => {
         }])
         .create();
 
-        app.use(useController(FooController));
+        app.use(controller(FooController));
 
         const responses = await Promise.all([
             request(app).get("/foo"),

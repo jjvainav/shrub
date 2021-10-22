@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response, Router } from "express";
 import request from "supertest";
-import { ExpressFactory, Get, Post, Route, useController } from "../src";
+import { controller, ExpressFactory, Get, Post, Route } from "../src";
 
-describe("controller", () => {
+describe("controller middleware", () => {
     test("with basic GET handler", async () => {
         const app = await ExpressFactory.create();
-        app.use(useController(FooController));
+        app.use(controller(FooController));
 
         const response = await request(app).get("/foo");
 
@@ -15,7 +15,7 @@ describe("controller", () => {
 
     test("with basic POST handler", async () => {
         const app = await ExpressFactory.create();
-        app.use(useController(FooController));
+        app.use(controller(FooController));
 
         const response = await request(app).post("/foo");
 
@@ -25,7 +25,7 @@ describe("controller", () => {
 
     test("with async handler", async () => {
         const app = await ExpressFactory.create();
-        app.use(useController(AsyncController));
+        app.use(controller(AsyncController));
 
         const response = await request(app).get("/async");
 
@@ -35,7 +35,7 @@ describe("controller", () => {
 
     test("with async handler that throws", async () => {
         const app = await ExpressFactory.create();
-        app.use(useController(AsyncController));
+        app.use(controller(AsyncController));
         app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
             res.status(500).json({ error: true });
         });
@@ -48,7 +48,7 @@ describe("controller", () => {
 
     test("with GET handler for path containing parameter", async () => {
         const app = await ExpressFactory.create();
-        app.use(useController(FooController));
+        app.use(controller(FooController));
 
         const response = await request(app).get("/foo/123");
 
@@ -58,7 +58,7 @@ describe("controller", () => {
 
     test("with GET handler and custom request handler", async () => {
         const app = await ExpressFactory.create();
-        app.use(useController(FooController));
+        app.use(controller(FooController));
 
         const response = await request(app).get("/foo/handler");
 
@@ -69,7 +69,7 @@ describe("controller", () => {
 
     test("with multiple Get decorators for the same handler", async () => {
         const app = await ExpressFactory.create();
-        app.use(useController(FooController));
+        app.use(controller(FooController));
 
         const response1 = await request(app).get("/foo/1");
         const response2 = await request(app).get("/foo/2");
@@ -83,7 +83,7 @@ describe("controller", () => {
 
     test("with multiple routes for the same handler", async () => {
         const app = await ExpressFactory.create();
-        app.use(useController(FooController));
+        app.use(controller(FooController));
 
         const response1 = await request(app).get("/foo/3");
         const response2 = await request(app).get("/foo/4");
@@ -99,7 +99,7 @@ describe("controller", () => {
         const app = await ExpressFactory.create();
         const base = Router();
 
-        base.use("/base", useController(FooController));
+        base.use("/base", controller(FooController));
         app.use(base);
 
         const response = await request(app).get("/base/foo");
@@ -112,7 +112,7 @@ describe("controller", () => {
         const app = await ExpressFactory.create();
         const base = Router();
 
-        base.use(useController(RootController));
+        base.use(controller(RootController));
         app.use(base);
 
         const response = await request(app).get("/");

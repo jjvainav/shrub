@@ -1,5 +1,5 @@
 import { IModule, IModuleConfigurator, IServiceRegistration } from "@shrub/core";
-import { ExpressModule, IExpressConfiguration, useController } from "@shrub/express";
+import { controller, ExpressModule, IExpressConfiguration } from "@shrub/express";
 import { SocketIOModule } from "@shrub/socket.io";
 import { TodoController } from "./controller";
 import { ITodoRepository, TodoRepository } from "./repository";
@@ -19,7 +19,7 @@ export class TodoApiModule implements IModule {
 
     configure({ config, services }: IModuleConfigurator): void {
         const express = config.get(IExpressConfiguration);
-        express.use("/todos", useController(TodoController));
+        express.use("/todos", controller(TodoController));
 
         services.get(ITodoService).listen();
     }

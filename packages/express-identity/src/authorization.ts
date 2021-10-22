@@ -24,7 +24,7 @@ export interface IAuthorizationOptions {
 }
 
 /** Route middleware for requests that require user authorization. If no options are provided the middleware will simply verify if the request has an authenticated user. */
-export function useAuthorization(verifyOrOptions?: AuthorizeCallback | IAuthorizationOptions): RequestHandler {
+export function authorization(verifyOrOptions?: AuthorizeCallback | IAuthorizationOptions): RequestHandler {
     let challengeParameters: IChallengeParameters | ((req: Request) => IChallengeParameters) | undefined;
     let verify: AuthorizeCallback | undefined;
 

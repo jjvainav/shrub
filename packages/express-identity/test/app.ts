@@ -4,7 +4,7 @@ import { IModule } from "@shrub/core";
 import { ExpressFactory, IExpressApplication, IExpressConfiguration } from "@shrub/express";
 import { ExpressSessionModule, IExpressSessionConfiguration, ISession, ISessionValueCollection } from "@shrub/express-session";
 import { IAuthenticationHandler } from "../src/authentication";
-import { IAuthorizationOptions, useAuthorization } from "../src/authorization";
+import { authorization, IAuthorizationOptions } from "../src/authorization";
 import { ExpressIdentityModule, IExpressIdentityConfiguration } from "../src/module";
 import { ITokenOptions } from "../src/token";
 
@@ -62,7 +62,7 @@ export function createTestApp(authenticationHandlers: IAuthenticationHandler[], 
             const requestHandlers: express.RequestHandler[] = [];
 
             if (authorizationOptions) {
-                requestHandlers.push(useAuthorization(authorizationOptions));
+                requestHandlers.push(authorization(authorizationOptions));
             }
         
             requestHandlers.push((req, res) => {

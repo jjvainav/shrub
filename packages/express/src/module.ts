@@ -1,7 +1,7 @@
 import express from "express";
 import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration, IServiceCollection } from "@shrub/core";
 import { HttpModule, IHttpModuleConfiguration, IHttpServer } from "@shrub/http";
-import { IRequestContextService, RequestContextService } from "./request-context";
+import { IRequestContextService, requestContext, RequestContextService } from "./request-context";
 
 export const IExpressConfiguration = createConfig<IExpressConfiguration>();
 export interface IExpressConfiguration extends express.Application {
@@ -24,27 +24,8 @@ export class ExpressModule implements IModule {
         registration.registerSingleton(IExpressApplication, {
             create: services => {
                 const app = express();
+                app.use(requestContext(services));
                 this.overrideListen(services, app);
-
-                app.use((req, res, next) => {
-                    // use a scoped service collection for the request
-                    const requestServices = services.createScope();
-                    const requestContextService = requestServices.get(IRequestContextService);
-
-                    res.on("finish", () => requestServices.dispose());
-
-                    // note: this needs to be configurable to support express sub apps
-                    // when loading a set of modules as an independent sub app the root app will
-                    // have defined a context on the request but for sub apps we need to overwrite
-                    // it using the context configured for this specific domain
-                    Object.defineProperty(req, "context", {
-                        configurable: true,
-                        get() { return requestContextService.context; }
-                    });
-
-                    next();
-                });
-
                 return app;
             }
         });

@@ -1,7 +1,7 @@
 import * as express from "express";
 import * as path from "path";
 import { IModuleConfigurator } from "@shrub/core";
-import { ExpressFactory, ExpressModule, IExpressConfiguration, useController } from "@shrub/express";
+import { controller, ExpressFactory, ExpressModule, IExpressConfiguration } from "@shrub/express";
 import { Controller } from "./controller";
 
 async function start() {
@@ -13,7 +13,7 @@ async function start() {
                 const app = config.get(IExpressConfiguration);
 
                 app.use(express.static(path.join(__dirname, "public")));
-                app.use(useController(Controller));
+                app.use(controller(Controller));
             }
         }])
         .create();

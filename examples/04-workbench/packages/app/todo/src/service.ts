@@ -1,5 +1,5 @@
 import axios from "axios";
-import io from "socket.io-client";
+import io, { Socket } from "socket.io-client";
 import { createService, Singleton } from "@shrub/core";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import { ITodoItem } from "./item";
@@ -19,7 +19,7 @@ export interface ITodoService {
 export class TodoService implements ITodoService {
     private readonly itemDeleted = new EventEmitter<string>("item-deleted");
     private readonly itemSaved = new EventEmitter<ITodoItem>("item-saved");
-    private readonly socket: SocketIOClient.Socket;
+    private readonly socket: Socket;
 
     constructor() {
         this.socket = io({ transports: ["websocket"] });

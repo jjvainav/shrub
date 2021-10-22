@@ -5,13 +5,13 @@ import { createTestApp } from "./app";
 describe("authorization", () => {
     test("authorize authenticated user", async () => {
         // pass an empty authorization options so that the createTestApp function will inject the
-        // useAuthorization route middleware - by default this will simply ensure a user has been authenticated
-        const authorization: IAuthorizationOptions = {};
+        // authorization route middleware - by default this will simply ensure a user has been authenticated
+        const options: IAuthorizationOptions = {};
         const app = await createTestApp([{
             scheme: "test",
             authenticate: (context, result) => result.success({ id: "1", scope: "read" })
         }],
-        authorization);
+        options);
 
         const response = await request(app).get("/test");
 
@@ -19,14 +19,14 @@ describe("authorization", () => {
     });
 
     test("authorize authenticated user with custom verification", async () => {
-        const authorization: IAuthorizationOptions = {
+        const options: IAuthorizationOptions = {
             verify: context => Promise.resolve(context.claims.scope === "read")
         };
         const app = await createTestApp([{
             scheme: "test",
             authenticate: (context, result) => result.success({ id: "1", scope: "read" })
         }],
-        authorization);
+        options);
 
         const response = await request(app).get("/test");
 

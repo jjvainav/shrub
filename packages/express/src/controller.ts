@@ -68,7 +68,7 @@ export function Put(path?: PathParams, ...handlers: RequestHandler[]): (target: 
 }
 
 /** Middleware that exposes the routes for a Controller. */
-export function useController<T>(ctor: Constructor<T>): RequestHandler {
+export function controller<T>(ctor: Constructor<T>): RequestHandler {
     const router: Router = ctor.prototype[routerKey];
     if (!router) {
         throw new Error(`Invalid controller '${ctor.name}', class does not have a Route decorator.`);

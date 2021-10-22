@@ -884,72 +884,17 @@
   dependencies:
     "@octokit/openapi-types" "^7.2.3"
 
-"@shrub/core@0.5.11", "@shrub/core@^0.5.11":
-  version "0.5.11"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.11.tgz#ce1f24f20c1a8543714769f80e93c1f4e4e6b96c"
-  integrity sha512-u1dZYjlAUfj+Fu6+QgGZ1W2BhXaEyDJ9G9W1AQ9H3EqeS8w5pJrn+/MFl4gxnM2ZyF4tDb6CCtKrHR/ylYB7Pg==
-
-"@shrub/express@^0.5.11":
-  version "0.5.11"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.11.tgz#d29287b0ce76c640a5a1eeea236785dd79b3ce44"
-  integrity sha512-mSoi1YPWylCJPN8zfLP2UY2Yi99NWPjFQF9MC+P2gmcro9aa0li2vOcKxFOH+KupaKZtVtMoxrD1PrIJliTZWw==
+"@sprig/event-emitter-dom@^0.1.71":
+  version "0.1.71"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.1.71.tgz#0834a2ec891add920798cf1cafec904b8b691efc"
+  integrity sha512-zZAiG9iCmeTUKU8Vks6l/z3S6ch317/y1uQ9bBXKLjVRssNLTblEgTV1mM5fdNB4Rq1geuyHeFyn0CnDlOtQiA==
   dependencies:
-    "@shrub/core" "0.5.11"
-    "@shrub/http" "0.5.11"
-    express "^4.17.1"
+    "@sprig/event-emitter" "0.1.71"
 
-"@shrub/http@0.5.11":
-  version "0.5.11"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.11.tgz#c845aa1377aee8f8d8fb2bd19ee790c335dbe456"
-  integrity sha512-UdTj0EpxkLGOR8L5pFX6s1RJlC3dUKPlU2qmFxEi2eZyWzcrUhxklktvbJ4iOw8whzwtON6y4OwWKaSSPLaofw==
-  dependencies:
-    "@shrub/core" "0.5.11"
-
-"@shrub/model@0.5.11", "@shrub/model@^0.5.11":
-  version "0.5.11"
-  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.5.11.tgz#940c08c686ff0029f4e1ce87f321c0f3aa1cf15a"
-  integrity sha512-GpmYSyVhUED6yF7m+mmL//1uZJBhyW+KNpFhxRMgJdVuqLS/njGfDYU2mbpw4pn7GdoWx8A+W/BVaKNoBukZGQ==
-  dependencies:
-    "@shrub/core" "0.5.11"
-    "@sprig/serialization" "0.1.58"
-
-"@shrub/vue-i18n@^0.5.11":
-  version "0.5.11"
-  resolved "https://registry.yarnpkg.com/@shrub/vue-i18n/-/vue-i18n-0.5.11.tgz#5afbfcbb5a92b6c16c99e3a9cb830b157e16d871"
-  integrity sha512-5/v/KyNfRKVkgw0Dct0pNgLd3G3tuGVaeRvGWc1FlBFXZNbWUPWZeC6EcSvCca2sNkUGkV1QJBNOKbK0jaIE3g==
-  dependencies:
-    "@shrub/core" "0.5.11"
-    "@shrub/vue" "0.5.11"
-    "@sprig/event-emitter" "^0.1.58"
-    vue-i18n "^8.24.3"
-
-"@shrub/vue@0.5.11", "@shrub/vue@^0.5.11":
-  version "0.5.11"
-  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.5.11.tgz#8439fa451d659b3728c6752bfd9c8245f50b7a4b"
-  integrity sha512-Y/2l+Rx+jlbo18DRk3Ht3wh6ntDK+R+bh8qQCS4zNzyF4achQ4XP5zY+dY3w1FkF4T4NTk/WvdyCfOKHCNz2Zw==
-  dependencies:
-    "@shrub/core" "0.5.11"
-    "@shrub/model" "0.5.11"
-    "@sprig/serialization" "0.1.58"
-    vue "^2.6.10"
-    vue-class-component "^7.1.0"
-
-"@sprig/event-emitter-dom@^0.1.59":
-  version "0.1.59"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.1.59.tgz#9d6cff015e3f2566f7b88d11c954e1ce54bea844"
-  integrity sha512-tLMDB+OBoCydmDcRLdj0NfeNZF6L9SJkyEMTNwM+D36h5V3DTRLFIvVejOEQfvI2AGjNTjwPIJeiAJG8QFmqDQ==
-  dependencies:
-    "@sprig/event-emitter" "0.1.59"
-
-"@sprig/event-emitter@0.1.59", "@sprig/event-emitter@^0.1.58", "@sprig/event-emitter@^0.1.59":
-  version "0.1.59"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.59.tgz#1a6250219f9a558285abf14befc880e3cc11329f"
-  integrity sha512-5Bvg8JdQ/Ob25B6hb/ds9PMrYUB1tJstPNLDubwTtLSZ3+f2Vl6i2XH0p7mBmcfUXSAoSHPkBZJXWDOpqIKq9A==
-
-"@sprig/serialization@0.1.58":
-  version "0.1.58"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.58.tgz#194c1774f1398058c571d8d32263fe9bd090bd61"
-  integrity sha512-PLhRgyOd/DLl8bMAvq60VQy51jmx7/K5NBzfu5JNqlCRfBuVq0vtNM2UA+KLGP21jLr4XO+KjoSoItt3f4Lg9w==
+"@sprig/event-emitter@0.1.71", "@sprig/event-emitter@^0.1.71":
+  version "0.1.71"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.71.tgz#78071cfa5e069c35253a9b24730b9610fe60dd95"
+  integrity sha512-hN2dtBxVIIAG4lWYSpxuISLRoMx6+HIu5A6u7ROuVxGFnZ3rexgYscnyIeFRVjPOISBVvY3AkZU6j7f63+mjpA==
 
 "@tootallnate/once@1":
   version "1.1.2"
@@ -1107,11 +1052,6 @@
   dependencies:
     "@types/mime" "^1"
     "@types/node" "*"
-
-"@types/socket.io-client@^1.4.32":
-  version "1.4.36"
-  resolved "https://registry.yarnpkg.com/@types/socket.io-client/-/socket.io-client-1.4.36.tgz#e4f1ca065f84c20939e9850e70222202bd76ff3f"
-  integrity sha512-ZJWjtFBeBy1kRSYpVbeGYTElf6BqPQUkXDlHHD4k/42byCN5Rh027f4yARHCink9sKAkbtGZXEAmR0ZCnc2/Ag==
 
 "@vue/component-compiler-utils@^3.1.0":
   version "3.2.0"
@@ -6329,11 +6269,6 @@ vue-hot-reload-api@^2.3.0:
   version "2.3.4"
   resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.3.4.tgz#532955cc1eb208a3d990b3a9f9a70574657e08f2"
   integrity sha512-BXq3jwIagosjgNVae6tkHzzIk6a8MHFtzAdwhnV5VlvPTFxDCvIttgSiHWjdGoTJvXtmRu5HacExfdarRcFhog==
-
-vue-i18n@^8.24.3:
-  version "8.24.4"
-  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-8.24.4.tgz#b158614c1df7db183d9cadddbb73e1d540269492"
-  integrity sha512-RZE94WUAGxEiBAANxQ0pptbRwDkNKNSXl3fnJslpFOxVMF6UkUtMDSuYGuW2blDrVgweIXVpethOVkYoNNT9xw==
 
 vue-loader@^15.7.1:
   version "15.9.7"
