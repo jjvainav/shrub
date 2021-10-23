@@ -44,6 +44,14 @@ describe("invoker", () => {
         expect(result).toBe("foo");
     });
 
+    test("for basic GET action that uses query string", async () => {
+        const invoker = context.createControllerInvoker(FooControllerInvoker);
+
+        const result = await invoker.getFoo("bar");
+        
+        expect(result).toBe("foobar");
+    });
+
     test("for basic GET action that requires a url param", async () => {
         const invoker = context.createControllerInvoker(FooControllerInvoker);
 
@@ -74,7 +82,13 @@ describe("invoker", () => {
 class FooController {
     @Get("/")
     getFoo(req: Request, res: Response, next: NextFunction): void {
-        res.json({ foo: "foo" });
+        let foo = "foo";
+
+        if (req.query.concat) {
+            foo = foo + req.query.concat;
+        }
+
+        res.json({ foo });
     }
 
     // this needs to come before getFooById so it's route gets registered first
@@ -90,11 +104,17 @@ class FooController {
 }
 
 class FooControllerInvoker extends ControllerInvoker {
-    getFoo(): Promise<string> {
+    getFoo(concat?: string): Promise<string> {
+        let path = "/foo";
+
+        if (concat) {
+            path = `${path}?concat=${concat}`;
+        }
+
         return this.invokeAction({
             controller: FooController,
             method: "GET",
-            path: "/foo"
+            path
         })
         .then(response => response.data.foo);
     }
