@@ -4,13 +4,15 @@ import client, { IRequest, IRequestClient } from "@sprig/request-client";
 import { RequestClientConstructor } from "@sprig/request-client-class";
 import { RequestHandler } from "express";
 
+export type ProxyClient<T> = T extends IProxy<infer C> ? C : never;
+
 /** A callback responsible for preparing a request to be invoked on behalf of a current request context. */
 export interface IPrepareClientRequest {
     (context: IRequestContext, request: IRequest): IRequest;
 }
 
 /** Defines an object responsible for forwarding requests to another endpoint. */
-export interface IProxyType<TClient, TProxy extends IProxy<TClient>> extends IInjectable<TProxy> {
+export interface IProxyType<TProxy extends IProxy<TClient>, TClient> extends IInjectable<TProxy> {
 }
 
 /** Defines an object responsible for forwarding requests to another endpoint. */
@@ -27,7 +29,7 @@ export interface IRemoteProxyOptions {
 }
 
 /** Creates an injectable proxy. */
-export function createProxy<TClient, TProxy extends IProxy<TClient>>(key: string): IProxyType<TClient, TProxy> {
+export function createProxy<TProxy extends IProxy<TClient>, TClient = ProxyClient<TProxy>>(key: string): IProxyType<TProxy, TClient> {
     return createInjectable({ 
         key, 
         configurable: true,
