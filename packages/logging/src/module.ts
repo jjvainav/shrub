@@ -20,7 +20,7 @@ export class LoggingModule implements IModule {
     }    
 
     configureServices(registration: IServiceRegistration): void {
-        registration.register(ILoggingRegistrationService, LoggingRegistrationService);
+        registration.register(ILoggingRegistrationService, LoggingRegistrationService, { sealed: true });
         registration.register(ILoggingService, LoggingService);
     }
 }

@@ -22,7 +22,7 @@ export class TracingModule implements IModule {
     }    
 
     configureServices(registration: IServiceRegistration): void {
-        registration.register(ITracingRegistrationService, TracingRegistrationService);
+        registration.register(ITracingRegistrationService, TracingRegistrationService, { sealed: true });
         registration.register(ITracingService, TracingService);
     }
 }
