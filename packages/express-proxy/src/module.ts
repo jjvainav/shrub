@@ -1,11 +1,11 @@
 import { createConfig, IModule, IModuleInitializer } from "@shrub/core";
 import { ExpressModule } from "@shrub/express";
-import { IProxyType } from "./proxy";
+import { IProxy, IProxyType } from "./proxy";
 
 export const IExpressProxyConfiguration = createConfig<IExpressProxyConfiguration>();
 export interface IExpressProxyConfiguration {
     /** Registers a proxy type and factory. */
-    useProxy<T>(proxyType: IProxyType<T>, factory: () => T): void;
+    useProxy<TClient, TProxy extends IProxy<TClient>>(proxyType: IProxyType<TClient, TProxy>, factory: () => TProxy): void;
 }
 
 /** Express module that provides support for configuring proxies. */

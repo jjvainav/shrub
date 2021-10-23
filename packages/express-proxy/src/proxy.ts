@@ -9,8 +9,14 @@ export interface IPrepareClientRequest {
     (context: IRequestContext, request: IRequest): IRequest;
 }
 
-/** Defines an injectable proxy that represents proxy instances of type T. */
-export interface IProxyType<T> extends IInjectable<T> {
+/** Defines an object responsible for forwarding requests to another endpoint. */
+export interface IProxyType<TClient, TProxy extends IProxy<TClient>> extends IInjectable<TProxy> {
+}
+
+/** Defines an object responsible for forwarding requests to another endpoint. */
+export interface IProxy<TClient> {
+    /** Create a client for that can be invoked on behalf of the specified request context. */
+    createClient(context: IRequestContext): TClient;
 }
 
 /** Defines options for a remote proxy. */
@@ -20,8 +26,8 @@ export interface IRemoteProxyOptions {
     readonly prepareStream?: IPrepareClientRequest;
 }
 
-/** Creates an injectable proxy used to define proxy interfaces and can be used as a decorator to inject proxies into service instances. */
-export function createProxyType<T>(key: string): IProxyType<T> {
+/** Creates an injectable proxy. */
+export function createProxy<TClient, TProxy extends IProxy<TClient>>(key: string): IProxyType<TClient, TProxy> {
     return createInjectable({ 
         key, 
         configurable: true,
@@ -29,27 +35,26 @@ export function createProxyType<T>(key: string): IProxyType<T> {
     });
 }
 
-/** Base class for a local proxy where the API module is hosted in the same process. */
-export abstract class LocalProxy<TClient> {
+/** A proxy where the client and enpoint are hosted in the same process. */
+export class LocalProxy<TClient> implements IProxy<TClient> {
     constructor(
         private readonly controllerInvokerConstructor: ControllerInvokerConstructor<TClient>,
         private readonly handler?: RequestHandler) {
     }
 
-    protected createClient(context: IRequestContext): TClient {
+    createClient(context: IRequestContext): TClient {
         return context.services.get(IControllerInvokerService).createControllerInvoker(this.controllerInvokerConstructor, this.handler);
     }
 }
 
-/** Base class for a remote proxy where the API is accessed via an external REST endpoint. */
-export abstract class RemoteProxy<TClient> {
+/** A proxy where the client accesses an external REST endpoint. */
+export class RemoteProxy<TClient> implements IProxy<TClient> {
     constructor(
         private readonly requestClientConstructor: RequestClientConstructor<TClient>,
         private readonly options: IRemoteProxyOptions) {
     }
 
-    /** Creates a new request client class instance for the proxy. */
-    protected createClient(context: IRequestContext): TClient {
+    createClient(context: IRequestContext): TClient {
         const prepareRequest = this.options.prepareRequest;
         const prepareStream = this.options.prepareStream;
         
