@@ -1,5 +1,6 @@
 import { IModuleSettingsCollection, IServiceRegistration, ModuleInstanceOrConstructor, ModuleLoader } from "@shrub/core";
-import { ExpressModule, IExpressApplication } from "./module";
+import { IExpressApplication } from "./app";
+import { ExpressModule } from "./module";
 
 /** A factory class for registering modules within an Express application context. */
 export class ExpressFactory {

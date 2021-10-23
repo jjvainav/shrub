@@ -2,6 +2,7 @@ export type ValidateOptionsCallback<T> = (obj: T, invalid: (err: OptionsValidati
 export type ValidateOptionsFailCallback = (err: OptionsValidationError) => void;
 
 type Constructor<T> = { new(...args: any[]): T };
+type Mutable<T> = {-readonly[P in keyof T]: T[P]};
 type NonOptionalKeys<T> = { [K in keyof T]-?: undefined extends T[K] ? never : K }[keyof T];
 type RegistrationResult = "success" | "frozen" | "sealed";
 
@@ -12,19 +13,27 @@ export interface IDisposable {
 
 export interface IInjectable<T> {
     readonly key: string;
+    readonly isConfigurable: boolean;
     readonly ctor?: Constructor<T>;
     readonly factory?: (services: IServiceCollection) => T;
+    configure(options: IInjectableConfigureOptions<T>): void;
     (...args: any[]): void;
 }
 
-/** Defines options for creating an injectable object. */
-export interface IInjectableOptions<T> {
-    /** A unique key for the injectable. */
-    readonly key: string;
+/** Defines configurable options for an injectable object. */
+export interface IInjectableConfigureOptions<T> {
     /** A constructor for a concrete class that will be created when injected. */
     readonly ctor?: Constructor<T>;
     /** A factory function responsible for creating an instances of the injectable. */
     readonly factory?: (services: IServiceCollection) => T;
+}
+
+/** Defines options for creating an injectable object. */
+export interface IInjectableOptions<T> extends IInjectableConfigureOptions<T> {
+    /** A unique key for the injectable. */
+    readonly key: string;
+    /** True if the ctor or factory for the injectable may be changed; the default is false. */
+    readonly configurable?: boolean;
 }
 
 export interface IOptions<T> extends IInjectable<T> {
@@ -146,20 +155,30 @@ export function createInjectable<T>(key: string): IInjectable<T>;
 export function createInjectable<T>(options: IInjectableOptions<T>): IInjectable<T>;
 export function createInjectable<T>(keyOrOptions: string | IInjectableOptions<T>): IInjectable<T> {
     const options = typeof keyOrOptions === "object" ? keyOrOptions : { key: keyOrOptions };
-    const injectable = <any>function (target: any, propertyKey: string, parameterIndex: number): any {
+    const injectable: Mutable<IInjectable<T>> = <any>function (target: any, propertyKey: string, parameterIndex: number): any {
         if (!isConstructor(target)) {
             throw new Error("An injectable decorator only supports constructor parameters.");
         }
 
-        captureDependency(injectable, target, parameterIndex);
+        captureDependency(<IInjectable<T>>injectable, target, parameterIndex);
     };
 
     injectable.key = options.key;
+    injectable.isConfigurable = !!options.configurable;
     injectable.ctor = options.ctor;
     injectable.factory = options.factory;
     injectable.toString = () => options.key;
 
-    return injectable;
+    injectable.configure = function (options: IInjectableConfigureOptions<T>): void {
+        if (!this.isConfigurable) {
+            throw new Error("Injectable is not configurable.");
+        }
+
+        this.ctor = options.ctor
+        this.factory = options.factory;
+    }
+
+    return <IInjectable<T>>injectable;
 }
 
 export function createOptions<T>(key: string, defaultOptions?: T): IOptions<T> {

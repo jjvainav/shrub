@@ -1,7 +1,8 @@
 import { createService, Transient } from "@shrub/core";
-import { controller, Constructor, IExpressApplication } from "@shrub/express";
 import { Request, RequestHandler, Response } from "express";
 import { PathParams } from "express-serve-static-core";
+import { IExpressApplication } from "./app";
+import { controller, Constructor } from "./controller";
 
 export type ControllerInvokerConstructor<T> = { new(options: IControllerInvokerOptions): T };
 

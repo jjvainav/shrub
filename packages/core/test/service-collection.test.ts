@@ -3,19 +3,10 @@ import {
     OptionsValidationError, Scoped, ServiceMap, Singleton, SingletonServiceFactory 
 } from "../src/service-collection";
 
-class ConstructorInjectable implements IConstructorInjectable {
-    constructor (@ISingletonService readonly singleton?: ISingletonService) {
-    }
-}
-
-const IConstructorInjectable = createInjectable<IConstructorInjectable>({ 
-    key: "constructor-injectable",
-    ctor: ConstructorInjectable
-})
-
-const IFactoryInjectable = createInjectable<IFactoryInjectable>({ 
-    key: "factory-injectable",
-    factory: services => ({ singleton: services.tryGet(ISingletonService) })
+const IConfigurableInjectable = createInjectable<IConfigurableInjectable>({ 
+    key: "configurable-injectable",
+    configurable: true,
+    factory: () => ({ value: "default" })
 });
 
 const IFooService = createService<IFooService>("foo-service");
@@ -45,12 +36,8 @@ ITestOptionsWithValidation.register((obj, fail) => {
     }
 });
 
-interface IConstructorInjectable {
-    readonly singleton?: ISingletonService;
-}
-
-interface IFactoryInjectable {
-    readonly singleton?: ISingletonService;
+interface IConfigurableInjectable {
+    readonly value: string;
 }
 
 interface IFooService {
@@ -219,6 +206,11 @@ class ChildScopedService implements IChildScopedService {
 @Singleton
 class ParentSingletonService implements IParentSingletonService {
     constructor(@IChildScopedService scopedService: IChildScopedService) {
+    }
+}
+
+class ConfigurableTestObject {
+    constructor(@IConfigurableInjectable readonly injectable: IConfigurableInjectable) {
     }
 }
 
@@ -726,7 +718,15 @@ describe("service scope", () => {
 });
 
 describe("injectable", () => {
-    test("instance created from factory", () => {
-        const 
+    test("override factory for configurable injectable", () => {
+        const services = new ServiceMap();
+        const instantiationService = services.get(IInstantiationService);
+
+        const instance1 = instantiationService.createInstance(ConfigurableTestObject);
+        IConfigurableInjectable.configure({ factory: () => ({ value: "override" }) });
+        const instance2 = instantiationService.createInstance(ConfigurableTestObject);
+
+        expect(instance1.injectable.value).toBe("default");
+        expect(instance2.injectable.value).toBe("override");
     });
 });

@@ -1,14 +1,12 @@
 import express from "express";
-import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration, IServiceCollection } from "@shrub/core";
+import { createConfig, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration, IServiceCollection } from "@shrub/core";
 import { HttpModule, IHttpModuleConfiguration, IHttpServer } from "@shrub/http";
+import { ControllerInvokerService, IControllerInvokerService } from "./controller-invoker";
 import { IRequestContextService, requestContext, RequestContextService } from "./request-context";
+import { IExpressApplication } from "./app";
 
 export const IExpressConfiguration = createConfig<IExpressConfiguration>();
 export interface IExpressConfiguration extends express.Application {
-}
-
-export const IExpressApplication = createService<IExpressApplication>("express-application");
-export interface IExpressApplication extends express.Application {
 }
 
 export class ExpressModule implements IModule {
@@ -20,6 +18,7 @@ export class ExpressModule implements IModule {
     }
 
     configureServices(registration: IServiceRegistration): void {
+        registration.register(IControllerInvokerService, ControllerInvokerService);
         registration.register(IRequestContextService, RequestContextService, { sealed: true });
         registration.registerSingleton(IExpressApplication, {
             create: services => {

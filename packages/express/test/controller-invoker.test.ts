@@ -1,37 +1,20 @@
 import { ModuleLoader } from "@shrub/core";
 import { Get, Route } from "@shrub/express";
-import { authorization, ExpressIdentityModule, IExpressIdentityConfiguration } from "@shrub/express-identity";
-import { NextFunction, Request, Response } from "express";
-import { HttpError } from "http-errors";
-import { ControllerInvoker, ExpressControllerInvokerModule, IControllerInvokerService } from "../src";
+import { NextFunction, Request, RequestHandler, Response } from "express";
+import createError, { HttpError } from "http-errors";
+import { ControllerInvoker, ExpressModule, IControllerInvokerService } from "../src";
 
 interface IInvokerTestContext extends IControllerInvokerService {
-    allow: boolean;
 }
 
 function createTestContext(): Promise<IInvokerTestContext> {
     let context: IInvokerTestContext;
     return new Promise(resolve => ModuleLoader.useModules([{
         name: "test",
-        dependencies: [
-            ExpressControllerInvokerModule,
-            ExpressIdentityModule
-        ],
-        configure: ({ services, config }) => {
-            config.get(IExpressIdentityConfiguration).useAuthentication({
-                scheme: "test-context",
-                authenticate: (_, result) => {
-                    if (context.allow) {
-                        result.success({});
-                    }
-                    else {
-                        result.fail("Authentication failed.");
-                    }
-                }
-            });
-
+        dependencies: [ExpressModule],
+        configure: ({ services }) => {
             const service = services.get(IControllerInvokerService);
-            context = { createControllerInvoker: service.createControllerInvoker.bind(service), allow: true };
+            context = { createControllerInvoker: service.createControllerInvoker.bind(service) };
             resolve(context);
         }
     }])
@@ -40,6 +23,10 @@ function createTestContext(): Promise<IInvokerTestContext> {
 
 function isHttpError(err: unknown): err is HttpError {
     return (<HttpError>err).status !== undefined && (<HttpError>err).statusCode !== undefined;
+}
+
+function unauthorized(): RequestHandler {
+    return (_, __, next) => next(createError(401));
 }
 
 describe("invoker", () => {
@@ -65,16 +52,7 @@ describe("invoker", () => {
         expect(result).toBe("foo1");
     });
 
-    test("for basic GET action that requires authorization and is allowed", async () => {
-        const invoker = context.createControllerInvoker(FooControllerInvoker);
-
-        const result = await invoker.getSecureFoo();
-        
-        expect(result).toBe("foo");
-    });
-
-    test("for basic GET action that requires authorization and is not allowed", async () => {
-        context.allow = false;
+    test("for basic GET action that fails due to action specific middleware", async () => {
         const invoker = context.createControllerInvoker(FooControllerInvoker);
 
         try {
@@ -100,7 +78,7 @@ class FooController {
     }
 
     // this needs to come before getFooById so it's route gets registered first
-    @Get("/secure", authorization())
+    @Get("/secure", unauthorized())
     getSecureFoo(req: Request, res: Response, next: NextFunction): void {
         res.json({ foo: "foo" });
     }
