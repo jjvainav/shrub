@@ -1,0 +1,38 @@
+{
+    "name": "@shrub/express-gateway",
+    "description": "Express module that provides support for communicating between client and Api services.",
+    "version": "0.5.37",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "module": "dist/esm/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.18.0"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "build:esm": "tsc -p tsconfig.esm.json",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
+    },
+    "devDependencies": {
+        "@types/express": "4.17.9"
+    },
+    "dependencies": {
+        "@shrub/core": "0.5.37",
+        "@shrub/express": "0.5.37",
+        "@sprig/request-client": "^0.1.71",
+        "@sprig/request-client-class": "^0.1.71",
+        "express": "^4.17.1"
+    },
+    "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
+}
