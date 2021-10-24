@@ -6,7 +6,7 @@ import { RequestHandler } from "express";
 
 /** The client type for a proxy. */
 export type ProxyClient<T> = T extends IProxy<infer C> ? C : never;
-export type ProxyFactory<TProxy extends IProxy<TClient>, TClient> = (services: IServiceCollection) => TProxy;
+export type ProxyFactory<TProxy extends IProxy<TClient>, TClient = ProxyClient<TProxy>> = (services: IServiceCollection) => TProxy;
 
 /** A callback responsible for preparing a request to be invoked on behalf of a current request context. */
 export interface IPrepareClientRequest {
