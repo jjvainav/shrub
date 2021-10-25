@@ -47,7 +47,10 @@ export interface IService<T> extends IInjectable<T> {
 }
 
 export interface IInstantiationService {
+    /** Creates an object instance for the specified constructor and injects injectable constructor parameters. */
     createInstance<T>(ctor: Constructor<T>): T;
+    /** Creates an object instance for the specified injectable; note: service instances cannot be created via this function and must be accessed via the service collection. */
+    createInstance<T>(injectable: IInjectable<T>): T;
 }
 
 export interface IOptionsService {
@@ -247,6 +250,10 @@ function isDisposable(obj: any): obj is IDisposable {
     return (<IDisposable>obj).dispose !== undefined;
 }
 
+function isInjectable<T>(target: any): target is IInjectable<T> {
+    return typeof target === "function" && target.key !== undefined && target.configure !== undefined;
+}
+
 function isServiceFactory<T>(target: any): target is IServiceFactory<T> {
     return typeof target === "object" && (<IServiceFactory<T>>target).create !== undefined;
 }
@@ -304,8 +311,10 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         this.get(IOptionsService).configureOptions(options, callback);
     }
 
-    createInstance<T>(ctor: Constructor<T>): T {
-        return this.createObjectInstance(ctor);
+    createInstance<T>(ctorOrInjectable: Constructor<T> | IInjectable<T>): T {
+        return isInjectable(ctorOrInjectable)
+            ? this.createInjectableInstance(ctorOrInjectable)
+            : this.createObjectInstance(ctorOrInjectable);
     }
 
     createScope(): IScopedServiceCollection {
@@ -502,10 +511,12 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
     }
 
     private getOrCreateInjectable<T>(injectable: IInjectable<T>, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): T {
-        if (this.services.has(injectable.key)) {
-            return this.getOrCreateServiceInstance(injectable.key, rootScope, ancestors);
-        }
+        return this.services.has(injectable.key)
+            ? this.getOrCreateServiceInstance(injectable.key, rootScope, ancestors)
+            : this.createInjectableInstance(injectable);
+    }
 
+    private createInjectableInstance<T>(injectable: IInjectable<T>): T {
         if (injectable.factory) {
             return injectable.factory(this);
         }
@@ -514,7 +525,7 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
             return this.createInstance(injectable.ctor);
         }
 
-        throw new Error(`Invalid injectable (${injectable.key}), either a service has not been registered or the injectable does not define a factory or constructor.`);
+        throw new Error(`Invalid injectable (${injectable.key}), the injectable must define a factory or constructor.`);
     }
 
     private createServiceInstance<T>(entry: IServiceEntry<T>, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): T {

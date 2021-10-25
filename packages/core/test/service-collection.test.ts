@@ -9,6 +9,8 @@ const IConfigurableInjectable = createInjectable<IConfigurableInjectable>({
     factory: () => ({ value: "default" })
 });
 
+const ITestInjectable = createInjectable<ITestInjectable>({ key: "test-injectable", factory: () => ({ value: "test" }) });
+
 const IFooService = createService<IFooService>("foo-service");
 const IBarService = createService<IBarService>("bar-service");
 const ICircular1Service = createService<ICircular1Service>("circular1-service");
@@ -37,6 +39,10 @@ ITestOptionsWithValidation.register((obj, fail) => {
 });
 
 interface IConfigurableInjectable {
+    readonly value: string;
+}
+
+interface ITestInjectable {
     readonly value: string;
 }
 
@@ -211,6 +217,13 @@ class ParentSingletonService implements IParentSingletonService {
 
 class ConfigurableTestObject {
     constructor(@IConfigurableInjectable readonly injectable: IConfigurableInjectable) {
+    }
+}
+
+class TestObject {
+    constructor(
+        @IFooService readonly fooService: IFooService,
+        @IBarService readonly barService: IBarService) {
     }
 }
 
@@ -716,6 +729,28 @@ describe("service scope", () => {
         expect(instantiation).toBe(scope);
     });
 });
+
+describe("instantiation", () => {
+    test("create instance that has injectable constructor parameters", () => {
+        const services = new ServiceMap();
+
+        services.registerTransient(IFooService, FooBarService);
+        services.registerTransient(IBarService, FooBarService);
+
+        const instance = services.get(IInstantiationService).createInstance(TestObject);
+
+        expect(instance.fooService.foo).toBe("foo");
+        expect(instance.barService.bar).toBe("bar");
+    });
+
+    test("create injectable instance", () => {
+        const services = new ServiceMap();
+
+        const instance = services.get(IInstantiationService).createInstance(ITestInjectable);
+
+        expect(instance.value).toBe("test");
+    });
+})
 
 describe("injectable", () => {
     test("override factory for configurable injectable", () => {
