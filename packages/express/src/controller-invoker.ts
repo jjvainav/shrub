@@ -69,6 +69,7 @@ export abstract class ControllerInvoker {
 
     private createExpressRequest<TController>(options: IControllerRequestOptions<TController>): Request {
         return <Request><unknown>{
+            headers: {},
             method: options.method,
             body: options.body,
             url: options.path

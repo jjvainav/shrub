@@ -1,0 +1,10 @@
+@import "../variables";
+
+.toolbar {
+    height: $toolbar-height;
+    width: 100%;
+}
+
+.toolbar-bottom-border {
+    border-bottom: $toolbar-border-bottom;
+}

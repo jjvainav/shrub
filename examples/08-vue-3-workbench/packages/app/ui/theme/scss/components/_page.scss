@@ -1,0 +1,61 @@
+@import "../variables";
+
+.page {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    background-color: $page-background-color;
+
+    .page-banner {
+        position: sticky;
+        top: 0;
+        z-index: $zindex-sticky;
+    }
+
+    .page-content {
+        padding-left: $page-content-padding-left;
+        padding-right: $page-content-padding-right;
+        padding-top: $page-content-padding-top;
+        padding-bottom: $page-content-padding-bottom;
+    }
+
+    .page-header {
+        background-color: $page-header-background-color;
+        padding-left: $page-header-padding-left;
+        padding-right: $page-header-padding-right;
+        padding-top: $page-header-padding-top;
+    }
+
+    .page-header-sticky {
+        position: sticky;
+        top: -$page-header-padding-top - $page-header-bottom-border-width;
+        z-index: $zindex-sticky;
+    }
+
+    .page-header-border {
+        border-bottom: $page-header-bottom-border;
+    }
+
+    .page-header-title-container {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        overflow: hidden;
+    }
+
+    .page-header-title {
+        display: flex;
+    }
+
+    .page-header-subtitle {
+        display: flex;
+        color: $text-muted;
+    }
+
+    .page-inner {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+}

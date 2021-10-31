@@ -1,0 +1,8 @@
+@import "../variables";
+
+.form-switch {
+    .form-check-input {
+        // if $enable-rounded is false then the switch will have hard corners; we don't want that
+        border-radius: $form-switch-border-radius;
+    }
+}

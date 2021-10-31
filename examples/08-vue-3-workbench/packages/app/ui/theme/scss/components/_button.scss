@@ -1,0 +1,31 @@
+@import "../variables";
+
+.btn-muted {
+    color: $text-muted;
+}
+
+.btn-muted-outline {
+    color: $text-muted;
+    border-color: $gray-300;
+}
+
+@each $color, $value in $theme-colors {
+    .btn-muted-#{$color}:active, .btn-muted-#{$color}:hover {
+        color: $value;
+    }
+
+    .btn-muted-outline-#{$color}:active, .btn-muted-outline-#{$color}:hover {
+        color: $value;
+        border-color: $value;
+    }
+}
+
+.btn-min-width {
+    min-width: $btn-min-width;
+}
+
+.btn > i {
+    &::before {
+        vertical-align: middle !important;
+    }
+}

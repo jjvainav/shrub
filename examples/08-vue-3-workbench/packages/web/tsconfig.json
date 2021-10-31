@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": ".",
+        "experimentalDecorators": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "outDir": "dist",
+        "strict": true,
+        "target": "es6",
+        "paths": {
+            "@shrub/*": ["../../packages/*"]
+        }
+    },
+    "files": [
+        "src/server.ts"
+    ],
+    "references": [
+        { "path": "../app/intro" },
+        { "path": "../app/settings" },
+        { "path": "../app/workbench" }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "name": "@app/ui",
+    "description": "Contains common UI components and styling.",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "build": "yarn run build-ts && yarn run copy-vue",
+        "build-ts": "tsc -b .",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "copy-vue": "copyfiles -u 1 ./src/**/*.vue dist"
+    },
+    "dependencies": {
+        "bootstrap": "^5.0.1",
+        "bootstrap-icons": "^1.5.0",
+        "vue": "^3.2.20",
+        "vue-router": "^4.0.12"
+    },
+    "devDependencies": {
+        "@types/bootstrap": "^5.0.14",
+        "copyfiles": "^2.1.0"
+    }
+}

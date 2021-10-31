@@ -1,0 +1,26 @@
+// Cosmo 4.6.0
+// Bootswatch
+
+
+// Variables ===================================================================
+
+// note: this originally used the v2 url which had semi colons but it caused issues on the client
+$web-font-path: "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700&display=swap" !default;
+@import url($web-font-path);
+
+// Typography ==================================================================
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+// Progress bars ===============================================================
+
+.progress {
+  @include box-shadow(none);
+
+  .progress-bar {
+    font-size: 8px;
+    line-height: 8px;
+  }
+}

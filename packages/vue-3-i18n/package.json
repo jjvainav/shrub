@@ -1,0 +1,33 @@
+{
+    "name": "@shrub/vue-3-i18n",
+    "description": "A module that adds internationalization support for Vue 3 based apps.",
+    "version": "0.5.40",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "module": "dist/esm/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "build:esm": "tsc -p tsconfig.esm.json",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "test": "jest"
+    },
+    "dependencies": {
+        "@shrub/core": "0.5.40",
+        "@shrub/vue-3": "0.5.40",
+        "@sprig/event-emitter": "^0.1.71",
+        "vue": "^3.2.20",
+        "vue-i18n": "^9.2.0-beta.15"
+    },
+    "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
+}

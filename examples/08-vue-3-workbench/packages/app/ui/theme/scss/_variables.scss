@@ -1,0 +1,91 @@
+// Override the contrast ratio so that the primary color generates white as the contrasting color.
+// Using the default for this would result in the text over the primary color to be black instead of white.
+// The Cosmo styles are based on Bootstrap 4.6.0 whereas we are using Bootstrap 5
+$min-contrast-ratio:                            3;
+
+@import "./cosmo-variables";
+
+$enable-shadows:                                true;
+
+$card-border-color:                             $gray-300;    
+$card-cap-bg:                                   $light;
+
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/variables";
+
+// Breakpoints
+$device-breakpoint-xs:                         575.98px;
+$device-breakpoint-sm:                         767.98px;
+$device-breakpoint-md:                         991.98px;
+$device-breakpoint-lg:                         1199.98px;
+
+// Margin
+$margin-0:                                     0;
+$margin-xxs:                                   0.45rem;
+$margin-xs:                                    0.65rem;
+$margin-sm:                                    1rem;
+$margin-md:                                    2rem;
+$margin-lg:                                    3rem;
+$margin-xl:                                    4rem;
+$margin-xxl:                                   5rem;
+$margin-xxxl:                                  8rem;
+
+// Padding
+$padding-0:                                    0;
+$padding-xxs:                                  0.45rem;
+$padding-xs:                                   0.65rem;
+$padding-sm:                                   1rem;
+$padding-md:                                   2rem;
+$padding-lg:                                   3rem;
+$padding-xl:                                   4rem;
+$padding-xxl:                                  5rem;
+$padding-xxxl:                                 8rem;
+
+// Button
+$btn-icon-font-size:                            $font-size-lg;
+$btn-min-width:                                 120px;
+
+// Dropdown List
+$dropdown-list-placeholder-color:               $input-placeholder-color;
+$dropdown-list-btn-border:                      $input-border-width solid $input-border-color;
+$dropdown-list-btn-padding-y:                   $input-padding-y; 
+$dropdown-list-btn-padding-x:                   $input-padding-x;
+
+// Page
+$page-background-color:                         $white;
+
+$page-content-padding-left:                     32px;
+$page-content-padding-right:                    32px;
+$page-content-padding-top:                      16px;
+$page-content-padding-bottom:                   16px;
+
+$page-header-background-color:                  $page-background-color;
+$page-header-bottom-border-width:               1px;
+$page-header-bottom-border:                     $page-header-bottom-border-width solid $gray-200;
+$page-header-padding-left:                      32px;
+$page-header-padding-right:                     32px;
+$page-header-padding-top:                       24px;
+
+// Sidebar
+$sidebar-primary-bg:                            $primary;
+
+$sidebar-item-active-background-color:          $sidebar-primary-bg;
+
+$sidebar-items-background-color:                $dark;
+$sidebar-items-width:                           60px;
+$sidebar-items-z-index:                         11;
+
+$sidebar-panel-background-color:                $light;
+$sidebar-panel-border:                          1px solid $gray-300;
+$sidebar-panel-link-color:                      $sidebar-primary-bg;
+$sidebar-panel-link-hover-background-color:     $gray-200;
+$sidebar-panel-link-hover-color:                $sidebar-primary-bg;
+$sidebar-panel-group-title-color:               $dark;
+$sidebar-panel-group-title-border:              1px solid $gray-300;
+$sidebar-panel-width:                           230px;
+$sidebar-panel-z-index:                         10;
+
+// Toolbar
+$toolbar-border-bottom:                         1px solid $gray-200;
+$toolbar-height:                                52px;

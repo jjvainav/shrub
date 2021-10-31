@@ -1,0 +1,19 @@
+{
+    "name": "@app/settings",
+    "version": "1.0.0",
+    "private": true,
+    "main": "dist/index.js",
+    "typings": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc -b && yarn run copy-vue && yarn run clean-declarations",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "clean-declarations": "rimraf ./dist/locale/**/*.d.ts",
+        "copy-vue": "copyfiles -u 1 ./src/component/**/*.vue dist"
+    },
+    "dependencies": {
+        "vue": "^3.2.20"
+    },
+    "devDependencies": {
+        "copyfiles": "^2.1.1"
+    }
+}

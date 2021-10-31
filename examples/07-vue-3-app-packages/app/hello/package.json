@@ -10,7 +10,7 @@
         "copy-vue": "copyfiles -u 1 ./src/**/*.vue dist"
     },
     "dependencies": {
-        "vue": "^3.0.2"
+        "vue": "^3.2.20"
     },
     "devDependencies": {
         "copyfiles": "^2.1.1"
