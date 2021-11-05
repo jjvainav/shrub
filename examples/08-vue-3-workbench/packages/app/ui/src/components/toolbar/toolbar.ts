@@ -21,4 +21,4 @@ export const Toolbar = defineComponent({
             class: ["container-fluid", "p-0", props.justifyContent ? { [`justify-content-${props.justifyContent}`]: true } : {}]
         },
         context.slots)])
-    });
+});

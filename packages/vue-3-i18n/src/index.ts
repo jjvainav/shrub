@@ -1,7 +1,7 @@
 import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration } from "@shrub/core";
 import { IVueConfiguration, VueModule } from "@shrub/vue-3";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
-import { createI18n, I18n, LocaleMessageDictionary, LocaleMessages, VueI18n } from "vue-i18n";
+import { Composer, createI18n, I18n, I18nMode, LocaleMessageDictionary, LocaleMessages, VueI18n } from "vue-i18n";
 
 export const IVueI18nConfiguration = createConfig<IVueI18nConfiguration>();
 export const IVueI18nService = createService<IVueI18nService>("vue-i18n");
@@ -12,6 +12,11 @@ export interface IVueI18nConfiguration {
 }
 
 export interface IVueI18nModuleSettings {
+    /** 
+     * True to enable legacy mode for the vue-i18n package. Set this to true when your Vue components use the old Options Api
+     * or false when using the Composition Api. This is false by default.
+     */
+    readonly legacy?: boolean;
     /** The locale to set after loading all the modules; the default is en-US. */
     readonly locale?: string;
 }
@@ -86,12 +91,13 @@ export class VueI18nModule implements IModule {
     }
 
     configureServices(registration: IServiceRegistration): void {
-        registration.registerSingleton(IVueI18nService, { create: () => new VueI18nService(this.i18n!.global) });
+        registration.registerSingleton(IVueI18nService, { create: () => new VueI18nService(this.i18n!.global, this.i18n!.mode) });
     }
 
     configure({ config, next, services, settings }: IModuleConfigurator): Promise<void> {
+        const legacy = (<IVueI18nModuleSettings>settings).legacy === true;
         const locale = this.getLocale(settings);
-        this.i18n = createI18n({ fallbackLocale: locale });
+        this.i18n = createI18n({ fallbackLocale: locale, legacy });
         config.get(IVueConfiguration).configure(app => app.use(this.i18n!));
         return next().then(() => services.get(IVueI18nService).setLocale(locale));
     }
@@ -113,11 +119,13 @@ class VueI18nService implements IVueI18nService {
     private readonly localeChanged = new EventEmitter();
     private invoker?: ILocalLoaderInvoker;
 
-    constructor(private readonly i18n: VueI18n) {
+    constructor(
+        private readonly i18n: VueI18n,
+        private readonly mode: I18nMode) {
     }
 
     get currentLocale(): string {
-        return this.i18n.locale;
+        return this.getLocale();
     }
 
     get onLocaleChanged(): IEvent {
@@ -126,7 +134,7 @@ class VueI18nService implements IVueI18nService {
 
     load(loader: ILocaleLoader): Promise<void> {
         const invoker = this.createInvoker(loader);
-        return invoker({ locale: this.i18n.locale });
+        return invoker({ locale: this.getLocale() });
     }
 
     registerLoader(loader: ILocaleLoader): void {
@@ -142,7 +150,13 @@ class VueI18nService implements IVueI18nService {
             await this.invoker({ locale, path: path && this.normalizePath(path) });
         }
 
-        this.i18n.locale = locale;
+        if (this.mode === "legacy") {
+            this.i18n.locale = locale;
+        }
+        else {
+            (<Composer><unknown>this.i18n).locale.value = locale;
+        }
+        
         this.localeChanged.emit();
     }
 
@@ -163,7 +177,7 @@ class VueI18nService implements IVueI18nService {
             return loader(options)
                 .then(result => this.isEsModule(result) ? result.default : result)
                 .then(message => this.i18n.mergeLocaleMessage(options.locale, message))
-                .catch(() => {
+                .catch(() => {                    
                     if (fallbackLocale) {
                         return tryLoadWithFallback({ ...options, locale: fallbackLocale });
                     }
@@ -198,6 +212,11 @@ class VueI18nService implements IVueI18nService {
         }
 
         return undefined;
+    }
+
+    private getLocale(): string {
+        // when using composition mode the locale is wrapped as a ref
+        return this.mode === "legacy" ? this.i18n.locale : (<Composer><unknown>this.i18n).locale.value;
     }
 
     private isEsModule(obj: ILocaleMessageObject | IEsModuleLocalMessages): obj is IEsModuleLocalMessages {
