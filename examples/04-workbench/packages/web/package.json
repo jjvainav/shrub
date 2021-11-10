@@ -16,9 +16,9 @@
         "@app/intro": "1.0.0",
         "@app/todo": "1.0.0",
         "@app/workbench": "1.0.0",
-        "@shrub/core": "^0.5.42",
-        "@shrub/express": "^0.5.42",
-        "@shrub/http": "^0.5.42",
+        "@shrub/core": "^0.5.43",
+        "@shrub/express": "^0.5.43",
+        "@shrub/http": "^0.5.43",
         "connect-history-api-fallback": "^1.6.0",
         "cors": "^2.8.5",
         "express": "^4.17.1"

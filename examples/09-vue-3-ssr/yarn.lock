@@ -12,6 +12,45 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.5.tgz#9283c9ce5b289a3c4f61c12757469e59377f81f3"
   integrity sha512-6nFkfkmSeV/rqSaS4oWHgmpnYw194f6hmWF5is6b0J1naJZoiD0NTc9AiUwPHvWsowkjuHErCZT1wa0jg+BLIA==
 
+"@shrub/core@0.5.43":
+  version "0.5.43"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.43.tgz#927e4b4603da193590fa01b911b92af82b7fef19"
+  integrity sha512-nxhdsUHIR855EylK7tUYHpthllft/C8uqKiNPEd7OGYz8BDYQc2W2flOxU6eTNroAdgrwL+6EK/yp7cisfCDxA==
+
+"@shrub/express@^0.5.43":
+  version "0.5.43"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.43.tgz#4698c068cad9169e7dca286ee88c14bfbe9af6ad"
+  integrity sha512-0kK4h1hMSqqE1bWVneh1g3C/TmGJwBnpNhXr3C/Gm9EjbfyYCJDCYWukMth77gMJM1xu1+oMHRDP/6Zx40ahFw==
+  dependencies:
+    "@shrub/core" "0.5.43"
+    "@shrub/http" "0.5.43"
+    express "^4.17.1"
+
+"@shrub/http@0.5.43":
+  version "0.5.43"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.43.tgz#51f72b951701909670d6e9e1e069e3d2ec481203"
+  integrity sha512-W8MyEfV9Y7j5kut8+13xBxJM4Oct/ZIsAFr10GnhQot6hisGfXaxhi5EALOCwVEuutOhzIkbdv1p42ri0KSmcA==
+  dependencies:
+    "@shrub/core" "0.5.43"
+
+"@shrub/vue-3-router@^0.5.43":
+  version "0.5.43"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-3-router/-/vue-3-router-0.5.43.tgz#6b10581d5d903ff0457003972b5c96f56cda7f2c"
+  integrity sha512-VkOgv5v9Tn/mZZzszrHCy6HxsrJF3gQi5CDrBJ9gHVsTDgWNbUwFlQd/vCVEj0CT+5YfOAgHk/OySTIN5OGvAg==
+  dependencies:
+    "@shrub/core" "0.5.43"
+    "@shrub/vue-3" "0.5.43"
+    vue "^3.2.20"
+    vue-router "^4.0.12"
+
+"@shrub/vue-3@0.5.43", "@shrub/vue-3@^0.5.43":
+  version "0.5.43"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-3/-/vue-3-0.5.43.tgz#8d34fc13dfac93d91587a044f38c1a7c09fd1f0e"
+  integrity sha512-zcRwb4nVjhZl8YLgaO2nv0G5r7z4HknI56H8MjQCKv4WQaSMZ1sL1ZnJUgAqWKPEa9BFfM6fESJT332Kbx88Aw==
+  dependencies:
+    "@shrub/core" "0.5.43"
+    vue "^3.2.20"
+
 "@types/body-parser@*":
   version "1.19.1"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.1.tgz#0c0174c42a7d017b818303d4b5d969cb0b75929c"
@@ -151,6 +190,11 @@
   dependencies:
     "@vue/compiler-dom" "3.2.21"
     "@vue/shared" "3.2.21"
+
+"@vue/devtools-api@^6.0.0-beta.18":
+  version "6.0.0-beta.20.1"
+  resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.0.0-beta.20.1.tgz#5b499647e929c35baf2a66a399578f9aa4601142"
+  integrity sha512-R2rfiRY+kZugzWh9ZyITaovx+jpU4vgivAEAiz80kvh3yviiTU3CBuGuyWpSwGz9/C7TkSWVM/FtQRGlZ16n8Q==
 
 "@vue/reactivity@3.2.21":
   version "3.2.21"
@@ -2214,6 +2258,13 @@ vue-loader@^16.8.3:
     chalk "^4.1.0"
     hash-sum "^2.0.0"
     loader-utils "^2.0.0"
+
+vue-router@^4.0.12:
+  version "4.0.12"
+  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-4.0.12.tgz#8dc792cddf5bb1abcc3908f9064136de7e13c460"
+  integrity sha512-CPXvfqe+mZLB1kBWssssTiWg4EQERyqJZes7USiqfW9B5N2x+nHlnsM1D3b5CaJ6qgCvMmYJnz+G0iWjNCvXrg==
+  dependencies:
+    "@vue/devtools-api" "^6.0.0-beta.18"
 
 vue@^3.2.20:
   version "3.2.21"

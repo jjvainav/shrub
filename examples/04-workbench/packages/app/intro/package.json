@@ -12,9 +12,9 @@
         "copy-vue": "copyfiles -u 1 ./src/component/**/*.vue dist"
     },
     "dependencies": {
-        "@shrub/core": "^0.5.42",
-        "@shrub/vue": "^0.5.42",
-        "@shrub/vue-i18n": "^0.5.42",
+        "@shrub/core": "^0.5.43",
+        "@shrub/vue": "^0.5.43",
+        "@shrub/vue-i18n": "^0.5.43",
         "marked": "^0.7.0",
         "vue": "^2.6.10",
         "vue-class-component": "^7.1.0"
