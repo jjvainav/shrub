@@ -10,6 +10,12 @@
         "start": "node dist/server.js"
     },
     "dependencies": {
+        "@shrub/core": "^0.5.42",
+        "@shrub/express": "^0.5.42",
+        "@shrub/express-event-stream": "^0.5.42",
+        "@shrub/express-tracing": "^0.5.42",
+        "@shrub/messaging": "^0.5.42",
+        "@shrub/tracing-console": "^0.5.42",
         "@sprig/request-client": "^0.1.71",
         "@sprig/request-client-events": "^0.1.71",
         "express": "^4.17.1"

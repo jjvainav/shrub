@@ -1,8 +1,8 @@
-﻿import Vue, { ComponentOptions, VNodeData } from "vue";
-import Router from "vue-router";
-import { IModule, IModuleConfigurator, IModuleInitializer, IModuleSettingsCollection, IServiceCollection, IServiceRegistration, ModuleInstanceOrConstructor, ModuleLoader } from "@shrub/core";
+﻿import { IModule, IModuleConfigurator, IModuleInitializer, IModuleSettingsCollection, IServiceCollection, IServiceRegistration, ModuleInstanceOrConstructor, ModuleLoader } from "@shrub/core";
 import { IModelService, ModelModule } from "@shrub/model";
 import { IVueConfiguration, IVueMountOptions, VueModule } from "@shrub/vue";
+import Vue, { ComponentOptions, VNodeData } from "vue";
+import Router from "vue-router";
 import { ServerModelService } from "./model-service";
 
 /** 
@@ -148,7 +148,7 @@ export class VueServerModule implements IModule {
             ...options
         });
 
-        return { app, router: options.router };
+        return { app, router: (<any>options).router };
     }
 
     private getComponentOptions(): ComponentOptions<Vue> {

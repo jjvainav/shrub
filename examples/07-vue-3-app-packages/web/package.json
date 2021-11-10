@@ -12,6 +12,7 @@
         "start": "node dist/server.js"
     },
     "dependencies": {
+        "@shrub/express": "^0.5.42",
         "express": "^4.17.1"
     },
     "devDependencies": {
