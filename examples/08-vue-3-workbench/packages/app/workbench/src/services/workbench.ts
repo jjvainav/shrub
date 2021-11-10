@@ -1,5 +1,5 @@
 import { createService, Singleton } from "@shrub/core";
-import { IEsModuleLocalMessages, ILocaleMessageObject, IVueI18nService, TranslateValues } from "@shrub/vue-i18n";
+import { IEsModuleLocalMessages, ILocaleMessageObject, IVueI18nService } from "@shrub/vue-3-i18n";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import { Component } from "vue";
 import VueRouter, { RouteLocationNormalized, RouteLocationRaw, RouteRecordRaw } from "vue-router";
@@ -65,12 +65,13 @@ export interface IWorkbenchContent {
 }
 
 export interface IWorkbenchMenuItem {
+    readonly icon: string;
     readonly title: string | ILocaleCallback;
     readonly order?: number;
 }
 
 export interface ILocaleContext {
-    translate(key: string, values?: TranslateValues): string;
+    translate(key: string, named?: Record<string, unknown>): string;
 }
 
 export interface ILocaleCallback {
@@ -136,7 +137,7 @@ export class WorkbenchBrowserService implements IWorkbenchService {
     }
 
     getLocaleString(callback: ILocaleCallback): string {
-        return callback({ translate: (key, values) => this.i18nService.translate(key, values) });
+        return callback({ translate: (key, named) => this.i18nService.translate(key, named) });
     }
 
     navigateTo(link: IWorkbenchLink): void {

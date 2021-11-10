@@ -1,0 +1,17 @@
+{
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "outDir": "dist",
+        "rootDir": "src",
+        "lib": [
+            "dom",
+            "ESNext"
+        ]
+    },
+    "include": ["src"],
+    "references": [
+        { "path": "../core" },
+        { "path": "../vue-3" }
+    ]
+}

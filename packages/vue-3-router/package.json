@@ -1,0 +1,30 @@
+{
+    "name": "@shrub/vue-3-router",
+    "description": "A module that adds support for Vue 3 router.",
+    "version": "0.5.42",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "module": "dist/esm/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "build:esm": "tsc -p tsconfig.esm.json",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
+    },
+    "dependencies": {
+        "@shrub/core": "0.5.42",
+        "@shrub/vue-3": "0.5.42",
+        "vue": "^3.2.20",
+        "vue-router": "^4.0.12"
+    }
+}

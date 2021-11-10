@@ -1,5 +1,5 @@
 ﻿import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IService, IServiceCollection, IServiceRegistration } from "@shrub/core";
-import { App, ComponentPublicInstance, ComponentOptions, createApp, h, inject, VNode, VNodeProps } from "vue";
+import { App, Component, ComponentPublicInstance, DefineComponent, createApp, createSSRApp, h, inject, VNode } from "vue";
 
 declare module "@vue/runtime-core" {
     interface ComponentCustomProperties {
@@ -8,23 +8,35 @@ declare module "@vue/runtime-core" {
     }
 }
 
-export type ComponentProps<P> = VNodeProps & Record<string, any> & P;
+export type RootProps = Record<string, unknown>;
 
 export interface IVueAppService {
+    /** The Vue app for the current application. */
     readonly app: App;
-    readonly instance: ComponentPublicInstance;
+    /** The component instance for the root component; note, this will be undefined during SSR. */
+    readonly instance?: ComponentPublicInstance;
 }
 
+/** Defines configuration for the Vue module. */
 export interface IVueConfiguration {
+    /** True if the current Vue application is configured for ssr server-side rendering. */
+    readonly isServer: boolean;
     /** Allows configuring the Vue application before the root component is mounted. */
     configure(callback: (app: App<Element>) => void): void;
     /** Mounts a root Vue component. */
-    mount<P>(component: ComponentOptions<P> | (() => ComponentOptions<P>), props?: ComponentProps<P> | (() => ComponentProps<P>)): void;
+    mount(component: DefineComponent, props?: RootProps | ((services: IServiceCollection) => RootProps)): void;
 }
 
 export interface IVueModuleSettings {
     /** The element id to mount to; the default is #app. */
     readonly el?: string;
+    /** 
+     * True if the Vue App should be created for server-side rendering; the default is false. 
+     * When using SSR this should be true for both client and server.
+     */
+    readonly ssr?: boolean;
+    /** True if the current instance is running on the server. This is only used when ssr is true; note, the App instance is accessible via the IVueAppService. */
+    readonly isServer?: boolean;
 }
 
 // a basic interface for interacting with Vue router which avoids the need to import the vue-router package
@@ -49,20 +61,20 @@ export function useService<T>(service: IService<T>): T {
 }
 
 export class VueModule implements IModule {
-    private readonly app = createApp({
-        render: () => this.render!()
-    });
+    private readonly root: Component = { render: () => this.render!() };
 
-    private component?: ComponentOptions<any> | (() => ComponentOptions<any>);
+    private app?: App<Element>;
+    private component?: DefineComponent;
     private instance?: ComponentPublicInstance;
-    private props?: ComponentProps<any> | (() => ComponentProps<any>);
+    private props?: RootProps | ((services: IServiceCollection) => RootProps);
     private render?: () => VNode;
 
     readonly name = "vue";
 
     initialize({ config }: IModuleInitializer): void {
-        config(IVueConfiguration).register(() => ({
-            configure: callback => callback(this.app),
+        config(IVueConfiguration).register(({ settings }) => ({
+            isServer: !!(<IVueModuleSettings>settings).isServer,
+            configure: callback => callback(this.app!),
             mount: (component, props) => {
                 if (this.component) {
                     throw new Error("A component has already been mounted.");
@@ -77,7 +89,9 @@ export class VueModule implements IModule {
     configureServices(registration: IServiceRegistration): void {
         const self = this;
         registration.registerInstance(IVueAppService, { 
-            app: this.app,
+            get app() {
+                return self.app!;
+            },
             get instance() {
                 return self.instance!;
             } 
@@ -85,6 +99,7 @@ export class VueModule implements IModule {
     }
 
     async configure({ settings, services, next }: IModuleConfigurator): Promise<void> {
+        this.app = (<IVueModuleSettings>settings).ssr ? createSSRApp(this.root) : createApp(this.root);
         this.app.config.globalProperties.$services = services;
         this.app.provide(servicesKey, services);
 
@@ -96,22 +111,26 @@ export class VueModule implements IModule {
             return Promise.resolve();
         }
 
-        const el = this.getElementId(settings);
-        if (!document.getElementById(el.substr(1))) {
-            throw new Error(`Element with id (${el}) not found`);
-        }
-
-        const router = <IVueRouter>this.app.config.globalProperties.$router;
-        const component = typeof this.component === "function" ? this.component() : this.component;
-        const props = typeof this.props === "function" ? this.props() : this.props;
+        const component = this.component;
+        const props = typeof this.props === "function" ? this.props(services) : this.props;
         this.render = () => h(component, props);
 
-        if (router) {
-            // need to wait on the router when using SSR
-            router.isReady().then(() => this.instance = this.app.mount(el));
-        }
-        else {
-            this.instance = this.app.mount(el);
+        if (!(<IVueModuleSettings>settings).isServer) {
+            const el = this.getElementId(settings);
+            if (!document.getElementById(el.substr(1))) {
+                throw new Error(`Element with id (${el}) not found`);
+            }
+
+            if ((<IVueModuleSettings>settings).ssr) {
+                // when using ssr need to wait for the router to finish initializing before mounting:
+                // https://v3.vuejs.org/guide/ssr/routing.html
+                const router = <IVueRouter>this.app.config.globalProperties.$router;
+                const isReady = router && router.isReady() || Promise.resolve();
+                await isReady.then(() => this.instance = this.app!.mount(el));
+            }
+            else {
+                this.instance = this.app.mount(el);
+            }
         }
     }
 

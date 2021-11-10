@@ -9,7 +9,7 @@
                 </a>
             </div>
         </div>
-        <sidebar-panel v-if="!detachPanel" :state="state"></sidebar-panel>
+        <sidebar-panel :state="state"></sidebar-panel>
     </div>
 </template>
 

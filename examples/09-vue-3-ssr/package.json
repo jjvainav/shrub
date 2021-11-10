@@ -1,0 +1,34 @@
+{
+    "name": "09-vue-3-ssr",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "build": "yarn run clean && yarn run build-client && yarn run build-server",
+        "build-client": "webpack --config ./build/webpack.config.client.js --mode=development --progress",
+        "build-server": "concurrently \"tsc\" \"yarn run build-server-ssr\"",
+        "build-server-host": "tsc",
+        "build-server-ssr": "webpack --config ./build/webpack.config.server.js --mode=development --progress",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "start": "node dist/server.js"
+    },
+    "dependencies": {
+        "express": "^4.17.1",
+        "express-handlebars": "^5.3.4",
+        "vue": "^3.2.20"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.13",
+        "@types/express-handlebars": "^5.3.1",
+        "concurrently": "^4.1.2",
+        "css-loader": "^6.5.1",
+        "html-webpack-plugin": "^5.5.0",
+        "rimraf": "^2.6.3",
+        "typescript": "^4.2.4",
+        "vue-loader": "^16.8.3",
+        "webpack": "^5.62.1",
+        "webpack-cli": "^4.9.1",
+        "webpack-manifest-plugin": "^4.0.2",
+        "webpack-merge": "^5.8.0",
+        "webpack-node-externals": "^3.0.0"
+    }
+}

@@ -55,7 +55,7 @@ async function setupComposition(...modules: IModule[]): Promise<ISetupCompositio
 describe("module - legacy mode", () => {
     test("verify vue-i18n installation", async () => {
         const collection = await setupLegacy();
-        const instance = collection.services.get(IVueAppService).instance;
+        const instance = collection.services.get(IVueAppService).instance!;
 
         expect(instance.$i18n).toBeDefined();
     });
@@ -70,14 +70,14 @@ describe("module - legacy mode", () => {
             })
         });
 
-        const instance = collection.services.get(IVueAppService).instance;
+        const instance = collection.services.get(IVueAppService).instance!;
         expect(instance.$t("hi")).toBe("hi!");
     });
 
     test("manually load locale messages", async () => {
         const collection = await setupLegacy();
         const service = collection.services.get(IVueI18nService);
-        const instance = collection.services.get(IVueAppService).instance;
+        const instance = collection.services.get(IVueAppService).instance!;
 
         await service.load(() => Promise.resolve({ hi: "hi!" }));
 
@@ -102,7 +102,7 @@ describe("module - legacy mode", () => {
             }
         );
 
-        const instance = collection.services.get(IVueAppService).instance;
+        const instance = collection.services.get(IVueAppService).instance!;
         expect(instance.$t("foo")).toBe("foo!");
         expect(instance.$t("bar")).toBe("bar!");
     });
@@ -117,7 +117,7 @@ describe("module - legacy mode", () => {
             }))
         });
 
-        const instance = collection.services.get(IVueAppService).instance;
+        const instance = collection.services.get(IVueAppService).instance!;
         const service = collection.services.get(IVueI18nService);
 
         service.onLocaleChanged(() => changed = true);
@@ -146,7 +146,7 @@ describe("module - legacy mode", () => {
             })
         });
 
-        const instance = collection.services.get(IVueAppService).instance;
+        const instance = collection.services.get(IVueAppService).instance!;
         const service = collection.services.get(IVueI18nService);
 
         service.onLocaleChanged(() => changed = true);

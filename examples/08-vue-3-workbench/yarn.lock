@@ -6181,11 +6181,6 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vue-functional-data-merge@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/vue-functional-data-merge/-/vue-functional-data-merge-4.0.1.tgz#62d81ad155f997645ef9df860603a3104515c3f7"
-  integrity sha512-aRSqeqmNll7J42BME13zg9TsmWi3nG+JOGxzXiLLTRVkGQizfnHDO/Tg2lybbk6PG/wOzKFXG35EHN3K47Pl9w==
-
 vue-loader@^16.8.2:
   version "16.8.2"
   resolved "https://registry.yarnpkg.com/vue-loader/-/vue-loader-16.8.2.tgz#78552d6558207a93f09e4fb68b068d44964eb740"

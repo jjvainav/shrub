@@ -131,8 +131,6 @@ export default defineComponent({
         SidebarPanel
     },
     props: {
-        // if detach panel is true, the sidebar will not render a panel and instead expects the parent component to handle this
-        detachPanel: { type: Boolean, default: false },
         panelState: { type: Object as PropType<ISidebarPanelState> },
         items: { type: Array as PropType<Array<ISidebarItem>>, default: () => [] }
     },
