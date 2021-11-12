@@ -1,5 +1,5 @@
 <template>
-    <h2>Hello</h2>
+    <h2>{{ hello() }}</h2>
 </template>
 
-<script lang="ts" src="./hello"></script>
+<script src="./hello"></script>

@@ -37,10 +37,12 @@ const createClientConfig = (bundle) => ({
         }
     },
     module: {
-        rules: [{
-            test: /\.vue$/,
-            loader: "vue-loader"
-        }]
+        rules: [
+            {
+                test: /\.vue$/,
+                loader: "vue-loader"
+            }
+        ]
     },
     plugins: [
         new VueLoaderPlugin(),
