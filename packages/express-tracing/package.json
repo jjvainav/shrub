@@ -1,7 +1,7 @@
 {
     "name": "@shrub/express-tracing",
     "description": "A module that provides middleware for tracing express requests.",
-    "version": "0.5.43",
+    "version": "0.5.44",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -29,10 +29,10 @@
         "@types/express": "4.17.9"
     },
     "dependencies": {
-        "@shrub/core": "0.5.43",
-        "@shrub/express": "0.5.43",
-        "@shrub/logging": "0.5.43",
-        "@shrub/tracing": "0.5.43",
+        "@shrub/core": "0.5.44",
+        "@shrub/express": "0.5.44",
+        "@shrub/logging": "0.5.44",
+        "@shrub/tracing": "0.5.44",
         "express": "^4.17.1"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
