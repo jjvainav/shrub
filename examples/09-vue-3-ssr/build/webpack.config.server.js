@@ -27,9 +27,7 @@ const createServerConfig = (bundle) => merge(base, {
     },
     externals: nodeExternals({
         modulesDir: path.resolve(__dirname, nodeModulesRoot),
-        // TODO: currently need to include the @app packages because they are being generated as esnext modules and Vue SSR doesn't seem to support that 
-        // - if this changes and they are being generated as commonjs modules then the @app packages can probably be removed from the whitelist
-        allowlist: [/\.css$/, /\?vue&type=style/, /^@app\//]
+        allowlist: [/\.css$/, /\?vue&type=style/]
     }),
     plugins: [
         new WebpackManifestPlugin({

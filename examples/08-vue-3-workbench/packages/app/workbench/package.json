@@ -11,8 +11,8 @@
         "copy-vue": "copyfiles -u 1 ./src/components/**/*.vue dist"
     },
     "dependencies": {
-        "@sprig/event-emitter": "^0.1.71",
-        "@sprig/event-emitter-dom": "^0.1.71",
+        "@sprig/event-emitter": "^0.2.0",
+        "@sprig/event-emitter-dom": "^0.2.0",
         "vue": "^3.2.20",
         "vue-router": "^4.0.12"
     },
