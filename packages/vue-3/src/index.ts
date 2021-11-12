@@ -24,7 +24,7 @@ export interface IVueConfiguration {
     /** Allows configuring the Vue application before the root component is mounted. */
     configure(callback: (app: App<Element>) => void): void;
     /** Mounts a root Vue component. */
-    mount(component: DefineComponent, props?: RootProps | ((services: IServiceCollection) => RootProps)): void;
+    mount(component: DefineComponent<{}, {}, any>, props?: RootProps | ((services: IServiceCollection) => RootProps)): void;
 }
 
 export interface IVueModuleSettings {
@@ -64,7 +64,7 @@ export class VueModule implements IModule {
     private readonly root: Component = { render: () => this.render!() };
 
     private app?: App<Element>;
-    private component?: DefineComponent;
+    private component?: DefineComponent<{}, {}, any>;
     private instance?: ComponentPublicInstance;
     private props?: RootProps | ((services: IServiceCollection) => RootProps);
     private render?: () => VNode;
