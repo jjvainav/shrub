@@ -1,7 +1,7 @@
 import { createService, Singleton } from "@shrub/core";
 import { ILogger } from "@shrub/logging";
 import { IMessageChannelConsumer, isChannelNameMatch, ISubscribeOptions, ISubscription, MessageHandler } from "@shrub/messaging";
-import client, { IRequest, IRequestPromise } from "@sprig/request-client";
+import client, { IRequest, IRequestPromise } from "@sprig/request-client/dist/polyfill";
 import { IRequestEventStream, jsonValidator, RequestEventStream } from "@sprig/request-client-events";
 import urlJoin from "url-join";
 import { IMessageEnvelope } from "./producer";

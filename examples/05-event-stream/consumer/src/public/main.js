@@ -1,4 +1,4 @@
-import client from "@sprig/request-client/dist/native";
+import client from "@sprig/request-client";
 import { RequestEventStream } from "@sprig/request-client-events";
 
 const form = document.getElementById("form");

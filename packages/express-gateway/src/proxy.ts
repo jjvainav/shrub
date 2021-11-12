@@ -1,6 +1,6 @@
 import { createInjectable, IInjectable, IServiceCollection } from "@shrub/core";
 import { ControllerInvokerConstructor, IControllerInvokerService, IRequestContext } from "@shrub/express";
-import client, { IRequest, IRequestClient } from "@sprig/request-client";
+import client, { IRequest, IRequestClient } from "@sprig/request-client/dist/polyfill";
 import { RequestClientConstructor } from "@sprig/request-client-class";
 import { RequestHandler } from "express";
 
