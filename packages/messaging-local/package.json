@@ -1,7 +1,7 @@
 {
     "name": "@shrub/messaging-local",
     "description": "Provides local pub/sub using event emitters.",
-    "version": "0.5.44",
+    "version": "0.5.45",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -25,7 +25,7 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/core": "0.5.44",
+        "@shrub/core": "0.5.45",
         "@sprig/event-emitter": "^0.2.0",
         "@sprig/unique-id": "^0.2.0"
     },
