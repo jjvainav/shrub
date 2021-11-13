@@ -11,7 +11,7 @@ const appRoot = "../";
 const distRoot = appRoot + "dist";
 const viewsRoot = appRoot + "src/views";
 
-const createClientConfig = (bundle) => merge(base, {
+const createClientConfig = (bundle) => merge(base(), {
     entry: { 
         [bundle.name]: path.resolve(__dirname, viewsRoot, bundle.entry)
     },

@@ -18,7 +18,7 @@ export abstract class BaseController {
         const loadApp = await import(appPath).then(value => value.default);
         const appContext = await loadApp();
 
-        await appContext.router.push(req.url);
+        await appContext.router.push(req.originalUrl);
         await appContext.router.isReady();
 
         const appContent = await renderToString(appContext.app);

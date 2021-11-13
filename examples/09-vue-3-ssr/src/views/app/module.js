@@ -1,5 +1,6 @@
 import { IVueConfiguration, VueModule } from "@shrub/vue-3";
 import { IVueRouterConfiguration, VueRouterModule } from "@shrub/vue-3-router";
+import "./styles.css";
 
 export class AppModule {
     name = "app";
@@ -13,7 +14,7 @@ export class AppModule {
     configure({ config }) {
         config.get(IVueRouterConfiguration).addRoute({ path: "/", component: { template: "<div></div>" } });
         config.get(IVueConfiguration).mount({ 
-            template: '<router-link to="/hello">Hello</router-link>&nbsp;&nbsp;<router-link to="/world">World!</router-link><div><router-view></router-view></div>' 
+            template: '<div class="root"><router-link to="/hello">Hello</router-link>&nbsp;&nbsp;<router-link to="/world">World!</router-link></div><div><router-view></router-view></div>' 
         });
     }
 }
@@ -23,7 +24,7 @@ class HelloModule {
     dependencies = [VueModule, VueRouterModule];
     
     configure({ config }) {
-        config.get(IVueRouterConfiguration).addRoute({ path: "/hello", component: () => import('./hello') });
+        config.get(IVueRouterConfiguration).addRoute({ path: "/hello", component: () => import("./hello.vue") });
     }
 }
 
@@ -32,6 +33,6 @@ class WorldModule {
     dependencies = [VueModule, VueRouterModule];
     
     configure({ config }) {
-        config.get(IVueRouterConfiguration).addRoute({ path: "/world", component: () => import('./world') });
+        config.get(IVueRouterConfiguration).addRoute({ path: "/world", component: () => import("./world.vue") });
     }
 }

@@ -16,7 +16,7 @@ const nodeModulesRoot = "../node_modules";
 // the views folder relative to the web app root
 const viewsRoot = "./src/views";
 
-const createServerConfig = (bundle) => merge(base, {
+const createServerConfig = (bundle) => merge(base({ isServer: true }), {
     entry: { app: path.resolve(__dirname, appRoot, viewsRoot, bundle.entry) },
     target: "node",
     output: {
@@ -27,7 +27,7 @@ const createServerConfig = (bundle) => merge(base, {
     },
     externals: nodeExternals({
         modulesDir: path.resolve(__dirname, nodeModulesRoot),
-        allowlist: [/\.css$/, /\?vue&type=style/]
+        allowlist: [/\.(sa|sc|c)ss$/, /\?vue&type=style/]
     }),
     plugins: [
         new WebpackManifestPlugin({
