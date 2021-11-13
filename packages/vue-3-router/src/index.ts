@@ -6,6 +6,8 @@ import { createRouter, createWebHistory, RouteRecordRaw, Router, RouterHistory, 
 export interface IVueRouterConfiguration {
     /** Adds the specified route to the router. */
     addRoute(route: RouteRecordRaw): void;
+    /** Forces the creation of the Vue Router. Normally, it will automatically get created after all modules have been loaded but this will allow manual creation for when it is needed sooner. */
+    createRouter(): void;
     /** Configures the router to use the specified history; by default, the router will use the web history or memory history when running on the server. */
     useHistory(history: RouterHistory): void;
     /** Configures the router to use the specified scroll behavior. */
@@ -30,18 +32,30 @@ export class VueRouterModule implements IModule {
     readonly name = "vue-router";
 
     initialize({ config }: IModuleInitializer): void {
-        config(IVueRouterConfiguration).register(() => ({
+        config(IVueRouterConfiguration).register(({ config }) => ({
             addRoute: route => {
                 if (this.options) {
                     this.options.routes!.push(route);
                 }
+                else if (this.router) {
+                    this.router.addRoute(route);
+                }
             },
+            createRouter: () => this.createRouter(config.get(IVueConfiguration)),
             useHistory: history => {
+                if (this.router) {
+                    throw new Error("Vue router has already been created.");
+                }
+
                 if (this.options) {
                     this.options.history = history;
                 }
             },
             useScrollBehavior: scrollBehavior => {
+                if (this.router) {
+                    throw new Error("Vue router has already been created.");
+                }
+
                 if (this.options) {
                     this.options.scrollBehavior = scrollBehavior;
                 }
@@ -62,16 +76,19 @@ export class VueRouterModule implements IModule {
         await next();
 
         const vue = config.get(IVueConfiguration);
-        vue.configure(app => {
-            if (this.options) {
-                this.router = createRouter({
-                    history: this.options.history || vue.isServer ? createMemoryHistory() : createWebHistory(),
-                    routes: this.options.routes!
-                });
+        vue.configure(app => app.use(this.createRouter(vue)));
+    }
 
-                this.options = undefined;
-                app.use(this.router);
-            }
-        });
+    private createRouter(vue: IVueConfiguration): Router {
+        if (this.options) {
+            this.router = createRouter({
+                history: this.options.history || vue.isServer ? createMemoryHistory() : createWebHistory(),
+                routes: this.options.routes!
+            });
+
+            this.options = undefined;
+        }
+
+        return this.router!;
     }
 }
