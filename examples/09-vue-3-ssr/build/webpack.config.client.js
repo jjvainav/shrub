@@ -28,8 +28,6 @@ const createClientConfig = (bundle) => merge(base(), {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            // exclude the .js assets because they will get injected by vue SSR
-            excludeAssets: [/.*.js/],
             // the output file
             filename: path.resolve(__dirname, distRoot, "views", bundle.template),
             // the html template for the view
