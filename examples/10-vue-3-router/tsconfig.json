@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": ".",
+        "experimentalDecorators": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "outDir": "dist",
+        "strict": true,
+        "target": "ESNext"
+    },
+    "include": ["types"],
+    "files": [
+        "src/server.ts"
+    ]
+}
