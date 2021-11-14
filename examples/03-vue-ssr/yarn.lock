@@ -2,6 +2,64 @@
 # yarn lockfile v1
 
 
+"@shrub/core@0.5.46":
+  version "0.5.46"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.46.tgz#58162a5ba2c5011f4d0d3534367fa7c16c241da6"
+  integrity sha512-45IPESXlJnTc8Su099HBl06G7QaIEhWTAhnjigx5LQtX8iF8aXnUbGjLKuQIDHG1F6I2Ck9HsPW9KlupOcW/7Q==
+
+"@shrub/express@^0.5.46":
+  version "0.5.46"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.46.tgz#81b7bc5f2ae9d1e9424ffd91e1722f361e87fc8f"
+  integrity sha512-kPA/e/BftAqIfUKEDBQVZe0b+DfZYzVko101YUICVk3pzYZvf+tNH2O5v59LBhg9Yh0OyohE/nM3j/Od0s5FDg==
+  dependencies:
+    "@shrub/core" "0.5.46"
+    "@shrub/http" "0.5.46"
+    express "^4.17.1"
+
+"@shrub/http@0.5.46":
+  version "0.5.46"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.46.tgz#32b966824a2930e94e2ed618a09dae96b799edb6"
+  integrity sha512-tPVQyZwYijuL6lnEOBrBsB/ELuP/2U7h+aNXmLl8iHLv6ZiR8KLLdTzlGx0JcN45TWk8I3wTAmgDlqfqhDE41Q==
+  dependencies:
+    "@shrub/core" "0.5.46"
+
+"@shrub/model@0.5.46":
+  version "0.5.46"
+  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.5.46.tgz#6e198599bc610fefe5e1f736949e980112257f25"
+  integrity sha512-0Bcj5ARx3lzk7SYDROTNtRKpGEnyMPwKoMPHt9SkvK+mCStRrz62ze/RliA8miE/XMGVMnumMo7pRksQAs1f1A==
+  dependencies:
+    "@shrub/core" "0.5.46"
+    "@sprig/serialization" "0.2.0"
+
+"@shrub/vue-server@^0.5.46":
+  version "0.5.46"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-server/-/vue-server-0.5.46.tgz#e03e5e1c399805369728a2437c2c22eefd4801b3"
+  integrity sha512-Ysl84LfXv3rB5DHTO/ky5Odua+xjvWnzRTj7lPJf59P1NCIvT3sjVEgaxUr7bYKIZUbRmHRx6ihcECWRpoK6hA==
+  dependencies:
+    "@shrub/core" "0.5.46"
+    "@shrub/model" "0.5.46"
+    "@shrub/vue" "0.5.46"
+    "@sprig/serialization" "0.2.0"
+    vue "^2.6.10"
+    vue-router "^3.1.3"
+    vue-server-renderer "^2.6.10"
+
+"@shrub/vue@0.5.46":
+  version "0.5.46"
+  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.5.46.tgz#49f1ad004dcd1dac400def86545d9aca8a67dea9"
+  integrity sha512-b5IfrY4L3sbVvJHK9hrIOWvtMdrlgCepKBTFsCc1W7C+4FWU80JaZjq/YnLcugGWAeElKEHPhHG/hfVy4Awpeg==
+  dependencies:
+    "@shrub/core" "0.5.46"
+    "@shrub/model" "0.5.46"
+    "@sprig/serialization" "0.2.0"
+    vue "^2.6.10"
+    vue-class-component "^7.1.0"
+
+"@sprig/serialization@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.2.0.tgz#5e5886b169c02e6c8427c171683713ad69324bc7"
+  integrity sha512-xVrjm+QPgIerpHjA8oXYIj8ZeGRT7VRLw7OcFJTscX2ON/0RbhVxRjX+2qjJQ/+GI1da7gR7nblxHP2C0vc2Ow==
+
 "@types/body-parser@*":
   version "1.19.0"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.0.tgz#0685b3c47eb3006ffed117cdd55164b61f80538f"
@@ -2813,6 +2871,11 @@ pbkdf2@^3.0.3:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
+picocolors@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-0.2.1.tgz#570670f793646851d1ba135996962abad587859f"
+  integrity sha512-cMlDqaLEqfSaW8Z7N5Jw+lyIW869EzT73/F5lhtY9cLGoVxSXznfgfXMO0Z5K0o0Q2TkTXq+0KFsdnSe3jDViA==
+
 picomatch@^2.0.4, picomatch@^2.2.1:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.0.tgz#f1f061de8f6a4bf022892e2d128234fb98302972"
@@ -2886,13 +2949,12 @@ postcss-value-parser@^3.3.0, postcss-value-parser@^3.3.1:
   integrity sha512-pISE66AbVkp4fDQ7VHBwRNXzAAKJjw4Vw7nWI/+Q3vuly7SNfgYXvm6i5IgFylHGK5sP/xHAbB7N49OS4gWNyQ==
 
 postcss@^7.0.14, postcss@^7.0.5, postcss@^7.0.6:
-  version "7.0.35"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-7.0.35.tgz#d2be00b998f7f211d8a276974079f2e92b970e24"
-  integrity sha512-3QT8bBJeX/S5zKTTjTCIjRF3If4avAT6kqxcASlTWEtAFCb9NH0OUxNDfgZSWdP5fJnBYCMEWkIFfWeugjzYMg==
+  version "7.0.39"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-7.0.39.tgz#9624375d965630e2e1f2c02a935c82a59cb48309"
+  integrity sha512-yioayjNbHn6z1/Bywyb2Y4s3yvDAeXGOyxqD+LnVOinq6Mdmd++SW2wUNVzavyyHxd6+DxzWGIuosg6P1Rj8uA==
   dependencies:
-    chalk "^2.4.2"
+    picocolors "^0.2.1"
     source-map "^0.6.1"
-    supports-color "^6.1.0"
 
 prettier@^1.18.2:
   version "1.19.1"
@@ -3880,6 +3942,11 @@ vm-browserify@^1.0.1:
   resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
 
+vue-class-component@^7.1.0:
+  version "7.2.6"
+  resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-7.2.6.tgz#8471e037b8e4762f5a464686e19e5afc708502e4"
+  integrity sha512-+eaQXVrAm/LldalI272PpDe3+i4mPis0ORiMYxF6Ae4hyuCh15W8Idet7wPUEs4N4YptgFHGys4UrgNQOMyO6w==
+
 vue-hot-reload-api@^2.3.0:
   version "2.3.4"
   resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.3.4.tgz#532955cc1eb208a3d990b3a9f9a70574657e08f2"
@@ -3895,6 +3962,11 @@ vue-loader@^15.7.1:
     loader-utils "^1.1.0"
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
+
+vue-router@^3.1.3:
+  version "3.5.3"
+  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.5.3.tgz#041048053e336829d05dafacf6a8fb669a2e7999"
+  integrity sha512-FUlILrW3DGitS2h+Xaw8aRNvGTwtuaxrRkNSHWTizOfLUie7wuYwezeZ50iflRn8YPV5kxmU2LQuu3nM/b3Zsg==
 
 vue-server-renderer@^2.6.10:
   version "2.6.12"
