@@ -10,11 +10,20 @@ export type ControllerInvokerConstructor<T> = { new(options: IControllerInvokerO
 export interface IControllerInvokerOptions {
     readonly app: IExpressApplication;
     readonly handler?: RequestHandler;
+    readonly prepare?: RequestHandler;
+}
+
+/** Defines options when creating a new controller invoker. */
+export interface ICreateControllerInvokerOptions {
+    /** A handler that gets invoked prior to invoking the action but after any pre-configured application middleware. */
+    readonly handler?: RequestHandler;
+    /** A handler that gets invoked prior to invoking any middleware and is useful for pre-handling a request/response. */
+    readonly prepare?: RequestHandler;
 }
 
 /** A service for creating controller invokers. */
 export interface IControllerInvokerService {
-    createControllerInvoker<T>(ctor: ControllerInvokerConstructor<T>, handler?: RequestHandler): T;
+    createControllerInvoker<T>(ctor: ControllerInvokerConstructor<T>, options?: ICreateControllerInvokerOptions): T;
 }
 
 /** Defines options for invoking a controller action. */
@@ -36,9 +45,11 @@ export const IControllerInvokerService = createService<IControllerInvokerService
 /** A class that is responsible for exposing and invoking controller actions. */
 export abstract class ControllerInvoker {
     private readonly handler: RequestHandler;
+    private readonly prepare: RequestHandler;
 
     constructor(private readonly options: IControllerInvokerOptions) {
         this.handler = !options.handler ? (_, __, next) => next() : options.handler;
+        this.prepare = !options.prepare ? (_, __, next) => next() : options.prepare;
     }
 
     /** Invokes an express request handler directly which represents a single controller action and returns a result. */
@@ -59,10 +70,14 @@ export abstract class ControllerInvoker {
                 }
             };
 
-            this.options.app(req, res, (err: any) => nextOrReject(err, () => {
-                // the handler is the custom handler provided to the controller invoker, this allows configuring the express middleware before invoking the controller
-                // the router handles invoking the controller and if next is invoked assume an error or a 404
-                this.handler(req, res, (err: any) => nextOrReject(err, () => router(req, res, (err: any) => reject(err || new Error(`Path ${options.path} not found.`)))));
+            // first invoke prepare
+            this.prepare(req, res, (err: any) => nextOrReject(err, () => {
+                // if successful, invoke the application middleware pipeline
+                this.options.app(req, res, (err: any) => nextOrReject(err, () => {
+                    // next, invoke the handler prior to invoking the route/controller
+                    // the router handles invoking the controller and if next is invoked assume an error or a 404
+                    this.handler(req, res, (err: any) => nextOrReject(err, () => router(req, res, (err: any) => reject(err || new Error(`Path ${options.path} not found.`)))));
+                }));
             }));
         });
     }
@@ -129,7 +144,7 @@ export class ControllerInvokerService implements IControllerInvokerService {
     constructor(@IExpressApplication private readonly app: IExpressApplication) {
     }
 
-    createControllerInvoker<T>(ctor: ControllerInvokerConstructor<T>, handler?: RequestHandler): T {
-        return new ctor({ app: this.app, handler });
+    createControllerInvoker<T>(ctor: ControllerInvokerConstructor<T>, options?: ICreateControllerInvokerOptions): T {
+        return new ctor({ app: this.app, handler: options && options.handler, prepare: options && options.prepare });
     }
 }

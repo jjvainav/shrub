@@ -1,8 +1,7 @@
 import { createInjectable, IInjectable, IServiceCollection } from "@shrub/core";
-import { ControllerInvokerConstructor, IControllerInvokerService, IRequestContext } from "@shrub/express";
+import { ControllerInvokerConstructor, IControllerInvokerService, ICreateControllerInvokerOptions, IRequestContext } from "@shrub/express";
 import client, { IRequest, IRequestClient } from "@sprig/request-client/dist/polyfill";
 import { RequestClientConstructor } from "@sprig/request-client-class";
-import { RequestHandler } from "express";
 
 /** The client type for a proxy. */
 export type ProxyClient<T> = T extends IProxy<infer C> ? C : never;
@@ -43,11 +42,11 @@ export function createProxy<TProxy extends IProxy<TClient>, TClient = ProxyClien
 export class LocalProxy<TClient> implements IProxy<TClient> {
     constructor(
         private readonly controllerInvokerConstructor: ControllerInvokerConstructor<TClient>,
-        private readonly handler?: RequestHandler) {
+        private readonly options?: ICreateControllerInvokerOptions) {
     }
 
     createClient(context: IRequestContext): TClient {
-        return context.services.get(IControllerInvokerService).createControllerInvoker(this.controllerInvokerConstructor, this.handler);
+        return context.services.get(IControllerInvokerService).createControllerInvoker(this.controllerInvokerConstructor, this.options);
     }
 }
 
