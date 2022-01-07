@@ -1,7 +1,7 @@
 {
     "name": "@shrub/http",
     "description": "A module that provides base support for a Node http server.",
-    "version": "0.5.46",
+    "version": "0.5.47",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -24,7 +24,7 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.46"
+        "@shrub/core": "0.5.47"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
 }
