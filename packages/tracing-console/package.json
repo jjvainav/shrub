@@ -1,7 +1,7 @@
 {
     "name": "@shrub/tracing-console",
     "description": "A module that provides a simple trace writer that writes information to the console.",
-    "version": "0.5.47",
+    "version": "0.5.48",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -24,9 +24,9 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.47",
-        "@shrub/logging": "0.5.47",
-        "@shrub/tracing": "0.5.47",
+        "@shrub/core": "0.5.48",
+        "@shrub/logging": "0.5.48",
+        "@shrub/tracing": "0.5.48",
         "chalk": "^2.4.2"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"

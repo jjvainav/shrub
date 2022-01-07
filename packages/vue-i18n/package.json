@@ -1,7 +1,7 @@
 {
     "name": "@shrub/vue-i18n",
     "description": "A module that adds internationalization support for Vue based apps.",
-    "version": "0.5.47",
+    "version": "0.5.48",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -23,8 +23,8 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/core": "0.5.47",
-        "@shrub/vue": "0.5.47",
+        "@shrub/core": "0.5.48",
+        "@shrub/vue": "0.5.48",
         "@sprig/event-emitter": "^0.2.0",
         "vue": "^2.6.10",
         "vue-i18n": "^8.24.3"
