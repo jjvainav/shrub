@@ -5,7 +5,7 @@ import { IExpressApplication } from "./app";
 import { controller, Constructor } from "./controller";
 
 export type ControllerInvokerConstructor<T> = { new(options: IControllerInvokerOptions): T };
-export type ControllerErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction, retry: Function) => void;
+export type ControllerErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction, retry: Function, retryCount: number) => void;
 
 /** Defines options for a controller invoker. */
 export interface IControllerInvokerOptions {
@@ -63,13 +63,21 @@ export abstract class ControllerInvoker {
     protected invokeAction<TController>(options: IControllerRequestOptions<TController>): Promise<IControllerResponse> {
         const router = controller(options.controller);
         return new Promise((resolve, reject) => {
+            let retryCount: number | undefined;
             // if an error is returned at any point reject the promise
             const nextOrReject: ErrorRequestHandler = (err, req, res, next) => {
                 if (err) {
                     if (this.options.error) {
                         // 1) if the error handler invokes next reject using the provided error
                         // 2) there doesn't seem to be a good way to retry a request so call invokeAction to rebuild request/response and try again
-                        this.options.error(err, req, res, (err2: any) => reject(err2), () => invokeAction());
+
+                        const retry = () => {
+                            retryCount = retryCount || 0;
+                            retryCount++;
+                            invokeAction();
+                        };
+
+                        this.options.error(err, req, res, (err2: any) => reject(err2), retry, retryCount || 0);
                     }
                     else {
                         reject(err);

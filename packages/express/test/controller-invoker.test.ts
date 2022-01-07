@@ -109,15 +109,13 @@ describe("invoker", () => {
     test("for basic GET action that attempts a retry after a failed action", async () => {
         // first use an invalid token
         let token = "invalid_token";
-        let attempts = 1;
         const invoker = context.createControllerInvoker(FooControllerInvoker, {
             prepare: (req, res, next) => tokenMiddleware(token)(req, res, next),
-            error: (err, req, res, next, retry) => {
+            error: (err, req, res, next, retry, retryCount) => {
                 // only allow a single retry
-                if (attempts === 1 && isHttpError(err) && err.statusCode === 401) {
+                if (!retryCount && isHttpError(err) && err.statusCode === 401) {
                     // reset the token to a valid one
                     token = expectedToken;
-                    attempts++;
                     retry();
                 }
                 else {
@@ -127,11 +125,42 @@ describe("invoker", () => {
             }
         });
 
-        createError(401);
+        const result = await invoker.getSecureFoo();
+
+        expect(result).toBe("foo");
+    });
+
+    test("for basic GET action that fails during retry", async () => {
+        // first use an invalid token
+        let token = "invalid_token";
+        let totalRetryCount = 0;
+        const invoker = context.createControllerInvoker(FooControllerInvoker, {
+            prepare: (req, res, next) => tokenMiddleware(token)(req, res, next),
+            error: (err, req, res, next, retry, retryCount) => {
+                totalRetryCount = retryCount;
+
+                // only allow a single retry
+                if (retryCount < 2 && isHttpError(err) && err.statusCode === 401) {
+                    if (retryCount === 1) {
+                        // reset the token to a valid one
+                        token = expectedToken;
+                    }
+
+                    // this will keep track of the total number of retries that were attempted
+                    totalRetryCount++;
+                    retry();
+                }
+                else {
+                    // unexpected, pass it down
+                    next(err);
+                }
+            }
+        });
 
         const result = await invoker.getSecureFoo();
 
         expect(result).toBe("foo");
+        expect(totalRetryCount).toBe(2);
     });
 });
 
