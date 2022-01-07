@@ -1,16 +1,18 @@
 import { createService, Transient } from "@shrub/core";
-import { Request, RequestHandler, Response } from "express";
+import { ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from "express";
 import { PathParams } from "express-serve-static-core";
 import { IExpressApplication } from "./app";
 import { controller, Constructor } from "./controller";
 
 export type ControllerInvokerConstructor<T> = { new(options: IControllerInvokerOptions): T };
+export type ControllerErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction, retry: Function) => void;
 
 /** Defines options for a controller invoker. */
 export interface IControllerInvokerOptions {
     readonly app: IExpressApplication;
     readonly handler?: RequestHandler;
     readonly prepare?: RequestHandler;
+    readonly error?: ControllerErrorRequestHandler;
 }
 
 /** Defines options when creating a new controller invoker. */
@@ -19,6 +21,11 @@ export interface ICreateControllerInvokerOptions {
     readonly handler?: RequestHandler;
     /** A handler that gets invoked prior to invoking any middleware and is useful for pre-handling a request/response. */
     readonly prepare?: RequestHandler;
+    /** 
+     * A callback that will get called when a request generates an error and allows the ability to retry a request. 
+     * Note: when retrying a request there is no need to invoke 'next'; the retry attempt will rebuild the request/response and invoke the request pipeline again.
+     */
+    readonly error?: ControllerErrorRequestHandler;
 }
 
 /** A service for creating controller invokers. */
@@ -56,29 +63,44 @@ export abstract class ControllerInvoker {
     protected invokeAction<TController>(options: IControllerRequestOptions<TController>): Promise<IControllerResponse> {
         const router = controller(options.controller);
         return new Promise((resolve, reject) => {
-            // create the express Request object to pass down the request chain
-            const req = this.createExpressRequest(options);
-            // create the express Response object that will resovle the Promise when the response has ended (i.e. when res.end is inovked)
-            const res = this.createExpressResponse(resolve);
             // if an error is returned at any point reject the promise
-            const nextOrReject = (err: any, next: () => void) => {
+            const nextOrReject: ErrorRequestHandler = (err, req, res, next) => {
                 if (err) {
-                    reject(err);
+                    if (this.options.error) {
+                        // 1) if the error handler invokes next reject using the provided error
+                        // 2) there doesn't seem to be a good way to retry a request so call invokeAction to rebuild request/response and try again
+                        this.options.error(err, req, res, (err2: any) => reject(err2), () => invokeAction());
+                    }
+                    else {
+                        reject(err);
+                    }
                 }
                 else {
                     next();
                 }
             };
 
-            // first invoke prepare
-            this.prepare(req, res, (err: any) => nextOrReject(err, () => {
-                // if successful, invoke the application middleware pipeline
-                this.options.app(req, res, (err: any) => nextOrReject(err, () => {
-                    // next, invoke the handler prior to invoking the route/controller
-                    // the router handles invoking the controller and if next is invoked assume an error or a 404
-                    this.handler(req, res, (err: any) => nextOrReject(err, () => router(req, res, (err: any) => reject(err || new Error(`Path ${options.path} not found.`)))));
+            const invokeAction = () => {
+                // create the express Request object to pass down the request chain
+                const req = this.createExpressRequest(options);
+                // create the express Response object that will resovle the Promise when the response has ended (i.e. when res.end is inovked)
+                const res = this.createExpressResponse(resolve);
+
+                // first invoke prepare
+                this.prepare(req, res, (err: any) => nextOrReject(err, req, res, () => {
+                    // if successful, invoke the application middleware pipeline
+                    this.options.app(req, res, (err: any) => nextOrReject(err, req, res, () => {
+                        // next, invoke the handler prior to invoking the route/controller
+                        // the router handles invoking the controller and if next is invoked assume an error or a 404
+                        this.handler(req, res, (err: any) => nextOrReject(err, req, res, () => router(req, res, (err: any) => {
+                            err = err || new Error(`Path ${options.path} not found.`);
+                            nextOrReject(err, req, res, () => reject(new Error("Failed to process request successfully.")));
+                        })));
+                    }));
                 }));
-            }));
+            };
+
+            invokeAction();
         });
     }
 
@@ -145,6 +167,11 @@ export class ControllerInvokerService implements IControllerInvokerService {
     }
 
     createControllerInvoker<T>(ctor: ControllerInvokerConstructor<T>, options?: ICreateControllerInvokerOptions): T {
-        return new ctor({ app: this.app, handler: options && options.handler, prepare: options && options.prepare });
+        return new ctor({ 
+            app: this.app, 
+            handler: options && options.handler, 
+            prepare: options && options.prepare,
+            error: options && options.error
+        });
     }
 }

@@ -1,21 +1,32 @@
 import { ModuleLoader } from "@shrub/core";
-import { Get, Route } from "@shrub/express";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import createError, { HttpError } from "http-errors";
-import { ControllerInvoker, ExpressModule, IControllerInvokerService } from "../src";
+import { ControllerInvoker, ExpressModule, Get, IControllerInvokerService, IExpressConfiguration, Route } from "../src";
 
 interface IInvokerTestContext extends IControllerInvokerService {
 }
 
+const expectedToken = "valid_token";
+const tokenMiddleware = (token: string) => (req: Request, res: Response, next: NextFunction) => {
+    // this middleware is used to test injecting a token into the request before the applicatin's request pipeline is invoked
+    Object.defineProperty(req, "token", { value: token });
+    next();
+};
+
 function createTestContext(): Promise<IInvokerTestContext> {
-    let context: IInvokerTestContext;
     return new Promise(resolve => ModuleLoader.useModules([{
         name: "test",
         dependencies: [ExpressModule],
-        configure: ({ services }) => {
+        configure: ({ config, services }) => {
             const service = services.get(IControllerInvokerService);
-            context = { createControllerInvoker: service.createControllerInvoker.bind(service) };
-            resolve(context);
+
+            config.get(IExpressConfiguration).use((req, res, next) => {
+                // the tests expect the token to be injected prior to getting here
+                Object.defineProperty(req, "isAuthenticated", { value: (<any>req).token === expectedToken });
+                next();
+            });
+
+            resolve({ createControllerInvoker: service.createControllerInvoker.bind(service) });
         }
     }])
     .load());
@@ -25,8 +36,15 @@ function isHttpError(err: unknown): err is HttpError {
     return (<HttpError>err).status !== undefined && (<HttpError>err).statusCode !== undefined;
 }
 
-function unauthorized(): RequestHandler {
-    return (_, __, next) => next(createError(401));
+function authorize(): RequestHandler {
+    return (req, __, next) => {
+        // authorize any authenticated request
+        if (!(<any>req).isAuthenticated) {
+            return next(createError(401));
+        }
+
+        next();
+    };
 }
 
 describe("invoker", () => {
@@ -76,6 +94,45 @@ describe("invoker", () => {
             }
         }
     });
+
+    test("for basic GET action that succeeds when preparing a request before invoking an action", async () => {
+        const invoker = context.createControllerInvoker(FooControllerInvoker, {
+            // this will inject the token and 
+            prepare: tokenMiddleware(expectedToken)
+        });
+
+        const result = await invoker.getSecureFoo();
+
+        expect(result).toBe("foo");
+    });
+
+    test("for basic GET action that attempts a retry after a failed action", async () => {
+        // first use an invalid token
+        let token = "invalid_token";
+        let attempts = 1;
+        const invoker = context.createControllerInvoker(FooControllerInvoker, {
+            prepare: (req, res, next) => tokenMiddleware(token)(req, res, next),
+            error: (err, req, res, next, retry) => {
+                // only allow a single retry
+                if (attempts === 1 && isHttpError(err) && err.statusCode === 401) {
+                    // reset the token to a valid one
+                    token = expectedToken;
+                    attempts++;
+                    retry();
+                }
+                else {
+                    // unexpected, pass it down
+                    next(err);
+                }
+            }
+        });
+
+        createError(401);
+
+        const result = await invoker.getSecureFoo();
+
+        expect(result).toBe("foo");
+    });
 });
 
 @Route("/foo")
@@ -92,7 +149,7 @@ class FooController {
     }
 
     // this needs to come before getFooById so it's route gets registered first
-    @Get("/secure", unauthorized())
+    @Get("/secure", authorize())
     getSecureFoo(req: Request, res: Response, next: NextFunction): void {
         res.json({ foo: "foo" });
     }
