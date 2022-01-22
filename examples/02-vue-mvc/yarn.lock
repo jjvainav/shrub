@@ -7,6 +7,27 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.3.tgz#90420f9f9c6d3987f176a19a7d8e764271a2f55d"
   integrity sha512-Fxt+AfXgjMoin2maPIYzFZnQjAXjAL0PHscM5pRTtatFqB+vZxAM9tLp2Optnuw3QOQC40jTNeGYFOMvyf7v9g==
 
+"@shrub/core@0.5.49":
+  version "0.5.49"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.49.tgz#361c8f512318b4169a18a713c8d3c7e165f264b4"
+  integrity sha512-xvTyZBlEmO6neS8uKGKeDSuuHhLzlHwKrjgg16rbxibmMnnCKz5xkswn18Aqnt9/FqJX/s2U78eQDkLYfyYoJQ==
+
+"@shrub/express@^0.5.46":
+  version "0.5.49"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.49.tgz#9e1f4b63a2fd65ac3e0bc42b724230dcf07238a1"
+  integrity sha512-se7nqptrgfOFa6i/qQCxHTrK2aeRhGS5JHO5h7eSRYJ6sYs5Uq/7tHwc8FzSzkXll9tSdNDgH3EBaE5wluUzSQ==
+  dependencies:
+    "@shrub/core" "0.5.49"
+    "@shrub/http" "0.5.49"
+    express "^4.17.1"
+
+"@shrub/http@0.5.49":
+  version "0.5.49"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.49.tgz#c4f743a59077b0e015110b93336d186c9731bc59"
+  integrity sha512-u04IeDI6j/47VZfRl4ANXTTUcwFCBrQBTm6RsRc5UFTHkDA4I6azP8CSNiNsjlUzxBWwIVBFwfDtn/yi/4L25g==
+  dependencies:
+    "@shrub/core" "0.5.49"
+
 "@types/body-parser@*":
   version "1.19.0"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.0.tgz#0685b3c47eb3006ffed117cdd55164b61f80538f"
@@ -1159,9 +1180,9 @@ ms@2.1.1:
   integrity sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg==
 
 nanoid@^3.1.23:
-  version "3.1.23"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.23.tgz#f744086ce7c2bc47ee0a8472574d5c78e4183a81"
-  integrity sha512-FiB0kzdP0FFVGDKlRLEQ1BgDzU87dy5NnzjeW9YZNt+/c3+q82EQDUwniSAUxp/F0gFNI1ZhKU1FqYsMuqZVnw==
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.2.0.tgz#62667522da6673971cca916a6d3eff3f415ff80c"
+  integrity sha512-fmsZYa9lpn69Ad5eDn7FMcnnSR+8R34W9qJEijxYhTbfOWzr22n1QxCMzXLK+ODyW2973V3Fux959iQoUxzUIA==
 
 negotiator@0.6.2:
   version "0.6.2"
