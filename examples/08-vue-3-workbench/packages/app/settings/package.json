@@ -11,6 +11,8 @@
         "copy-vue": "copyfiles -u 1 ./src/component/**/*.vue dist"
     },
     "dependencies": {
+        "@shrub/core": "^0.5.49",
+        "@shrub/vue-3": "^0.5.49",
         "vue": "^3.2.20"
     },
     "devDependencies": {

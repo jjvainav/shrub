@@ -10,7 +10,7 @@ function setupTest(options?: IMessagingLocalOptions): Promise<ITestContext> {
     return ModuleLoader.load([{
         name: "Test Module",
         dependencies: [MessagingLocalModule],
-        configure: ({ config,  }) => {
+        configure: ({ config }) => {
             config.get(IMessagingLocalConfiguration).useLocalMessaging(options);
         }
     }])

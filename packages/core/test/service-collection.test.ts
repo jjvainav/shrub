@@ -482,7 +482,7 @@ describe("service options", () => {
             services.getOptions(ITestOptionsWithValidation);
             fail();
         }
-        catch (err) {
+        catch (err: any) {
             expect(err.message).toBe("Value must be 'value'.");
         }
     });

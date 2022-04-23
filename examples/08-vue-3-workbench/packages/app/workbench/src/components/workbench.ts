@@ -3,7 +3,7 @@ import { CToolbar } from "@app/ui/dist/components/toolbar";
 import { useService } from "@shrub/vue-3";
 import { defineComponent, PropType } from "vue";
 import { IWorkbenchModel } from "../model";
-import { IWorkbenchExample, IWorkbenchMenuItem, IWorkbenchService } from "../services/workbench";
+import { IWorkbenchExample, IWorkbenchService } from "../services/workbench";
 //import Sidebar from "./sidebar.vue";
 //import Toolbar from "./toolbar.vue";
 

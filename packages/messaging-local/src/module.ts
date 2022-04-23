@@ -82,7 +82,7 @@ class EventEmitterBrokerAdapter implements IMessageBrokerAdapter {
     }
 }
 
-export class Consumer implements IMessageConsumer {
+class Consumer implements IMessageConsumer {
     private readonly subscriptions = new Map<string, IConsumerSubscription[]>();
 
     constructor(producer: EventEmitter<IMessageEvent>) {

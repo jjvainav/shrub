@@ -11,10 +11,10 @@
         "copy-vue": "copyfiles -u 1 ./src/components/**/*.vue dist"
     },
     "dependencies": {
-        "@shrub/core": "^0.5.46",
-        "@shrub/model": "^0.5.46",
-        "@shrub/vue": "^0.5.46",
-        "@shrub/vue-i18n": "^0.5.46",
+        "@shrub/core": "^0.5.49",
+        "@shrub/model": "^0.5.49",
+        "@shrub/vue": "^0.5.49",
+        "@shrub/vue-i18n": "^0.5.49",
         "@sprig/event-emitter": "^0.2.0",
         "@sprig/event-emitter-dom": "^0.2.0",
         "material-design-icons-iconfont": "^5.0.1",

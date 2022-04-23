@@ -1,2 +1,2 @@
 export * from "./module";
-export { ILocaleService } from "./services";
+export { ILocaleService } from "./services/locale";

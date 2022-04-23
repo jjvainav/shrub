@@ -884,82 +884,82 @@
   dependencies:
     "@octokit/openapi-types" "^7.2.3"
 
-"@shrub/core@0.5.42", "@shrub/core@^0.5.42":
-  version "0.5.42"
-  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.42.tgz#a80666a3bbb6110564dbd806f42aabf0ca0522c3"
-  integrity sha512-uRHGQSwUNaKq8d6xj4w8ktjNz3Ztz8xXfKphx48ydb+kyxgHgbi7z3ALeMtHOWTWdJD8nsxIx+LjtAcmbyTUhQ==
+"@shrub/core@0.5.49", "@shrub/core@^0.5.49":
+  version "0.5.49"
+  resolved "https://registry.yarnpkg.com/@shrub/core/-/core-0.5.49.tgz#361c8f512318b4169a18a713c8d3c7e165f264b4"
+  integrity sha512-xvTyZBlEmO6neS8uKGKeDSuuHhLzlHwKrjgg16rbxibmMnnCKz5xkswn18Aqnt9/FqJX/s2U78eQDkLYfyYoJQ==
 
-"@shrub/express@^0.5.42":
-  version "0.5.42"
-  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.42.tgz#f0f6223e9ed5d3c47e59c25d78a80e5ac128fa0b"
-  integrity sha512-tPyAr1BV2EN8+gTBrsD3YZ+UT1Ti6NACeaRFPJ9olPGSPVFV1zSFWd45xLgsoa/QgPmmR+tVRCuy+eCYG6CDxw==
+"@shrub/express@^0.5.49":
+  version "0.5.49"
+  resolved "https://registry.yarnpkg.com/@shrub/express/-/express-0.5.49.tgz#9e1f4b63a2fd65ac3e0bc42b724230dcf07238a1"
+  integrity sha512-se7nqptrgfOFa6i/qQCxHTrK2aeRhGS5JHO5h7eSRYJ6sYs5Uq/7tHwc8FzSzkXll9tSdNDgH3EBaE5wluUzSQ==
   dependencies:
-    "@shrub/core" "0.5.42"
-    "@shrub/http" "0.5.42"
+    "@shrub/core" "0.5.49"
+    "@shrub/http" "0.5.49"
     express "^4.17.1"
 
-"@shrub/http@0.5.42", "@shrub/http@^0.5.42":
-  version "0.5.42"
-  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.42.tgz#dd0c04c9e39b8edb7d79f9cfde9974fdf29b9baa"
-  integrity sha512-s8S3izeQW0FzXe3/ZZHTWPgucS0hScc2WkzRyNFC2M2nNlNTohHcZGK4RSzjRtRtaWgtyGOHu3k1FhM6MWzDIw==
+"@shrub/http@0.5.49", "@shrub/http@^0.5.49":
+  version "0.5.49"
+  resolved "https://registry.yarnpkg.com/@shrub/http/-/http-0.5.49.tgz#c4f743a59077b0e015110b93336d186c9731bc59"
+  integrity sha512-u04IeDI6j/47VZfRl4ANXTTUcwFCBrQBTm6RsRc5UFTHkDA4I6azP8CSNiNsjlUzxBWwIVBFwfDtn/yi/4L25g==
   dependencies:
-    "@shrub/core" "0.5.42"
+    "@shrub/core" "0.5.49"
 
-"@shrub/model@0.5.42", "@shrub/model@^0.5.42":
-  version "0.5.42"
-  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.5.42.tgz#92d1938b1aca004ca4da59fe09c4f40434359b90"
-  integrity sha512-mNRonFVkn3Ef8mtPikLO3UNjnH0O8Ay09TXmpQRyssfCZpFOf3Tpu6+Yl7i7KcKFsfIyk732AtUixxZdNvDbVg==
+"@shrub/model@0.5.49", "@shrub/model@^0.5.49":
+  version "0.5.49"
+  resolved "https://registry.yarnpkg.com/@shrub/model/-/model-0.5.49.tgz#1f9ea994b542feec32947fca633683f9bc63026e"
+  integrity sha512-VX6w19+i28zXH9BQ6y/MbCDf+rPjOQc1u4VOAzPLfe223/jo+ibxKe+5iphgrBCXfSPWmLMqXr4CwokdXojSxQ==
   dependencies:
-    "@shrub/core" "0.5.42"
-    "@sprig/serialization" "0.1.71"
+    "@shrub/core" "0.5.49"
+    "@sprig/serialization" "0.2.0"
 
-"@shrub/socket.io@^0.5.42":
-  version "0.5.42"
-  resolved "https://registry.yarnpkg.com/@shrub/socket.io/-/socket.io-0.5.42.tgz#132d59f52798a58e569291191f1ade1f406ead50"
-  integrity sha512-qf0MJw5M6/Gvw9gGeWpth2nGlNc0Ss0+A9v2GIUEAsN9v87EyZ5rWJsQtqx9kBjaS5LaSvgO4mz9MhB3wIbW1g==
+"@shrub/socket.io@^0.5.49":
+  version "0.5.49"
+  resolved "https://registry.yarnpkg.com/@shrub/socket.io/-/socket.io-0.5.49.tgz#fd33a0acd8d32574049c487ee2c6af360a910654"
+  integrity sha512-RgejPubtpM/5r57pdyqhwYn7QOtF4nds4D4TYSuxsi7tacliD6iVpTotgxoBpzsvYhOsbMUHE1CcM5GabHir7Q==
   dependencies:
-    "@shrub/core" "0.5.42"
-    "@shrub/http" "0.5.42"
+    "@shrub/core" "0.5.49"
+    "@shrub/http" "0.5.49"
     socket.io "^4.1.2"
 
-"@shrub/vue-i18n@^0.5.42":
-  version "0.5.42"
-  resolved "https://registry.yarnpkg.com/@shrub/vue-i18n/-/vue-i18n-0.5.42.tgz#42a733febad7a96fb70f7da644c0c5f501a441ed"
-  integrity sha512-YmDu3IwpLaixNoJyqwt/mTaorR5rI/O3y5Y+ARlYB2VgQAvv+jtzwapWpZLse8Hpa/8RmSvK06juV11IKoKE9w==
+"@shrub/vue-i18n@^0.5.49":
+  version "0.5.49"
+  resolved "https://registry.yarnpkg.com/@shrub/vue-i18n/-/vue-i18n-0.5.49.tgz#19f28cad5a4fc7c63dfd4eaf5adf6808c2b13994"
+  integrity sha512-blz3c7IoPh0JdkOo1a0NZFHbnEeQ5FhFH3soJEjDwe/T6E0HhS+UJgDdiBHQdDEMsdTGW8GNEeiialN0yYXwfw==
   dependencies:
-    "@shrub/core" "0.5.42"
-    "@shrub/vue" "0.5.42"
-    "@sprig/event-emitter" "^0.1.71"
+    "@shrub/core" "0.5.49"
+    "@shrub/vue" "0.5.49"
+    "@sprig/event-emitter" "^0.2.0"
     vue "^2.6.10"
     vue-i18n "^8.24.3"
 
-"@shrub/vue@0.5.42", "@shrub/vue@^0.5.42":
-  version "0.5.42"
-  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.5.42.tgz#b3cd3224d2da5b5d39a320ed8f830b4329c5d729"
-  integrity sha512-QfRZkaigZ3b3LlggTvy1uHnNWlsR/rsThqtJvaU7ODcnIEwoCCuj5wUPY41QX9axq7XK2zO0rvl34Zk8pQseLg==
+"@shrub/vue@0.5.49", "@shrub/vue@^0.5.49":
+  version "0.5.49"
+  resolved "https://registry.yarnpkg.com/@shrub/vue/-/vue-0.5.49.tgz#ff138f5550d40f43aa7bde214e7957b812e7bb4f"
+  integrity sha512-bxtvab4/fut/xs8wIxzgxQzw3BV/VCm9nAejYvjRXUN4ea52IsCOf3A6WXlsNBG9uRhUdoChEG6VpuYp3p7HLg==
   dependencies:
-    "@shrub/core" "0.5.42"
-    "@shrub/model" "0.5.42"
-    "@sprig/serialization" "0.1.71"
+    "@shrub/core" "0.5.49"
+    "@shrub/model" "0.5.49"
+    "@sprig/serialization" "0.2.0"
     vue "^2.6.10"
     vue-class-component "^7.1.0"
 
-"@sprig/event-emitter-dom@^0.1.71":
-  version "0.1.71"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.1.71.tgz#0834a2ec891add920798cf1cafec904b8b691efc"
-  integrity sha512-zZAiG9iCmeTUKU8Vks6l/z3S6ch317/y1uQ9bBXKLjVRssNLTblEgTV1mM5fdNB4Rq1geuyHeFyn0CnDlOtQiA==
+"@sprig/event-emitter-dom@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.2.0.tgz#413d432e7a77ac483aaa3dbbc6fd027badca31f7"
+  integrity sha512-Rtx9N9ojfFGDmQLHfhc+maUSA8SCx/YvQXXXM+1uTtCdSFJVVf5p/hQyJeB6PB30g9ay7HzJBTS7YFDmgBL7TA==
   dependencies:
-    "@sprig/event-emitter" "0.1.71"
+    "@sprig/event-emitter" "0.2.0"
 
-"@sprig/event-emitter@0.1.71", "@sprig/event-emitter@^0.1.71":
-  version "0.1.71"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.1.71.tgz#78071cfa5e069c35253a9b24730b9610fe60dd95"
-  integrity sha512-hN2dtBxVIIAG4lWYSpxuISLRoMx6+HIu5A6u7ROuVxGFnZ3rexgYscnyIeFRVjPOISBVvY3AkZU6j7f63+mjpA==
+"@sprig/event-emitter@0.2.0", "@sprig/event-emitter@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.2.0.tgz#1cc2b4a464c96066c370127d71e12160124cafbf"
+  integrity sha512-IbgMo7/cHPe4ZjcvHzBmsBO58lqz1woA4kQCdF8kLR5DxsnnA5ALA8BGNdRi08V6jch6yTKNktn02M4+U88h9A==
 
-"@sprig/serialization@0.1.71":
-  version "0.1.71"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.1.71.tgz#e4770d67f41d5ea486d1df3448293ded6bdbde67"
-  integrity sha512-TaGCBTknLIWJVuEhCoIn7hLBPoujS5Oszpae0jBHOw+PltZqY7UaKFSZQU0ANdCqwGXnFkj4MciLVqdm2A/oRg==
+"@sprig/serialization@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.2.0.tgz#5e5886b169c02e6c8427c171683713ad69324bc7"
+  integrity sha512-xVrjm+QPgIerpHjA8oXYIj8ZeGRT7VRLw7OcFJTscX2ON/0RbhVxRjX+2qjJQ/+GI1da7gR7nblxHP2C0vc2Ow==
 
 "@tootallnate/once@1":
   version "1.1.2"
