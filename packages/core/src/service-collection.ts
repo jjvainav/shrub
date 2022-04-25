@@ -2,7 +2,7 @@ export type ValidateOptionsCallback<T> = (obj: T, invalid: (err: OptionsValidati
 export type ValidateOptionsFailCallback = (err: OptionsValidationError) => void;
 
 type Constructor<T> = { new(...args: any[]): T };
-type Mutable<T> = {-readonly[P in keyof T]: T[P]};
+type Mutable<T> = { -readonly[P in keyof T]: T[P] };
 type NonOptionalKeys<T> = { [K in keyof T]-?: undefined extends T[K] ? never : K }[keyof T];
 type RegistrationResult = "success" | "frozen" | "sealed";
 
