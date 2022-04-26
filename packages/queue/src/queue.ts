@@ -15,6 +15,8 @@ export interface IQueue {
     readonly onJobProgress: IEvent<IJobProgressEventArgs>;
     /** Adds a job to the queue. */
     add(options: IJobOptions): Promise<IJob>;
+    /** Closes the queue and all workers associated with the queue. */
+    close(): Promise<void>;
     /** Registers a callback for handling/processing jobs. */
     process(optionsOrCallback: IProcessOptions | ProcessJobCallback): IWorker;
 }

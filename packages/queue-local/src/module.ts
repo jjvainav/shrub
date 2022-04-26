@@ -136,21 +136,36 @@ class LocalQueueAdapter extends QueueAdapter {
 
                     return Promise.resolve(job);
                 },
+                close: () => {
+                    this.queues.delete(name);
+                    return new Promise(resolve => {
+                        if (asyncQueue.isIdle) {
+                            callbacks.length = 0;
+                            resolve();
+                        }
+                        else {
+                            asyncQueue.onIdle.once(() => {
+                                callbacks.length = 0;
+                                resolve();
+                            });
+                        }
+                    });
+                },
                 // TODO: need to support concurrent job processing
                 process: optionsOrCallback => {
                     const options = this.getProcessOptions(optionsOrCallback);
-                    callbacks.push(options.callback);
+                    const callback = options.callback;
+                    callbacks.push(callback);
                     return {
                         close: () => {
-                            this.queues.delete(name);
-                            return new Promise(resolve => {
-                                if (asyncQueue.isIdle) {
-                                    resolve();
+                            for (let i = 0; i < callbacks.length; i++) {
+                                if (callbacks[i] === callback) {
+                                    callbacks.splice(i, 1);
+                                    break;
                                 }
-                                else {
-                                    asyncQueue.onIdle.once(() => resolve());
-                                }
-                            });
+                            }
+
+                            return Promise.resolve();
                         }
                     };
                 }

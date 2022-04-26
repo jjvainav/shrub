@@ -1,9 +1,9 @@
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
 import { ILogger, LoggingModule } from "@shrub/logging";
-import { IJob, IJobActiveEventArgs, IJobCompletedEventArgs, IJobFailedEventArgs, IJobProgressEventArgs, 
-    IQueue, IQueueConfiguration, QueueAdapter, QueueModule 
+import { IJob, IJobActiveEventArgs, IJobCompletedEventArgs, IJobFailedEventArgs, IJobOptions, IJobProgressEventArgs, 
+    IProcessOptions, IQueue, IQueueConfiguration, IWorker, ProcessJobCallback, QueueAdapter, QueueModule 
 } from "@shrub/queue";
-import { EventEmitter } from "@sprig/event-emitter";
+import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import { ConnectionOptions, Job, JobsOptions, Queue, QueueScheduler, Worker } from "bullmq";
 
 export { ConnectionOptions };
@@ -75,72 +75,117 @@ class BullMQQueueAdapter extends QueueAdapter {
     }
 
     protected getQueueInstance(name: string): IQueue {
-        const jobActive = new QueueEventEmitter<IJobActiveEventArgs>();
-        const jobCompleted = new QueueEventEmitter<IJobCompletedEventArgs>();
-        const jobFailed = new QueueEventEmitter<IJobFailedEventArgs>();
-        const jobProgress = new QueueEventEmitter<IJobProgressEventArgs>();
-        let instance: Queue;
-
-        return {
-            get onJobActive() {
-                return jobActive.event;
-            },
-            get onJobCompleted() {
-                return jobCompleted.event;
-            },
-            get onJobFailed() {
-                return jobFailed.event;
-            },
-            get onJobProgress() {
-                return jobProgress.event;
-            },
-            add: options => {
-                const jobOptions: JobsOptions = {
-                    delay: options.delay,
-                    repeat: options.repeat && {
-                        cron: options.repeat.cron,
-                        immediately: options.repeat.immediate
-                    }
-                };
-
-                instance = instance || new Queue(name, { connection: this.connection });
-                return instance.add(options.name || "", options.data || {}, jobOptions).then(job => convertJob(job));
-            },
-            process: optionsOrCallback => {
-                const options = this.getProcessOptions(optionsOrCallback);
-                const worker = new Worker(name, job => options.callback(convertJob(job)), { 
-                    concurrency: options.concurrency,
-                    connection: this.connection
-                });
-
-                // BullMQ recommends attaching to 'error' and since we don't get job info pass the error to the logger
-                // https://docs.bullmq.io/guide/workers
-                worker.on("error", error => this.logger.logError(error));
-                worker.on("active", job => {
-                    this.logger.logDebug({ name: "BullMQ - job active", queueName: job.queueName, job: job.id });
-                    jobActive.tryEmit(() => ({ job: convertJob(job) }));
-                });
-                worker.on("completed", (job, returnValue) => {
-                    this.logger.logDebug({ name: "BullMQ - job completed", queueName: job.queueName, job: job.id });
-                    jobCompleted.tryEmit(() => ({ job: convertJob(job), returnValue }));
-                });
-                worker.on("failed", (job, error) => {
-                    this.logger.logWarn({ name: "BullMQ - job failed", queueName: job.queueName, job: job.id, message: error.message, stack: error.stack });
-                    jobFailed.tryEmit(() => ({ job: convertJob(job), error }));
-                });
-                worker.on("progress", (job, progress) => {
-                    this.logger.logDebug({ name: "BullMQ - job progress", queueName: job.queueName, job: job.id, progress: typeof progress === "number" ? progress : JSON.stringify(progress) });
-                    jobProgress.tryEmit(() => ({ job: convertJob(job), progress }));
-                });
-
-                return worker;
-            }
-        };
+        return new BullMQWrapper(this.logger, name, this.connection);
     }
 
     private initializeSchedulers(queueSchedulers: string[]): void {
         // TODO: is support needed to close the schedulers?
         queueSchedulers.forEach(name => new QueueScheduler(name, { connection: this.connection }));
+    }
+}
+
+class BullMQWrapper implements IQueue {
+    private readonly jobActive = new QueueEventEmitter<IJobActiveEventArgs>();
+    private readonly jobCompleted = new QueueEventEmitter<IJobCompletedEventArgs>();
+    private readonly jobFailed = new QueueEventEmitter<IJobFailedEventArgs>();
+    private readonly jobProgress = new QueueEventEmitter<IJobProgressEventArgs>();
+    private readonly workers = new Map<number, Worker>();
+
+    private instance?: Queue;
+    private workerId = 1;
+
+    constructor(
+        private readonly logger: ILogger,
+        private readonly queueName: string,
+        private readonly connection?: ConnectionOptions) {
+    }
+
+    get onJobActive(): IEvent<IJobActiveEventArgs> {
+        return this.jobActive.event;
+    }
+
+    get onJobCompleted(): IEvent<IJobCompletedEventArgs> {
+        return this.jobCompleted.event;
+    }
+
+    get onJobFailed(): IEvent<IJobFailedEventArgs> {
+        return this.jobFailed.event;
+    }
+
+    get onJobProgress(): IEvent<IJobProgressEventArgs> {
+        return this.jobProgress.event;
+    }
+
+    add(options: IJobOptions): Promise<IJob> {
+        const jobOptions: JobsOptions = {
+            delay: options.delay,
+            repeat: options.repeat && {
+                cron: options.repeat.cron,
+                immediately: options.repeat.immediate
+            }
+        };
+
+        this.instance = this.instance || new Queue(this.queueName, { connection: this.connection });
+        return this.instance.add(options.name || "", options.data || {}, jobOptions).then(job => convertJob(job));
+    }
+
+    async close(): Promise<void> {
+        const promises = Array.from(this.workers.values()).map(worker => worker.close());
+        this.workers.clear();
+
+        if (this.instance) {
+            promises.push(this.instance.close());
+            this.instance = undefined;
+        }
+
+        await Promise.all(promises);
+    }
+
+    process(optionsOrCallback: IProcessOptions | ProcessJobCallback): IWorker {
+        const options = this.getProcessOptions(optionsOrCallback);
+        const worker = new Worker(this.queueName, job => options.callback(convertJob(job)), { 
+            concurrency: options.concurrency,
+            connection: this.connection
+        });
+
+        // BullMQ recommends attaching to 'error' and since we don't get job info pass the error to the logger
+        // https://docs.bullmq.io/guide/workers
+        worker.on("error", error => this.logger.logError(error));
+        worker.on("active", job => {
+            this.logger.logDebug({ name: "BullMQ - job active", queueName: job.queueName, job: job.id });
+            this.jobActive.tryEmit(() => ({ job: convertJob(job) }));
+        });
+        worker.on("completed", (job, returnValue) => {
+            this.logger.logDebug({ name: "BullMQ - job completed", queueName: job.queueName, job: job.id });
+            this.jobCompleted.tryEmit(() => ({ job: convertJob(job), returnValue }));
+        });
+        worker.on("failed", (job, error) => {
+            this.logger.logWarn({ name: "BullMQ - job failed", queueName: job.queueName, job: job.id, message: error.message, stack: error.stack });
+            this.jobFailed.tryEmit(() => ({ job: convertJob(job), error }));
+        });
+        worker.on("progress", (job, progress) => {
+            this.logger.logDebug({ name: "BullMQ - job progress", queueName: job.queueName, job: job.id, progress: typeof progress === "number" ? progress : JSON.stringify(progress) });
+            this.jobProgress.tryEmit(() => ({ job: convertJob(job), progress }));
+        });
+
+        const id = this.workerId++;
+        this.workers.set(id, worker);
+
+        return {
+            close: () => {
+                const worker = this.workers.get(id);
+                if (worker) {
+                    this.workers.delete(id);
+                    return worker.close();
+                }
+
+                return Promise.resolve();
+            }
+        };
+    }
+
+    private getProcessOptions(optionsOrCallback: IProcessOptions | ProcessJobCallback): IProcessOptions {
+        return typeof optionsOrCallback === "function" ? { callback: optionsOrCallback } : optionsOrCallback;
     }
 }
 
