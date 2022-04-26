@@ -1,7 +1,7 @@
 {
     "name": "@shrub/express-event-stream",
     "description": "Express module that provides support for event-stream endpoints and event-stream brokerless messaging.",
-    "version": "0.5.50",
+    "version": "0.5.51",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -26,12 +26,12 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/core": "0.5.50",
-        "@shrub/express": "0.5.50",
-        "@shrub/express-tracing": "0.5.50",
-        "@shrub/logging": "0.5.50",
-        "@shrub/messaging": "0.5.50",
-        "@shrub/tracing": "0.5.50",
+        "@shrub/core": "0.5.51",
+        "@shrub/express": "0.5.51",
+        "@shrub/express-tracing": "0.5.51",
+        "@shrub/logging": "0.5.51",
+        "@shrub/messaging": "0.5.51",
+        "@shrub/tracing": "0.5.51",
         "@sprig/event-emitter": "^0.2.0",
         "@sprig/request-client": "^0.2.0",
         "@sprig/request-client-events": "^0.2.0",
