@@ -33,8 +33,22 @@ export interface IJob {
 
 /** Defines options for creating jobs. */
 export interface IJobOptions {
+    /** A name for the job. */
     readonly name?: string;
+    /** Data to pass to the job. */
     readonly data?: any;
+    /** The amount of time (in milliseconds) to delay before the job can be processed; if not defined, the job can be processed immediately. */
+    readonly delay?: number;
+    /** Options for repeatable jobs. */
+    readonly repeat?: IJobRepeatOptions;
+}
+
+/** Defines options for a repeatable job. */
+export interface IJobRepeatOptions {
+    /** A cron expression descrribing the repeat pattern. */
+    readonly cron?: string;
+    /** True if the job should be queued immeiately for execution; otherwise, the first job won't be scheduled until the next cron time. The default is false. */
+    readonly immediate?: boolean;
 }
 
 /** Defines options for registering a process for handling jobs. */

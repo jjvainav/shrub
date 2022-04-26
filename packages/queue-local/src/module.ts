@@ -1,11 +1,12 @@
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
 import { 
-    IJob, IJobCompletedEventArgs, IJobFailedEventArgs, IJobProgressEventArgs, IQueue, 
+    IJob, IJobCompletedEventArgs, IJobFailedEventArgs, IJobOptions, IJobProgressEventArgs, IQueue, 
     IQueueConfiguration, ProcessJobCallback, QueueAdapter, QueueModule 
 } from "@shrub/queue";
 import { AsyncQueue } from "@sprig/async-queue";
 import { EventEmitter } from "@sprig/event-emitter";
 import createId from "@sprig/unique-id";
+import { parseExpression } from "cron-parser";
 
 type Mutable<T> = { -readonly[P in keyof T]: T[P] };
 
@@ -58,6 +59,17 @@ class LocalQueueAdapter extends QueueAdapter {
                 return callbacks.length ? callbacks[index++] : undefined;
             };
 
+            const pushJob = (job: IJob, onFinished: () => void) => asyncQueue.push(async () => {
+                // TODO: how to handle if there are no handlers for the queue?
+                const callback = getCallback();
+                if (callback) {
+                    await callback(job)
+                        .then(returnValue => jobCompleted.emit({ job, returnValue }))
+                        .catch(error => jobFailed.emit({ job, error }))
+                        .finally(() => onFinished());
+                }
+            });
+
             queue = {
                 get onJobCompleted() {
                     return jobCompleted.event;
@@ -80,15 +92,42 @@ class LocalQueueAdapter extends QueueAdapter {
                         }
                     };
 
-                    asyncQueue.push(async () => {
-                        // TODO: how to handle if there are no handlers for the queue?
-                        const callback = getCallback();
-                        if (callback) {
-                            await callback(job)
-                                .then(returnValue => jobCompleted.emit({ job, returnValue }))
-                                .catch(error => jobFailed.emit({ job, error }));
+                    const getDelay = (options: IJobOptions) => {
+                        if (options.delay) {
+                            return options.delay;
                         }
-                    });
+
+                        if (options.repeat && options.repeat.cron) {
+                            // if we want to execute immediately simply skip returning a delay
+                            if (!options.repeat.immediate) {
+                                const now = Date.now();
+                                const next = parseExpression(options.repeat.cron).next().getTime();
+                                return next - now;
+                            }
+                        }
+
+                        return undefined;
+                    };
+
+                    const onFinished = () => {
+                        if (options.repeat && options.repeat.cron) {
+                            queue!.add({
+                                name: options.name,
+                                data: options.data,
+                                delay: getDelay({ repeat: { cron: options.repeat.cron } }),
+                                // make sure immediate is not set
+                                repeat: { cron: options.repeat.cron }
+                            });
+                        }
+                    };
+
+                    const delay = getDelay(options);
+                    if (delay !== undefined) {
+                        setTimeout(() => pushJob(job, onFinished), delay);
+                    }
+                    else {
+                        pushJob(job, onFinished);
+                    }
 
                     return Promise.resolve(job);
                 },

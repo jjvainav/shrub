@@ -2,7 +2,7 @@ import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "
 import { ILogger, LoggingModule } from "@shrub/logging";
 import { IJob, IJobCompletedEventArgs, IJobFailedEventArgs, IJobProgressEventArgs, IQueue, IQueueConfiguration, QueueAdapter, QueueModule } from "@shrub/queue";
 import { EventEmitter } from "@sprig/event-emitter";
-import { ConnectionOptions, Job, Queue, Worker, WorkerListener } from "bullmq";
+import { ConnectionOptions, Job, JobsOptions, Queue, QueueScheduler, Worker, WorkerListener } from "bullmq";
 
 export interface IQueueBullMQConfiguration {
     /** Enables the use of the a BullMQ job queue. */
@@ -15,6 +15,8 @@ export interface IQueueBullMQOptions {
     readonly connection?: ConnectionOptions;
     /** A set of queue name patterns defining the queues the BullMQ adapter will handle; if not defined, BullMQ job queue will be used for all queues. */
     readonly queueNamePatterns?: string[];
+    /** A set of queue names that are expected to process delayed or preating jobs. By default, BullMQ will not process these jobs unless explicitely defined. See https://docs.bullmq.io/guide/queuescheduler  */
+    readonly queueSchedulers?: string[];
 }
 
 interface IQueueEventEmitter {
@@ -52,8 +54,9 @@ export class QueueBullMQModule implements IModule {
         init.config(IQueueBullMQConfiguration).register(({ services }) => ({
             useBullMQQueue: options => this.adapters.push(new BullMQQueueAdapter(
                 services.get(ILogger),
-                options && options.connection, 
-                options && options.queueNamePatterns))
+                options && options.connection,
+                options && options.queueNamePatterns,
+                options && options.queueSchedulers))
         }));
     }
 
@@ -68,12 +71,16 @@ class BullMQQueueAdapter extends QueueAdapter {
     constructor(
         private readonly logger: ILogger,
         private readonly connection?: ConnectionOptions,
-        queueNamePatterns?: string[]) {
+        queueNamePatterns?: string[],
+        queueSchedulers?: string[]) {
             super(queueNamePatterns || ["*"]);
+            this.initializeSchedulers(queueSchedulers || []);       
     }
 
     protected getQueueInstance(name: string): IQueue {
+        let instance: Queue;
         const workerEvents = new BullMQWorkerEvents(this.logger);
+
         return {
             get onJobCompleted() {
                 return workerEvents.jobCompleted.event;
@@ -84,9 +91,18 @@ class BullMQQueueAdapter extends QueueAdapter {
             get onJobProgress() {
                 return workerEvents.jobProgress.event;
             },
-            add: options => new Queue(name, { connection: this.connection })
-                .add(options.name || "", options.data || {})
-                .then(job => convertJob(job)),
+            add: options => {
+                const jobOptions: JobsOptions = {
+                    delay: options.delay,
+                    repeat: options.repeat && {
+                        cron: options.repeat.cron,
+                        immediately: options.repeat.immediate
+                    }
+                };
+
+                instance = instance || new Queue(name, { connection: this.connection });
+                return instance.add(options.name || "", options.data || {}, jobOptions).then(job => convertJob(job));
+            },
             process: options => {
                 const worker = new Worker(name, job => options.callback(convertJob(job)), { 
                     concurrency: options.concurrency,
@@ -108,6 +124,11 @@ class BullMQQueueAdapter extends QueueAdapter {
                 };
             }
         };
+    }
+
+    private initializeSchedulers(queueSchedulers: string[]): void {
+        // TODO: is support needed to close the schedulers?
+        queueSchedulers.forEach(name => new QueueScheduler(name, { connection: this.connection }));
     }
 }
 
