@@ -137,7 +137,8 @@ class LocalQueueAdapter extends QueueAdapter {
                     return Promise.resolve(job);
                 },
                 // TODO: need to support concurrent job processing
-                process: options => {
+                process: optionsOrCallback => {
+                    const options = this.getProcessOptions(optionsOrCallback);
                     callbacks.push(options.callback);
                     return {
                         close: () => {

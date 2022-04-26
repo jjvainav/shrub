@@ -6,6 +6,8 @@ import { IJob, IJobActiveEventArgs, IJobCompletedEventArgs, IJobFailedEventArgs,
 import { EventEmitter } from "@sprig/event-emitter";
 import { ConnectionOptions, Job, JobsOptions, Queue, QueueScheduler, Worker } from "bullmq";
 
+export { ConnectionOptions };
+
 export interface IQueueBullMQConfiguration {
     /** Enables the use of the a BullMQ job queue. */
     useQueue(options?: IQueueBullMQOptions): void;
@@ -69,7 +71,7 @@ class BullMQQueueAdapter extends QueueAdapter {
         queueNamePatterns?: string[],
         queueSchedulers?: string[]) {
             super(queueNamePatterns || ["*"]);
-            this.initializeSchedulers(queueSchedulers || []);       
+            this.initializeSchedulers(queueSchedulers || []);
     }
 
     protected getQueueInstance(name: string): IQueue {
@@ -104,7 +106,8 @@ class BullMQQueueAdapter extends QueueAdapter {
                 instance = instance || new Queue(name, { connection: this.connection });
                 return instance.add(options.name || "", options.data || {}, jobOptions).then(job => convertJob(job));
             },
-            process: options => {
+            process: optionsOrCallback => {
+                const options = this.getProcessOptions(optionsOrCallback);
                 const worker = new Worker(name, job => options.callback(convertJob(job)), { 
                     concurrency: options.concurrency,
                     connection: this.connection

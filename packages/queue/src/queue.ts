@@ -16,7 +16,7 @@ export interface IQueue {
     /** Adds a job to the queue. */
     add(options: IJobOptions): Promise<IJob>;
     /** Registers a callback for handling/processing jobs. */
-    process(options: IProcessOptions): IWorker;
+    process(optionsOrCallback: IProcessOptions | ProcessJobCallback): IWorker;
 }
 
 /** Responsible for providing access to a queue. */
@@ -103,4 +103,8 @@ export abstract class QueueAdapter implements IQueueAdapter {
     }
 
     protected abstract getQueueInstance(name: string): IQueue;
+
+    protected getProcessOptions(optionsOrCallback: IProcessOptions | ProcessJobCallback): IProcessOptions {
+        return typeof optionsOrCallback === "function" ? { callback: optionsOrCallback } : optionsOrCallback;
+    }
 }
