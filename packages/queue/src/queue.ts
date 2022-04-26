@@ -5,6 +5,8 @@ export type ProcessJobCallback = (job: IJob) => Promise<void | any>;
 
 /** Defines the API for a queue. */
 export interface IQueue {
+    /** An event that is raised when a job has become active. */
+    readonly onJobActive: IEvent<IJobActiveEventArgs>;
     /** An event that is raised when a job has completed. */
     readonly onJobCompleted: IEvent<IJobCompletedEventArgs>;
     /** An event that is raised when a job has failed. */
@@ -63,6 +65,10 @@ export interface IProcessOptions {
 export interface IWorker {
     /** Closes the worker and all underlying connections. */
     close(): Promise<void>;
+}
+
+export interface IJobActiveEventArgs {
+    readonly job: IJob;
 }
 
 export interface IJobCompletedEventArgs {

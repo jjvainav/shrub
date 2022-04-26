@@ -1,6 +1,6 @@
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
 import { 
-    IJob, IJobCompletedEventArgs, IJobFailedEventArgs, IJobOptions, IJobProgressEventArgs, IQueue, 
+    IJob, IJobActiveEventArgs, IJobCompletedEventArgs, IJobFailedEventArgs, IJobOptions, IJobProgressEventArgs, IQueue, 
     IQueueConfiguration, ProcessJobCallback, QueueAdapter, QueueModule 
 } from "@shrub/queue";
 import { AsyncQueue } from "@sprig/async-queue";
@@ -46,6 +46,7 @@ class LocalQueueAdapter extends QueueAdapter {
         let queue = this.queues.get(name);
 
         if (!queue) {
+            const jobActive = new EventEmitter<IJobActiveEventArgs>();
             const jobCompleted = new EventEmitter<IJobCompletedEventArgs>();
             const jobFailed = new EventEmitter<IJobFailedEventArgs>();
             const jobProgress = new EventEmitter<IJobProgressEventArgs>();
@@ -63,6 +64,7 @@ class LocalQueueAdapter extends QueueAdapter {
                 // TODO: how to handle if there are no handlers for the queue?
                 const callback = getCallback();
                 if (callback) {
+                    jobActive.emit({ job });
                     await callback(job)
                         .then(returnValue => jobCompleted.emit({ job, returnValue }))
                         .catch(error => jobFailed.emit({ job, error }))
@@ -71,6 +73,9 @@ class LocalQueueAdapter extends QueueAdapter {
             });
 
             queue = {
+                get onJobActive() {
+                    return jobActive.event;
+                },
                 get onJobCompleted() {
                     return jobCompleted.event;
                 },
