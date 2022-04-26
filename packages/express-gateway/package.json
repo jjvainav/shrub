@@ -1,7 +1,7 @@
 {
     "name": "@shrub/express-gateway",
     "description": "Express module that provides support for communicating between client and Api services.",
-    "version": "0.5.52",
+    "version": "0.5.53",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -28,8 +28,8 @@
         "@types/express": "4.17.9"
     },
     "dependencies": {
-        "@shrub/core": "0.5.52",
-        "@shrub/express": "0.5.52",
+        "@shrub/core": "0.5.53",
+        "@shrub/express": "0.5.53",
         "@sprig/request-client": "^0.2.0",
         "@sprig/request-client-class": "^0.2.0",
         "express": "^4.17.1"
