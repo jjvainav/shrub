@@ -13,7 +13,7 @@ type Mutable<T> = { -readonly[P in keyof T]: T[P] };
 export const IQueueLocalConfiguration = createConfig<IQueueLocalConfiguration>();
 export interface IQueueLocalConfiguration {
     /** Enables the use of the local job queue. */
-    useLocalQueue(options?: IQueueLocalOptions): void;
+    useQueue(options?: IQueueLocalOptions): void;
 }
 
 /** Defines options for the local job queue. */
@@ -30,7 +30,7 @@ export class QueueLocalModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(IQueueLocalConfiguration).register(() => ({
-            useLocalQueue: options => this.adapter.addQueueNamePatterns(options && options.queueNamePatterns || ["*"])
+            useQueue: options => this.adapter.addQueueNamePatterns(options && options.queueNamePatterns || ["*"])
         }));
     }
 

@@ -8,7 +8,7 @@ import { ConnectionOptions, Job, JobsOptions, Queue, QueueScheduler, Worker } fr
 
 export interface IQueueBullMQConfiguration {
     /** Enables the use of the a BullMQ job queue. */
-    useBullMQQueue(options?: IQueueBullMQOptions): void;
+    useQueue(options?: IQueueBullMQOptions): void;
 }
 
 /** Defines options for the BullMQ job queue. */
@@ -47,7 +47,7 @@ export class QueueBullMQModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(IQueueBullMQConfiguration).register(({ services }) => ({
-            useBullMQQueue: options => this.adapters.push(new BullMQQueueAdapter(
+            useQueue: options => this.adapters.push(new BullMQQueueAdapter(
                 services.get(ILogger),
                 options && options.connection,
                 options && options.queueNamePatterns,
