@@ -1,7 +1,7 @@
 {
     "name": "@shrub/queue-bullmq",
     "description": "Provides a job/worker queue using BullMQ.",
-    "version": "0.5.54",
+    "version": "0.5.55",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -24,9 +24,9 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.54",
-        "@shrub/logging": "0.5.54",
-        "@shrub/queue": "0.5.54",
+        "@shrub/core": "0.5.55",
+        "@shrub/logging": "0.5.55",
+        "@shrub/queue": "0.5.55",
         "@sprig/event-emitter": "^0.2.0",
         "bullmq": "^1.80.6"
     },
