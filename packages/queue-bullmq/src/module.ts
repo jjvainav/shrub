@@ -1,7 +1,7 @@
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
 import { ILogger, LoggingModule } from "@shrub/logging";
 import { IJob, IJobActiveEventArgs, IJobCompletedEventArgs, IJobFailedEventArgs, IJobOptions, IJobProgressEventArgs, 
-    IProcessOptions, IQueue, IQueueConfiguration, IWorker, ProcessJobCallback, QueueAdapter, QueueModule 
+    IQueue, IQueueConfiguration, IWorker, IWorkerOptions, QueueAdapter, QueueModule, WorkerCallback
 } from "@shrub/queue";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
 import { ConnectionOptions, Job, JobsOptions, Queue, QueueScheduler, Worker } from "bullmq";
@@ -142,8 +142,8 @@ class BullMQWrapper implements IQueue {
         await Promise.all(promises);
     }
 
-    process(optionsOrCallback: IProcessOptions | ProcessJobCallback): IWorker {
-        const options = this.getProcessOptions(optionsOrCallback);
+    createWorker(optionsOrCallback: IWorkerOptions | WorkerCallback): IWorker {
+        const options = this.getWorkerOptions(optionsOrCallback);
         const worker = new Worker(this.queueName, job => options.callback(convertJob(job)), { 
             concurrency: options.concurrency,
             connection: this.connection
@@ -185,7 +185,7 @@ class BullMQWrapper implements IQueue {
         };
     }
 
-    private getProcessOptions(optionsOrCallback: IProcessOptions | ProcessJobCallback): IProcessOptions {
+    private getWorkerOptions(optionsOrCallback: IWorkerOptions | WorkerCallback): IWorkerOptions {
         return typeof optionsOrCallback === "function" ? { callback: optionsOrCallback } : optionsOrCallback;
     }
 }

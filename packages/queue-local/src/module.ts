@@ -1,7 +1,7 @@
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
 import { 
     IJob, IJobActiveEventArgs, IJobCompletedEventArgs, IJobFailedEventArgs, IJobOptions, IJobProgressEventArgs, IQueue, 
-    IQueueConfiguration, ProcessJobCallback, QueueAdapter, QueueModule 
+    IQueueConfiguration, QueueAdapter, QueueModule, WorkerCallback
 } from "@shrub/queue";
 import { AsyncQueue } from "@sprig/async-queue";
 import { EventEmitter } from "@sprig/event-emitter";
@@ -51,7 +51,7 @@ class LocalQueueAdapter extends QueueAdapter {
             const jobFailed = new EventEmitter<IJobFailedEventArgs>();
             const jobProgress = new EventEmitter<IJobProgressEventArgs>();
             const asyncQueue = new AsyncQueue();
-            const callbacks: ProcessJobCallback[] = [];
+            const callbacks: WorkerCallback[] = [];
             let index = 0;
 
             const getCallback = () => {
@@ -153,8 +153,8 @@ class LocalQueueAdapter extends QueueAdapter {
                     });
                 },
                 // TODO: need to support concurrent job processing
-                process: optionsOrCallback => {
-                    const options = this.getProcessOptions(optionsOrCallback);
+                createWorker: optionsOrCallback => {
+                    const options = this.getWorkerOptions(optionsOrCallback);
                     const callback = options.callback;
                     callbacks.push(callback);
                     return {

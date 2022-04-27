@@ -1,7 +1,7 @@
 import { IEvent } from "@sprig/event-emitter";
 import { QueueAdapterWhitelist } from "./whitelist";
 
-export type ProcessJobCallback<TData = any> = (job: IJob<TData>) => Promise<void | any>;
+export type WorkerCallback<TData = any> = (job: IJob<TData>) => Promise<void | any>;
 
 /** Defines the API for a queue. */
 export interface IQueue {
@@ -17,8 +17,8 @@ export interface IQueue {
     add<TData = any>(options: IJobOptions<TData>): Promise<IJob<TData>>;
     /** Closes the queue and all workers associated with the queue. */
     close(): Promise<void>;
-    /** Registers a callback for handling/processing jobs. */
-    process<TData = any>(optionsOrCallback: IProcessOptions<TData> | ProcessJobCallback<TData>): IWorker;
+    /** Creates a new worker for handling/processing jobs. */
+    createWorker<TData = any>(optionsOrCallback: IWorkerOptions<TData> | WorkerCallback<TData>): IWorker;
 }
 
 /** Responsible for providing access to a queue. */
@@ -57,9 +57,9 @@ export interface IJobRepeatOptions {
 }
 
 /** Defines options for registering a process for handling jobs. */
-export interface IProcessOptions<TData = any> {
+export interface IWorkerOptions<TData = any> {
     /** A callback for handling jobs. */
-    readonly callback: ProcessJobCallback<TData>;
+    readonly callback: WorkerCallback<TData>;
     /** Optionally specifies the maximum number of parallel jobs that can be processed at once; if not specified, the underlying queue's default will be used. */
     readonly concurrency?: number;
 }
@@ -107,7 +107,7 @@ export abstract class QueueAdapter implements IQueueAdapter {
 
     protected abstract getQueueInstance(name: string): IQueue;
 
-    protected getProcessOptions(optionsOrCallback: IProcessOptions | ProcessJobCallback): IProcessOptions {
+    protected getWorkerOptions(optionsOrCallback: IWorkerOptions | WorkerCallback): IWorkerOptions {
         return typeof optionsOrCallback === "function" ? { callback: optionsOrCallback } : optionsOrCallback;
     }
 }
