@@ -26,6 +26,7 @@ export interface IQueueBullMQOptions {
 function convertJob(job: Job): IJob {
     return {
         id: job.id || "",
+        name: job.name,
         data: job.data,
         get progress() {
             return job.progress;

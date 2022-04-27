@@ -1,7 +1,7 @@
 import { IEvent } from "@sprig/event-emitter";
 import { QueueAdapterWhitelist } from "./whitelist";
 
-export type ProcessJobCallback = (job: IJob) => Promise<void | any>;
+export type ProcessJobCallback<TData = any> = (job: IJob<TData>) => Promise<void | any>;
 
 /** Defines the API for a queue. */
 export interface IQueue {
@@ -14,11 +14,11 @@ export interface IQueue {
     /** An event that is raised when a job has reported progress. */
     readonly onJobProgress: IEvent<IJobProgressEventArgs>;
     /** Adds a job to the queue. */
-    add(options: IJobOptions): Promise<IJob>;
+    add<TData = any>(options: IJobOptions<TData>): Promise<IJob<TData>>;
     /** Closes the queue and all workers associated with the queue. */
     close(): Promise<void>;
     /** Registers a callback for handling/processing jobs. */
-    process(optionsOrCallback: IProcessOptions | ProcessJobCallback): IWorker;
+    process<TData = any>(optionsOrCallback: IProcessOptions<TData> | ProcessJobCallback<TData>): IWorker;
 }
 
 /** Responsible for providing access to a queue. */
@@ -28,19 +28,20 @@ export interface IQueueAdapter {
 }
 
 /** Represents a specific instance of a job in the queue. */
-export interface IJob {
+export interface IJob<TData = any> {
     readonly id: string;
-    readonly data: any;
+    readonly name: string;
+    readonly data: TData;
     readonly progress: number | object;
     updateProgress(progress: number | object): Promise<void>;
 }
 
 /** Defines options for creating jobs. */
-export interface IJobOptions {
+export interface IJobOptions<TData = any> {
     /** A name for the job. */
     readonly name?: string;
     /** Data to pass to the job. */
-    readonly data?: any;
+    readonly data?: TData;
     /** The amount of time (in milliseconds) to delay before the job can be processed; if not defined, the job can be processed immediately. */
     readonly delay?: number;
     /** Options for repeatable jobs. */
@@ -56,9 +57,9 @@ export interface IJobRepeatOptions {
 }
 
 /** Defines options for registering a process for handling jobs. */
-export interface IProcessOptions {
+export interface IProcessOptions<TData = any> {
     /** A callback for handling jobs. */
-    readonly callback: ProcessJobCallback;
+    readonly callback: ProcessJobCallback<TData>;
     /** Optionally specifies the maximum number of parallel jobs that can be processed at once; if not specified, the underlying queue's default will be used. */
     readonly concurrency?: number;
 }

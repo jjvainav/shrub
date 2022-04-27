@@ -88,6 +88,7 @@ class LocalQueueAdapter extends QueueAdapter {
                 add: options => {
                     const job: IJob = {
                         id: createId(),
+                        name: options.name || "",
                         data: options.data || {},
                         progress: 0,
                         updateProgress(progress: number | object) {
