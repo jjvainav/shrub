@@ -4,7 +4,7 @@ import { IJob, IJobActiveEventArgs, IJobCompletedEventArgs, IJobFailedEventArgs,
     IQueue, IQueueConfiguration, IWorker, IWorkerOptions, QueueAdapter, QueueModule, WorkerCallback
 } from "@shrub/queue";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";
-import { ConnectionOptions, Job, JobsOptions, Queue, QueueScheduler, Worker } from "bullmq";
+import { ConnectionOptions, Job, JobsOptions, Queue, QueueEvents, QueueScheduler, Worker } from "bullmq";
 
 export { ConnectionOptions };
 
@@ -21,20 +21,6 @@ export interface IQueueBullMQOptions {
     readonly queueNamePatterns?: string[];
     /** A set of queue names that are expected to process delayed or preating jobs. By default, BullMQ will not process these jobs unless explicitely defined. See https://docs.bullmq.io/guide/queuescheduler  */
     readonly queueSchedulers?: string[];
-}
-
-function convertJob(job: Job): IJob {
-    return {
-        id: job.id || "",
-        name: job.name,
-        data: job.data,
-        get progress() {
-            return job.progress;
-        },
-        updateProgress(progress) {
-            return job.updateProgress(progress);
-        }
-    };
 }
 
 export const IQueueBullMQConfiguration = createConfig<IQueueBullMQConfiguration>();
@@ -92,6 +78,7 @@ class BullMQWrapper implements IQueue {
     private readonly jobProgress = new QueueEventEmitter<IJobProgressEventArgs>();
     private readonly workers = new Map<number, Worker>();
 
+    private readonly events: QueueEventsReference;
     private instance?: Queue;
     private workerId = 1;
 
@@ -99,6 +86,7 @@ class BullMQWrapper implements IQueue {
         private readonly logger: ILogger,
         private readonly queueName: string,
         private readonly connection?: ConnectionOptions) {
+            this.events = new QueueEventsReference(queueName, connection);
     }
 
     get onJobActive(): IEvent<IJobActiveEventArgs> {
@@ -127,7 +115,7 @@ class BullMQWrapper implements IQueue {
         };
 
         this.instance = this.instance || new Queue(this.queueName, { connection: this.connection });
-        return this.instance.add(options.name || "", options.data || {}, jobOptions).then(job => convertJob(job));
+        return this.instance.add(options.name || "", options.data || {}, jobOptions).then(job => this.convertJob(job));
     }
 
     async close(): Promise<void> {
@@ -144,7 +132,7 @@ class BullMQWrapper implements IQueue {
 
     createWorker(optionsOrCallback: IWorkerOptions | WorkerCallback): IWorker {
         const options = this.getWorkerOptions(optionsOrCallback);
-        const worker = new Worker(this.queueName, job => options.callback(convertJob(job)), { 
+        const worker = new Worker(this.queueName, job => options.callback(this.convertJob(job)), { 
             concurrency: options.concurrency,
             connection: this.connection
         });
@@ -154,19 +142,19 @@ class BullMQWrapper implements IQueue {
         worker.on("error", error => this.logger.logError(error));
         worker.on("active", job => {
             this.logger.logDebug({ name: "BullMQ - job active", queueName: job.queueName, job: job.id });
-            this.jobActive.tryEmit(() => ({ job: convertJob(job) }));
+            this.jobActive.tryEmit(() => ({ job: this.convertJob(job) }));
         });
         worker.on("completed", (job, returnValue) => {
             this.logger.logDebug({ name: "BullMQ - job completed", queueName: job.queueName, job: job.id });
-            this.jobCompleted.tryEmit(() => ({ job: convertJob(job), returnValue }));
+            this.jobCompleted.tryEmit(() => ({ job: this.convertJob(job), returnValue }));
         });
         worker.on("failed", (job, error) => {
             this.logger.logWarn({ name: "BullMQ - job failed", queueName: job.queueName, job: job.id, message: error.message, stack: error.stack });
-            this.jobFailed.tryEmit(() => ({ job: convertJob(job), error }));
+            this.jobFailed.tryEmit(() => ({ job: this.convertJob(job), error }));
         });
         worker.on("progress", (job, progress) => {
             this.logger.logDebug({ name: "BullMQ - job progress", queueName: job.queueName, job: job.id, progress: typeof progress === "number" ? progress : JSON.stringify(progress) });
-            this.jobProgress.tryEmit(() => ({ job: convertJob(job), progress }));
+            this.jobProgress.tryEmit(() => ({ job: this.convertJob(job), progress }));
         });
 
         const id = this.workerId++;
@@ -185,6 +173,19 @@ class BullMQWrapper implements IQueue {
         };
     }
 
+    private convertJob(job: Job): IJob {
+        return {
+            id: job.id || "",
+            name: job.name,
+            data: job.data,
+            get progress() {
+                return job.progress;
+            },
+            updateProgress: progress => job.updateProgress(progress),
+            waitUntilFinished: () => job.waitUntilFinished(this.events.getInstance()).finally(() => this.events.releaseInstance())
+        };
+    }
+
     private getWorkerOptions(optionsOrCallback: IWorkerOptions | WorkerCallback): IWorkerOptions {
         return typeof optionsOrCallback === "function" ? { callback: optionsOrCallback } : optionsOrCallback;
     }
@@ -193,5 +194,33 @@ class BullMQWrapper implements IQueue {
 class QueueEventEmitter<TArgs> extends EventEmitter<TArgs> {
     tryEmit(getArgs: () => TArgs): Promise<void> {
         return this.count ? super.emit(getArgs()) : Promise.resolve();
+    }
+}
+
+/** 
+ * Manages a reference to a QueueEvents object and will close the connection when all references have been released. 
+ * BullMQ uses Redis Streams so only open a connection when necessary. 
+ */
+class QueueEventsReference {
+    private events?: QueueEvents;
+    private count = 0;
+
+    constructor(
+        private readonly queueName: string,
+        private readonly connection?: ConnectionOptions) {
+    }
+
+    getInstance(): QueueEvents {
+        this.events = this.events || new QueueEvents(this.queueName, { connection: this.connection });
+        this.count++;
+        return this.events;
+    }
+
+    releaseInstance(): void {
+        this.count--;
+        if (!this.count && this.events) {
+            this.events.close();
+            this.events = undefined;
+        }
     }
 }

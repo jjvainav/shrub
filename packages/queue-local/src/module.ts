@@ -86,6 +86,8 @@ class LocalQueueAdapter extends QueueAdapter {
                     return jobProgress.event;
                 },
                 add: options => {
+                    let finished: () => void; 
+                    const waitUntilFinished = new Promise<void>(resolve => finished = resolve);
                     const job: IJob = {
                         id: createId(),
                         name: options.name || "",
@@ -95,7 +97,8 @@ class LocalQueueAdapter extends QueueAdapter {
                             (<Mutable<IJob>>this).progress = progress;
                             jobProgress.emit({ job, progress });
                             return Promise.resolve();
-                        }
+                        },
+                        waitUntilFinished: () => waitUntilFinished
                     };
 
                     const getDelay = (options: IJobOptions) => {
@@ -116,6 +119,7 @@ class LocalQueueAdapter extends QueueAdapter {
                     };
 
                     const onFinished = () => {
+                        finished();
                         if (options.repeat && options.repeat.cron) {
                             queue!.add({
                                 name: options.name,

@@ -34,6 +34,7 @@ export interface IJob<TData = any> {
     readonly data: TData;
     readonly progress: number | object;
     updateProgress(progress: number | object): Promise<void>;
+    waitUntilFinished(): Promise<any>;
 }
 
 /** Defines options for creating jobs. */
