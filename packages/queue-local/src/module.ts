@@ -23,7 +23,7 @@ export interface IQueueLocalOptions {
 }
 
 export class QueueLocalModule implements IModule {
-    private readonly adapter = new LocalQueueAdapter([]);
+    private readonly adapter = new QueueLocalAdapter([]);
 
     readonly name = "queue-local";
     readonly dependencies = [QueueModule];
@@ -39,7 +39,7 @@ export class QueueLocalModule implements IModule {
     }
 }
 
-class LocalQueueAdapter extends QueueAdapter {
+export class QueueLocalAdapter extends QueueAdapter {
     private readonly queues = new Map<string, IQueue>();
 
     protected getQueueInstance(name: string): IQueue {

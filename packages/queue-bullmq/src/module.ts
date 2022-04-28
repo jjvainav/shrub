@@ -26,7 +26,7 @@ export interface IQueueBullMQOptions {
 export const IQueueBullMQConfiguration = createConfig<IQueueBullMQConfiguration>();
 
 export class QueueBullMQModule implements IModule {
-    private readonly adapters: BullMQQueueAdapter[] = [];
+    private readonly adapters: QueueBullMQAdapter[] = [];
 
     readonly name = "queue-bullmq";
     readonly dependencies = [
@@ -36,7 +36,7 @@ export class QueueBullMQModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(IQueueBullMQConfiguration).register(({ services }) => ({
-            useQueue: options => this.adapters.push(new BullMQQueueAdapter(
+            useQueue: options => this.adapters.push(new QueueBullMQAdapter(
                 services.get(ILogger),
                 options && options.connection,
                 options && options.queueNamePatterns,
@@ -51,7 +51,7 @@ export class QueueBullMQModule implements IModule {
     }
 }
 
-class BullMQQueueAdapter extends QueueAdapter {
+export class QueueBullMQAdapter extends QueueAdapter {
     constructor(
         private readonly logger: ILogger,
         private readonly connection?: ConnectionOptions,
