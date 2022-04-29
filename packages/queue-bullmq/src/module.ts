@@ -12,13 +12,13 @@ type WorkerListenerArgsConverter<T extends keyof WorkerListener, TResult> = (...
 
 export interface IQueueBullMQConfiguration {
     /** Enables the use of the a BullMQ job queue. */
-    useQueue(options?: IQueueBullMQOptions): void;
+    useQueue(options: IQueueBullMQOptions): void;
 }
 
 /** Defines options for the BullMQ job queue. */
 export interface IQueueBullMQOptions {
     /** BullMQ connection options for connecting to Redis. */
-    readonly connection?: ConnectionOptions;
+    readonly connection: ConnectionOptions;
     /** A set of queue name patterns defining the queues the BullMQ adapter will handle; if not defined, BullMQ job queue will be used for all queues. */
     readonly queueNamePatterns?: string[];
     /** A set of queue names that are expected to process delayed or preating jobs. By default, BullMQ will not process these jobs unless explicitely defined. See https://docs.bullmq.io/guide/queuescheduler  */
@@ -40,9 +40,9 @@ export class QueueBullMQModule implements IModule {
         init.config(IQueueBullMQConfiguration).register(({ services }) => ({
             useQueue: options => this.adapters.push(new QueueBullMQAdapter(
                 services.get(ILoggingService).createLogger(),
-                options && options.connection,
-                options && options.queueNamePatterns,
-                options && options.queueSchedulers))
+                options.connection,
+                options.queueNamePatterns,
+                options.queueSchedulers))
         }));
     }
 
@@ -56,7 +56,7 @@ export class QueueBullMQModule implements IModule {
 export class QueueBullMQAdapter extends QueueAdapter {
     constructor(
         private readonly logger: ILogger,
-        private readonly connection?: ConnectionOptions,
+        private readonly connection: ConnectionOptions,
         queueNamePatterns?: string[],
         queueSchedulers?: string[]) {
             super(queueNamePatterns || ["*"]);
@@ -64,7 +64,7 @@ export class QueueBullMQAdapter extends QueueAdapter {
     }
 
     protected getQueueInstance(name: string): IQueue {
-        return new BullMQWrapper(this.logger, name, this.connection);
+        return new BullMQWrapper(this.logger, this.connection, name);
     }
 
     private initializeSchedulers(queueSchedulers: string[]): void {
@@ -82,9 +82,9 @@ class BullMQWrapper implements IQueue {
 
     constructor(
         private readonly logger: ILogger,
-        private readonly queueName: string,
-        private readonly connection?: ConnectionOptions) {
-            this.events = new QueueEventsReference(queueName, connection);
+        private readonly connection: ConnectionOptions,
+        readonly name: string) {
+            this.events = new QueueEventsReference(name, connection);
     }
 
     add(options: IJobOptions): Promise<IJob> {
@@ -97,8 +97,7 @@ class BullMQWrapper implements IQueue {
             }
         };
 
-        this.instance = this.instance || new Queue(this.queueName, { connection: this.connection });
-        return this.instance.add(options.name || "", options.data || {}, jobOptions).then(job => this.convertJob(job));
+        return this.getInstance().add(options.name || "", options.data || {}, jobOptions).then(job => this.convertJob(job));
     }
 
     async close(): Promise<void> {
@@ -115,8 +114,9 @@ class BullMQWrapper implements IQueue {
 
     createWorker(optionsOrCallback: IWorkerOptions | WorkerCallback): IWorker {
         const options = this.getWorkerOptions(optionsOrCallback);
-        const worker = new Worker(this.queueName, job => options.callback(this.convertJob(job)), { 
-            concurrency: options.concurrency,
+        const worker = new Worker(this.name, job => options.callback(this.convertJob(job)), { 
+            autorun: true,
+            concurrency: options.concurrency || 1,
             connection: this.connection
         });
 
@@ -153,8 +153,13 @@ class BullMQWrapper implements IQueue {
                 }
 
                 return Promise.resolve();
-            }
+            },
+            waitUntilReady: () => worker.waitUntilReady().then(() => {})
         };
+    }
+
+    async waitUntilReady(): Promise<void> {
+        await this.getInstance().waitUntilReady();
     }
 
     private convertJob(job: Job): IJob {
@@ -177,6 +182,11 @@ class BullMQWrapper implements IQueue {
             updateProgress: progress => job.updateProgress(progress),
             waitUntilFinished: () => job.waitUntilFinished(this.events.getInstance()).finally(() => this.events.releaseInstance())
         };
+    }
+
+    private getInstance(): Queue {
+        this.instance = this.instance || new Queue(this.name, { connection: this.connection });
+        return this.instance;
     }
 
     private getWorkerOptions(optionsOrCallback: IWorkerOptions | WorkerCallback): IWorkerOptions {

@@ -5,12 +5,16 @@ export type WorkerCallback<TData = any> = (job: IJob<TData>) => Promise<void | a
 
 /** Defines the API for a queue. */
 export interface IQueue {
+    /** The name of the queue. */
+    readonly name: string;
     /** Adds a job to the queue. */
     add<TData = any>(options: IJobOptions<TData>): Promise<IJob<TData>>;
     /** Closes the queue and all workers associated with the queue. */
     close(): Promise<void>;
     /** Creates a new worker for handling/processing jobs. */
     createWorker<TData = any>(optionsOrCallback: IWorkerOptions<TData> | WorkerCallback<TData>): IWorker;
+    /** Waits until the queue is ready for processing. */
+    waitUntilReady(): Promise<void>;
 }
 
 /** Responsible for providing access to a queue. */
@@ -74,6 +78,8 @@ export interface IWorker {
     readonly onJobProgress: IEvent<IJobProgressEventArgs>;
     /** Closes the worker and all underlying connections. */
     close(): Promise<void>;
+    /** Waits until the worker is ready for processing. */
+    waitUntilReady(): Promise<void>;
 }
 
 export interface IJobActiveEventArgs {

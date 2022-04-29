@@ -76,6 +76,7 @@ export class QueueLocalAdapter extends QueueAdapter {
             });
 
             queue = {
+                name,
                 add: options => {
                     let finished: () => void; 
                     const waitUntilFinished = new Promise<void>(resolve => finished = resolve);
@@ -209,11 +210,13 @@ export class QueueLocalAdapter extends QueueAdapter {
 
                             return Promise.resolve();
                         },
-                        emitJobProgress: args => jobProgress.emit(args)
+                        emitJobProgress: args => jobProgress.emit(args),
+                        waitUntilReady: () => Promise.resolve()
                     };
 
                     return worker;
-                }
+                },
+                waitUntilReady: () => Promise.resolve()
             };
 
             this.queues.set(name, queue);
