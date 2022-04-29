@@ -1,7 +1,7 @@
 {
     "name": "@shrub/queue",
     "description": "Provides a basic abstraction and support for job/task queues.",
-    "version": "0.5.60",
+    "version": "0.5.61",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -25,8 +25,8 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/core": "0.5.60",
-        "@shrub/logging": "0.5.60",
+        "@shrub/core": "0.5.61",
+        "@shrub/logging": "0.5.61",
         "@sprig/event-emitter": "^0.2.0"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
