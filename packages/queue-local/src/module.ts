@@ -1,7 +1,7 @@
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
 import { 
     IJob, IJobActiveEventArgs, IJobCompletedEventArgs, IJobFailedEventArgs, IJobOptions, IJobProgressEventArgs, IQueue, 
-    IQueueConfiguration, QueueAdapter, QueueModule, WorkerCallback
+    IQueueConfiguration, IWorker, QueueAdapter, QueueModule, WorkerCallback
 } from "@shrub/queue";
 import { AsyncQueue } from "@sprig/async-queue";
 import { EventEmitter } from "@sprig/event-emitter";
@@ -20,6 +20,14 @@ export interface IQueueLocalConfiguration {
 export interface IQueueLocalOptions {
     /** A set of queue name patterns defining the queues the local adapter will handle; if not defined, local job queue will be used for all queues. */
     readonly queueNamePatterns?: string[];
+}
+
+interface ILocalJob<TData = any> extends IJob<TData> {
+    worker?: ILocalWorker;
+}
+
+interface ILocalWorker extends IWorker {
+    emitJobProgress(args: IJobProgressEventArgs): void;
 }
 
 export class QueueLocalModule implements IModule {
@@ -46,10 +54,6 @@ export class QueueLocalAdapter extends QueueAdapter {
         let queue = this.queues.get(name);
 
         if (!queue) {
-            const jobActive = new EventEmitter<IJobActiveEventArgs>();
-            const jobCompleted = new EventEmitter<IJobCompletedEventArgs>();
-            const jobFailed = new EventEmitter<IJobFailedEventArgs>();
-            const jobProgress = new EventEmitter<IJobProgressEventArgs>();
             const asyncQueue = new AsyncQueue();
             const callbacks: WorkerCallback[] = [];
             let index = 0;
@@ -64,38 +68,24 @@ export class QueueLocalAdapter extends QueueAdapter {
                 // TODO: how to handle if there are no handlers for the queue?
                 const callback = getCallback();
                 if (callback) {
-                    jobActive.emit({ job });
-                    await callback(job)
-                        .then(returnValue => jobCompleted.emit({ job, returnValue }))
-                        .catch(error => jobFailed.emit({ job, error }))
-                        .finally(() => onFinished());
+                    await callback(job).finally(() => onFinished());
                 }
             });
 
             queue = {
-                get onJobActive() {
-                    return jobActive.event;
-                },
-                get onJobCompleted() {
-                    return jobCompleted.event;
-                },
-                get onJobFailed() {
-                    return jobFailed.event;
-                },
-                get onJobProgress() {
-                    return jobProgress.event;
-                },
                 add: options => {
                     let finished: () => void; 
                     const waitUntilFinished = new Promise<void>(resolve => finished = resolve);
-                    const job: IJob = {
+                    const job: ILocalJob = {
                         id: createId(),
                         name: options.name || "",
                         data: options.data || {},
                         progress: 0,
                         updateProgress(progress: number | object) {
-                            (<Mutable<IJob>>this).progress = progress;
-                            jobProgress.emit({ job, progress });
+                            (<Mutable<ILocalJob>>this).progress = progress;
+                            if (this.worker) {
+                                this.worker.emitJobProgress({ job: this, progress });
+                            }
                             return Promise.resolve();
                         },
                         waitUntilFinished: () => waitUntilFinished
@@ -158,10 +148,35 @@ export class QueueLocalAdapter extends QueueAdapter {
                 },
                 // TODO: need to support concurrent job processing
                 createWorker: optionsOrCallback => {
+                    const jobActive = new EventEmitter<IJobActiveEventArgs>();
+                    const jobCompleted = new EventEmitter<IJobCompletedEventArgs>();
+                    const jobFailed = new EventEmitter<IJobFailedEventArgs>();
+                    const jobProgress = new EventEmitter<IJobProgressEventArgs>();
                     const options = this.getWorkerOptions(optionsOrCallback);
-                    const callback = options.callback;
+                    const callback: WorkerCallback = (job: ILocalJob) => {
+                        job.worker = worker;
+                        jobActive.emit({ job });
+                        return options.callback(job)
+                            .then(returnValue => {
+                                jobCompleted.emit({ job, returnValue })
+                                return returnValue;
+                            })
+                            .catch(error => jobFailed.emit({ job, error }));
+                    };
                     callbacks.push(callback);
-                    return {
+                    const worker: ILocalWorker = {
+                        get onJobActive() {
+                            return jobActive.event;
+                        },
+                        get onJobCompleted() {
+                            return jobCompleted.event;
+                        },
+                        get onJobFailed() {
+                            return jobFailed.event;
+                        },
+                        get onJobProgress() {
+                            return jobProgress.event;
+                        },
                         close: () => {
                             for (let i = 0; i < callbacks.length; i++) {
                                 if (callbacks[i] === callback) {
@@ -171,8 +186,11 @@ export class QueueLocalAdapter extends QueueAdapter {
                             }
 
                             return Promise.resolve();
-                        }
+                        },
+                        emitJobProgress: args => jobProgress.emit(args)
                     };
+
+                    return worker;
                 }
             };
 

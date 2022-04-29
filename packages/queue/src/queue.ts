@@ -5,14 +5,6 @@ export type WorkerCallback<TData = any> = (job: IJob<TData>) => Promise<void | a
 
 /** Defines the API for a queue. */
 export interface IQueue {
-    /** An event that is raised when a job has become active. */
-    readonly onJobActive: IEvent<IJobActiveEventArgs>;
-    /** An event that is raised when a job has completed. */
-    readonly onJobCompleted: IEvent<IJobCompletedEventArgs>;
-    /** An event that is raised when a job has failed. */
-    readonly onJobFailed: IEvent<IJobFailedEventArgs>;
-    /** An event that is raised when a job has reported progress. */
-    readonly onJobProgress: IEvent<IJobProgressEventArgs>;
     /** Adds a job to the queue. */
     add<TData = any>(options: IJobOptions<TData>): Promise<IJob<TData>>;
     /** Closes the queue and all workers associated with the queue. */
@@ -67,6 +59,14 @@ export interface IWorkerOptions<TData = any> {
 
 /** Defines a worker responsible for processing jobs. */
 export interface IWorker {
+    /** An event that is raised when a job has becomes active. */
+    readonly onJobActive: IEvent<IJobActiveEventArgs>;
+    /** An event that is raised when a job has completed. */
+    readonly onJobCompleted: IEvent<IJobCompletedEventArgs>;
+    /** An event that is raised when a job has failed. */
+    readonly onJobFailed: IEvent<IJobFailedEventArgs>;
+    /** An event that is raised when a job has reported progress. */
+    readonly onJobProgress: IEvent<IJobProgressEventArgs>;
     /** Closes the worker and all underlying connections. */
     close(): Promise<void>;
 }

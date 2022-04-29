@@ -3,10 +3,12 @@ import { ILogger, LoggingModule } from "@shrub/logging";
 import { IJob, IJobActiveEventArgs, IJobCompletedEventArgs, IJobFailedEventArgs, IJobOptions, IJobProgressEventArgs, 
     IQueue, IQueueConfiguration, IWorker, IWorkerOptions, QueueAdapter, QueueModule, WorkerCallback
 } from "@shrub/queue";
-import { EventEmitter, IEvent } from "@sprig/event-emitter";
-import { ConnectionOptions, Job, JobsOptions, Queue, QueueEvents, QueueScheduler, Worker } from "bullmq";
+import { EventEmitter } from "@sprig/event-emitter";
+import { ConnectionOptions, Job, JobsOptions, Queue, QueueEvents, QueueScheduler, Worker, WorkerListener } from "bullmq";
 
 export { ConnectionOptions };
+
+type WorkerListenerArgsConverter<T extends keyof WorkerListener, TResult> = (...args: Parameters<WorkerListener[T]>) => TResult;
 
 export interface IQueueBullMQConfiguration {
     /** Enables the use of the a BullMQ job queue. */
@@ -72,10 +74,6 @@ export class QueueBullMQAdapter extends QueueAdapter {
 }
 
 class BullMQWrapper implements IQueue {
-    private readonly jobActive = new QueueEventEmitter<IJobActiveEventArgs>();
-    private readonly jobCompleted = new QueueEventEmitter<IJobCompletedEventArgs>();
-    private readonly jobFailed = new QueueEventEmitter<IJobFailedEventArgs>();
-    private readonly jobProgress = new QueueEventEmitter<IJobProgressEventArgs>();
     private readonly workers = new Map<number, Worker>();
 
     private readonly events: QueueEventsReference;
@@ -87,22 +85,6 @@ class BullMQWrapper implements IQueue {
         private readonly queueName: string,
         private readonly connection?: ConnectionOptions) {
             this.events = new QueueEventsReference(queueName, connection);
-    }
-
-    get onJobActive(): IEvent<IJobActiveEventArgs> {
-        return this.jobActive.event;
-    }
-
-    get onJobCompleted(): IEvent<IJobCompletedEventArgs> {
-        return this.jobCompleted.event;
-    }
-
-    get onJobFailed(): IEvent<IJobFailedEventArgs> {
-        return this.jobFailed.event;
-    }
-
-    get onJobProgress(): IEvent<IJobProgressEventArgs> {
-        return this.jobProgress.event;
     }
 
     add(options: IJobOptions): Promise<IJob> {
@@ -137,30 +119,31 @@ class BullMQWrapper implements IQueue {
             connection: this.connection
         });
 
+        const jobActive = new WorkerEventEmitter<IJobActiveEventArgs, "active">(worker, "active", job => ({ job: this.convertJob(job) }));
+        const jobCompleted = new WorkerEventEmitter<IJobCompletedEventArgs, "completed">(worker, "completed", (job, returnValue) => ({ job: this.convertJob(job), returnValue }));
+        const jobFailed = new WorkerEventEmitter<IJobFailedEventArgs, "failed">(worker, "failed", (job, error) => ({ job: this.convertJob(job), error }));
+        const jobProgress = new WorkerEventEmitter<IJobProgressEventArgs, "progress">(worker, "progress", (job, progress) => ({ job: this.convertJob(job), progress }));
+
         // BullMQ recommends attaching to 'error' and since we don't get job info pass the error to the logger
         // https://docs.bullmq.io/guide/workers
         worker.on("error", error => this.logger.logError(error));
-        worker.on("active", job => {
-            this.logger.logDebug({ name: "BullMQ - job active", queueName: job.queueName, job: job.id });
-            this.jobActive.tryEmit(() => ({ job: this.convertJob(job) }));
-        });
-        worker.on("completed", (job, returnValue) => {
-            this.logger.logDebug({ name: "BullMQ - job completed", queueName: job.queueName, job: job.id });
-            this.jobCompleted.tryEmit(() => ({ job: this.convertJob(job), returnValue }));
-        });
-        worker.on("failed", (job, error) => {
-            this.logger.logWarn({ name: "BullMQ - job failed", queueName: job.queueName, job: job.id, message: error.message, stack: error.stack });
-            this.jobFailed.tryEmit(() => ({ job: this.convertJob(job), error }));
-        });
-        worker.on("progress", (job, progress) => {
-            this.logger.logDebug({ name: "BullMQ - job progress", queueName: job.queueName, job: job.id, progress: typeof progress === "number" ? progress : JSON.stringify(progress) });
-            this.jobProgress.tryEmit(() => ({ job: this.convertJob(job), progress }));
-        });
 
         const id = this.workerId++;
         this.workers.set(id, worker);
 
         return {
+            get onJobActive() {
+                return jobActive.event;
+            },
+            get onJobCompleted() {
+                return jobCompleted.event;
+            },
+            get onJobFailed() {
+                return jobFailed.event;
+            },
+            get onJobProgress() {
+                return jobProgress.event;
+            },
             close: () => {
                 const worker = this.workers.get(id);
                 if (worker) {
@@ -191,9 +174,29 @@ class BullMQWrapper implements IQueue {
     }
 }
 
-class QueueEventEmitter<TArgs> extends EventEmitter<TArgs> {
-    tryEmit(getArgs: () => TArgs): Promise<void> {
-        return this.count ? super.emit(getArgs()) : Promise.resolve();
+class WorkerEventEmitter<TArgs, T extends keyof WorkerListener> extends EventEmitter<TArgs> {
+    private readonly listener: WorkerListener[T];
+
+    constructor(
+        private readonly worker: Worker,
+        private readonly name: T, 
+        private readonly convertArgs: WorkerListenerArgsConverter<T, TArgs>) {
+        super();
+        this.listener = <WorkerListener[T]>((...args: Parameters<WorkerListener[T]>) => {
+            this.emit(this.convertArgs(...args));
+        });
+    }
+
+    protected callbackRegistered(): void {
+        if (this.count === 1) {
+            this.worker.on(this.name, this.listener);
+        }
+    }
+
+    protected callbackUnregistered(): void {
+        if (this.count === 0) {
+            this.worker.off(this.name, this.listener);
+        }
     }
 }
 
