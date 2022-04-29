@@ -1,5 +1,5 @@
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
-import { ILogger, LoggingModule } from "@shrub/logging";
+import { ILogger, ILoggingService, LoggingModule } from "@shrub/logging";
 import { IJob, IJobActiveEventArgs, IJobCompletedEventArgs, IJobFailedEventArgs, IJobOptions, IJobProgressEventArgs, 
     IQueue, IQueueConfiguration, IWorker, IWorkerOptions, QueueAdapter, QueueModule, WorkerCallback
 } from "@shrub/queue";
@@ -39,7 +39,7 @@ export class QueueBullMQModule implements IModule {
     initialize(init: IModuleInitializer): void {
         init.config(IQueueBullMQConfiguration).register(({ services }) => ({
             useQueue: options => this.adapters.push(new QueueBullMQAdapter(
-                services.get(ILogger),
+                services.get(ILoggingService).createLogger(),
                 options && options.connection,
                 options && options.queueNamePatterns,
                 options && options.queueSchedulers))
