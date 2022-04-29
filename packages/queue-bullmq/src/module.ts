@@ -89,6 +89,7 @@ class BullMQWrapper implements IQueue {
 
     add(options: IJobOptions): Promise<IJob> {
         const jobOptions: JobsOptions = {
+            jobId: options.id,
             delay: options.delay,
             repeat: options.repeat && {
                 cron: options.repeat.cron,
@@ -161,6 +162,15 @@ class BullMQWrapper implements IQueue {
             id: job.id || "",
             name: job.name,
             data: job.data,
+            get isActive() {
+                return job.isActive();
+            },
+            get isCompleted() {
+                return job.isCompleted();
+            },
+            get isFailed() {
+                return job.isFailed();
+            },
             get progress() {
                 return job.progress;
             },

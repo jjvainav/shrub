@@ -24,6 +24,9 @@ export interface IJob<TData = any> {
     readonly id: string;
     readonly name: string;
     readonly data: TData;
+    readonly isActive: Promise<boolean>;
+    readonly isCompleted: Promise<boolean>;
+    readonly isFailed: Promise<boolean>;
     readonly progress: number | object;
     updateProgress(progress: number | object): Promise<void>;
     waitUntilFinished(): Promise<any>;
@@ -31,6 +34,8 @@ export interface IJob<TData = any> {
 
 /** Defines options for creating jobs. */
 export interface IJobOptions<TData = any> {
+    /** An optional id to assign to the job; if not provided, the queue will assign a unique id. */
+    readonly id?: string;
     /** A name for the job. */
     readonly name?: string;
     /** Data to pass to the job. */

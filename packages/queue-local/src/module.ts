@@ -23,6 +23,9 @@ export interface IQueueLocalOptions {
 }
 
 interface ILocalJob<TData = any> extends IJob<TData> {
+    _isActive: boolean;
+    _isCompleted: boolean;
+    _isFailed: boolean;
     worker?: ILocalWorker;
 }
 
@@ -77,9 +80,21 @@ export class QueueLocalAdapter extends QueueAdapter {
                     let finished: () => void; 
                     const waitUntilFinished = new Promise<void>(resolve => finished = resolve);
                     const job: ILocalJob = {
-                        id: createId(),
+                        id: options.id || createId(),
                         name: options.name || "",
                         data: options.data || {},
+                        _isActive: false,
+                        _isCompleted: false,
+                        _isFailed: false,
+                        get isActive() {
+                            return Promise.resolve(this._isActive);  
+                        },
+                        get isCompleted() {
+                            return Promise.resolve(this._isCompleted);  
+                        },
+                        get isFailed() {
+                            return Promise.resolve(this._isFailed);  
+                        },
                         progress: 0,
                         updateProgress(progress: number | object) {
                             (<Mutable<ILocalJob>>this).progress = progress;
@@ -153,16 +168,23 @@ export class QueueLocalAdapter extends QueueAdapter {
                     const jobFailed = new EventEmitter<IJobFailedEventArgs>();
                     const jobProgress = new EventEmitter<IJobProgressEventArgs>();
                     const options = this.getWorkerOptions(optionsOrCallback);
-                    const callback: WorkerCallback = (job: ILocalJob) => {
+                    const callback = <WorkerCallback>((job: ILocalJob) => {
+                        job._isActive = true;
                         job.worker = worker;
                         jobActive.emit({ job });
                         return options.callback(job)
                             .then(returnValue => {
+                                job._isActive = false;
+                                job._isCompleted = true;
                                 jobCompleted.emit({ job, returnValue })
                                 return returnValue;
                             })
-                            .catch(error => jobFailed.emit({ job, error }));
-                    };
+                            .catch(error => {
+                                job._isActive = false;
+                                job._isFailed = true;
+                                jobFailed.emit({ job, error });
+                            });
+                    });
                     callbacks.push(callback);
                     const worker: ILocalWorker = {
                         get onJobActive() {
