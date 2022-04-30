@@ -140,7 +140,7 @@ class TestConsumer implements IMessageChannelConsumer {
     subscribe(options: ISubscribeOptions): Promise<ISubscription> {
         this.handlers.push(options.handler);
         return Promise.resolve({
-            unsubscribe: () => {}
+            unsubscribe: () => Promise.resolve()
         });
     }
 }

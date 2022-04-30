@@ -135,13 +135,14 @@ class Subscription implements ISubscription {
         this.connect();
     }
 
-    unsubscribe(): void {
+    unsubscribe(): Promise<void> {
         if (this.stream) {
             this.stream.close();
             this.stream = undefined;
         }
 
         this.closed = true;
+        return Promise.resolve();
     }
 
     private connect(): void {

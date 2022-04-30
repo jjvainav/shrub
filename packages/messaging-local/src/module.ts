@@ -115,6 +115,8 @@ class Consumer implements IMessageConsumer {
                         this.subscriptions.delete(subscription.subscriptionId);
                     }
                 }
+
+                return Promise.resolve();
             }
         });
     }

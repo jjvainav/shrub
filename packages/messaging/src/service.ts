@@ -51,7 +51,7 @@ export interface ISubscribeOptions {
 /** Represents a message consumer subscription. */
 export interface ISubscription {
     /** Unsubscribes from the consumer. */
-    unsubscribe(): void;
+    unsubscribe(): Promise<void>;
 }
 
 /** Defines a consumer for a message broker. */
@@ -123,7 +123,9 @@ export class MessageService implements IMessageService {
                 }
 
                 return Promise.all(subscriptions).then(subscriptions => ({
-                    unsubscribe: () => subscriptions.forEach(subscription => subscription.unsubscribe())
+                    unsubscribe: async () => {
+                        await Promise.all(subscriptions.map(subscription => subscription.unsubscribe()));
+                    }
                 }));
             }
         };
