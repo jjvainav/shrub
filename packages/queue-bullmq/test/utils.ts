@@ -16,4 +16,4 @@ export async function removeAllQueueData(queueName: string): Promise<void> {
         stream.on("error", error => reject(error));
     })
     .finally(() => client.disconnect());
-  }
+}

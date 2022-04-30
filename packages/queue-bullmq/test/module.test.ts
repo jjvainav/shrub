@@ -71,4 +71,24 @@ describe("module", () => {
 
         expect(jobs).toHaveLength(2);
     });
+
+    test("queue multiple simple jobs with a custom concurrency higher than 1", async () => {
+        const job1 = await queue.add({ name: "test-job" });
+        const job2 = await queue.add({ name: "test-job" });
+        const job3 = await queue.add({ name: "test-job" });
+
+        const jobs: IJob[] = [];
+        const worker = queue.createWorker({
+            callback: async job => jobs.push(job),
+            concurrency: 10
+        });
+        
+        await worker.waitUntilReady();
+        await job1.waitUntilFinished();
+        await job2.waitUntilFinished();
+        await job3.waitUntilFinished();
+        await worker.close();
+
+        expect(jobs).toHaveLength(3);
+    });
 });
