@@ -247,6 +247,54 @@ describe("module loader", () => {
     });
 });
 
+describe("module collection", () => {
+    beforeEach(() => capturedModules.length = 0);
+
+    test("dispose with multiple modules", async () => {
+        const disposed: IModule[] = [];
+        const module1: IModule = {
+            name: "1",
+            dispose: () => {
+                disposed.push(module1);
+            }
+        };
+        const module2: IModule = {
+            name: "2",
+            dispose: () => {
+                disposed.push(module2);
+            }
+        };
+        const modules = await ModuleLoader.load([module1, module2]);
+        await modules.dispose();
+
+        expect(disposed).toHaveLength(2);
+    });
+
+    test("dispose with multiple modules asynchronously", async () => {
+        const disposed: IModule[] = [];
+        const module1: IModule = {
+            name: "1",
+            dispose: () => new Promise(resolve => setTimeout(() => {
+                disposed.push(module1);
+                resolve();
+            }, 
+            10))
+        };
+        const module2: IModule = {
+            name: "2",
+            dispose: () => new Promise(resolve => setTimeout(() => {
+                disposed.push(module2);
+                resolve();
+            }, 
+            10))
+        };
+        const modules = await ModuleLoader.load([module1, module2]);
+        await modules.dispose();
+
+        expect(disposed).toHaveLength(2);
+    });
+});
+
 // captures modules when they are configured
 const capturedModules: IModule[] = [];
 

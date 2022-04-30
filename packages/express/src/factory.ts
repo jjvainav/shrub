@@ -1,8 +1,14 @@
 import { IModuleSettingsCollection, IServiceRegistration, ModuleInstanceOrConstructor, ModuleLoader } from "@shrub/core";
+import { IHttpServer } from "@shrub/http";
+import { createHttpTerminator } from "http-terminator";
 import { IExpressApplication } from "./app";
 import { ExpressModule } from "./module";
 
-/** A factory class for registering modules within an Express application context. */
+/** 
+ * A factory class for registering and managing modules within an Express application context. The factory
+ * will provide an Express app instance, automatically close open connections, and dispose the modules when 
+ * the server has been terminated.
+ */
 export class ExpressFactory {
     private readonly modules: ModuleInstanceOrConstructor[] = [ExpressModule];
     private readonly settings: IModuleSettingsCollection[] = [];
@@ -33,7 +39,22 @@ export class ExpressFactory {
             .useModules(this.modules);
 
         this.settings.forEach(cur => loader.useSettings(cur));
-        return loader.load().then(modules => modules.services.get(IExpressApplication));
+        return loader.load().then(modules => {
+            // grab the http server instance used by the app
+            const server: any = modules.services.get(IHttpServer);
+            // the http terminator will monitor connections so they can be closed when terminating the process
+            const httpTerminator = createHttpTerminator({ server });
+
+            // terminate all open connections and dispose the module collection
+            process.once("SIGTERM", () => httpTerminator.terminate().then(() => modules.dispose()
+                .then(() => process.exit(0))
+                .catch(error => {
+                    console.log("Failed to close gracefully.", error);
+                    process.exit(1);
+                })));
+
+            return modules.services.get(IExpressApplication);
+        });
     }
 
     configureServices(callback: (registration: IServiceRegistration) => void): this {

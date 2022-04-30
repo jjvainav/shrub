@@ -45,6 +45,7 @@ export interface IModule {
     initialize?(init: IModuleInitializer): void;
     configureServices?(registration: IServiceRegistration): void;
     configure?(configurator: IModuleConfigurator): void | Promise<void>;
+    dispose?(services: IServiceCollection): void | Promise<void>;
 }
 
 export interface IModuleConfigurationType<T> {
@@ -74,6 +75,8 @@ export interface IModuleInitializer {
 export interface IModuleCollection {
     /** The collection of services for the host. */
     readonly services: IServiceCollection;
+    /** Disposes the collection and all loaded modules. */
+    dispose(): Promise<void>;
     /** Gets the loaded module instance for the specified module constructor. */
     getInstance<T extends IModule>(ctor: ModuleConstructor<T>): T;
 }
@@ -225,6 +228,9 @@ export class ModuleLoader {
         // invoke the iterator to start configuring the modules
         return next().then(() => ({
             services: this.services,
+            dispose: async () => {
+                await Promise.all(loadedModules.map(module => Promise.resolve(module.dispose && module.dispose(this.services))));
+            },
             getInstance: <T extends IModule>(ctor: ModuleConstructor<T>) => {
                 const result = loadedModules.find(module => module instanceof ctor);
                 if (!result) {
