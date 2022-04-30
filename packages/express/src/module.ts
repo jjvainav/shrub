@@ -23,9 +23,11 @@ export class ExpressModule implements IModule {
         registration.registerSingleton(IExpressApplication, {
             create: services => {
                 const app = express();
+                // add an empty dispose, the express factory will override this
+                (<any>app).dispose = () => Promise.resolve();
                 app.use(requestContext(services));
                 this.overrideListen(services, app);
-                return app;
+                return <IExpressApplication><unknown>app;
             }
         });
     }

@@ -45,15 +45,9 @@ export class ExpressFactory {
             // the http terminator will monitor connections so they can be closed when terminating the process
             const httpTerminator = createHttpTerminator({ server });
 
-            // terminate all open connections and dispose the module collection
-            process.once("SIGTERM", () => httpTerminator.terminate().then(() => modules.dispose()
-                .then(() => process.exit(0))
-                .catch(error => {
-                    console.log("Failed to close gracefully.", error);
-                    process.exit(1);
-                })));
-
-            return modules.services.get(IExpressApplication);
+            const app = modules.services.get(IExpressApplication);
+            (<any>app).dispose = () => httpTerminator.terminate().then(() => modules.dispose());
+            return app;
         });
     }
 
