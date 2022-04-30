@@ -41,12 +41,17 @@ export class ExpressFactory {
         this.settings.forEach(cur => loader.useSettings(cur));
         return loader.load().then(modules => {
             // grab the http server instance used by the app
-            const server: any = modules.services.get(IHttpServer);
+            const server = modules.services.get(IHttpServer);
             // the http terminator will monitor connections so they can be closed when terminating the process
             const httpTerminator = createHttpTerminator({ server });
-
             const app = modules.services.get(IExpressApplication);
-            (<any>app).dispose = () => httpTerminator.terminate().then(() => modules.dispose());
+            (<any>app).dispose = async () => {
+                if (server.listening) {
+                    await httpTerminator.terminate();
+                }
+
+                await modules.dispose();
+            };
             return app;
         });
     }
