@@ -123,3 +123,27 @@ export abstract class QueueAdapter implements IQueueAdapter {
         return typeof optionsOrCallback === "function" ? { callback: optionsOrCallback } : optionsOrCallback;
     }
 }
+
+/** A collection of queue adaters and also exposes a queue adapter contract for requesting queues from the collection. */
+export class QueueAdapterCollection {
+    private readonly adapters: IQueueAdapter[] = [];
+
+    addQueueAdapter(adapter: IQueueAdapter): void {
+        this.adapters.push(adapter);
+    }
+
+    asQueueAdapter(): IQueueAdapter {
+        return {
+            getQueue: name => {
+                for (const adapter of this.adapters) {
+                    const queue = adapter.getQueue(name);
+                    if (queue) {
+                        return queue;
+                    }
+                }
+        
+                return undefined;
+            }
+        };
+    }
+}

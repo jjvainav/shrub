@@ -1,7 +1,7 @@
 import { createConfig, IModule, IModuleConfigurator, IModuleInitializer } from "@shrub/core";
 import { ILogger, ILoggingService, LoggingModule } from "@shrub/logging";
 import { IJob, IJobActiveEventArgs, IJobCompletedEventArgs, IJobFailedEventArgs, IJobOptions, IJobProgressEventArgs, 
-    IQueue, IQueueConfiguration, IWorker, IWorkerOptions, QueueAdapter, QueueModule, WorkerCallback
+    IQueue, IQueueConfiguration, IWorker, IWorkerOptions, QueueAdapter, QueueAdapterCollection, QueueModule, WorkerCallback
 } from "@shrub/queue";
 import { EventEmitter } from "@sprig/event-emitter";
 import { ConnectionOptions, Job, JobsOptions, Queue, QueueEvents, QueueScheduler, Worker, WorkerListener } from "bullmq";
@@ -28,7 +28,7 @@ export interface IQueueBullMQOptions {
 export const IQueueBullMQConfiguration = createConfig<IQueueBullMQConfiguration>();
 
 export class QueueBullMQModule implements IModule {
-    private readonly adapters: QueueBullMQAdapter[] = [];
+    private readonly adapters = new QueueAdapterCollection();
 
     readonly name = "queue-bullmq";
     readonly dependencies = [
@@ -38,7 +38,7 @@ export class QueueBullMQModule implements IModule {
 
     initialize(init: IModuleInitializer): void {
         init.config(IQueueBullMQConfiguration).register(({ services }) => ({
-            useQueue: options => this.adapters.push(new QueueBullMQAdapter(
+            useQueue: options => this.adapters.addQueueAdapter(new QueueBullMQAdapter(
                 services.get(ILoggingService).createLogger(),
                 options.connection,
                 options.queueNamePatterns,
@@ -46,10 +46,8 @@ export class QueueBullMQModule implements IModule {
         }));
     }
 
-    async configure({ config, next }: IModuleConfigurator): Promise<void> {
-        await next();
-        const queue = config.get(IQueueConfiguration);
-        this.adapters.forEach(adapter => queue.useQueue(adapter));
+    configure({ config }: IModuleConfigurator): void {
+        config.get(IQueueConfiguration).useQueue(this.adapters.asQueueAdapter());
     }
 }
 

@@ -1,5 +1,5 @@
 import { createService, Singleton } from "@shrub/core";
-import { IQueue, IQueueAdapter } from "./queue";
+import { IQueue, IQueueAdapter, QueueAdapterCollection } from "./queue";
 
 export interface IQueueService {
     getQueue(name: string): IQueue;
@@ -19,20 +19,19 @@ export const IQueueAdapterService = createService<IQueueAdapterService>("queue-a
 /** @internal */
 @Singleton
 export class QueueService implements IQueueService, IQueueAdapterService {
-    private readonly adapters: IQueueAdapter[] = [];
+    private readonly adapters = new QueueAdapterCollection();
 
     getQueue(name: string): IQueue {
-        for (const adapter of this.adapters) {
-            const queue = adapter.getQueue(name);
-            if (queue) {
-                return queue;
-            }
+        const queue = this.adapters.asQueueAdapter().getQueue(name);
+
+        if (!queue) {
+            throw new Error(`No queue adapter found to handle queue with name (${name}).`);
         }
 
-        throw new Error(`No queue adapter found to handle queue with name (${name}).`);
+        return queue;
     }
 
     register(adapter: IQueueAdapter): void {
-        this.adapters.push(adapter);
+        this.adapters.addQueueAdapter(adapter);
     }
 }
