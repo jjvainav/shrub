@@ -1,7 +1,7 @@
 {
     "name": "@shrub/request-client-logging",
     "description": "Provides functionality for integrating the request-client with the logging module and service.",
-    "version": "0.5.67",
+    "version": "0.5.68",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -21,8 +21,8 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.67",
-        "@shrub/logging": "0.5.67",
+        "@shrub/core": "0.5.68",
+        "@shrub/logging": "0.5.68",
         "@sprig/request-client": "^0.2.1"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
