@@ -43,6 +43,17 @@ describe("module", () => {
         expect(queuedJob!.id).toBe(job.id);
     });
 
+    test("queue simple job that returns a result", async () => {
+        const worker = queue.createWorker(() => new Promise(resolve => setTimeout(() => resolve("foo"), 0)));
+        await worker.waitUntilReady();
+
+        const job = await queue.add({ name: "test-job" });
+        const result = await job.waitUntilFinished();
+        await worker.close();
+
+        expect(result).toBe("foo");
+    });
+
     test("queue multiple simple jobs with the same job name before starting worker", async () => {
         const job1 = await queue.add({ name: "test-job" });
         const job2 = await queue.add({ name: "test-job" });

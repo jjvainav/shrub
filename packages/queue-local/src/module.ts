@@ -67,19 +67,26 @@ export class QueueLocalAdapter extends QueueAdapter {
                 return callbacks.length ? callbacks[index++] : undefined;
             };
 
-            const pushJob = (job: IJob, onFinished: () => void) => asyncQueue.push(async () => {
+            const pushJob = (job: IJob, onFinished: (returnValue: any) => void, onFailed: (reason: any) => void) => asyncQueue.push(async () => {
                 // TODO: how to handle if there are no handlers for the queue?
                 const callback = getCallback();
                 if (callback) {
-                    await callback(job).finally(() => onFinished());
+                    //await callback(job).finally(returnValue => onFinished(returnValue));
+                    await callback(job)
+                        .then(returnValue => onFinished(returnValue))
+                        .catch(reason => onFailed(reason));
                 }
             });
 
             queue = {
                 name,
                 add: options => {
-                    let finished: () => void; 
-                    const waitUntilFinished = new Promise<void>(resolve => finished = resolve);
+                    let failed: (reason: any) => void;
+                    let finished: (result: any) => void; 
+                    const waitUntilFinished = new Promise<any>((resolve, reject) => {
+                        failed = reject;
+                        finished = resolve;
+                    });
                     const job: ILocalJob = {
                         id: options.id || createId(),
                         name: options.name || "",
@@ -124,8 +131,9 @@ export class QueueLocalAdapter extends QueueAdapter {
                         return undefined;
                     };
 
-                    const onFinished = () => {
-                        finished();
+                    const onFailed = (reason: any) => failed(reason);
+                    const onFinished = (returnValue: any) => {
+                        finished(returnValue);
                         if (options.repeat && options.repeat.cron) {
                             queue!.add({
                                 name: options.name,
@@ -139,10 +147,10 @@ export class QueueLocalAdapter extends QueueAdapter {
 
                     const delay = getDelay(options);
                     if (delay !== undefined) {
-                        setTimeout(() => pushJob(job, onFinished), delay);
+                        setTimeout(() => pushJob(job, onFinished, onFailed), delay);
                     }
                     else {
-                        pushJob(job, onFinished);
+                        pushJob(job, onFinished, onFailed);
                     }
 
                     return Promise.resolve(job);
