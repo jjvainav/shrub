@@ -6,8 +6,16 @@ export type JobReturnValue<T> = T extends JobType<any, infer TReturnValue> ? TRe
 export type JobType<TData = any, TReturnValue = void> = {};
 export type JobTypes = { [key: string]: JobType<any> };
 
+/** Defines the contract for the queue manager. */
+export interface IQueueManager<TJobTypes extends JobTypes> {
+    add<T extends keyof TJobTypes>(name: T, data: JobData<TJobTypes[T]>, repeat?: IJobRepeatOptions): Promise<IJob<JobData<TJobTypes[T]>, JobReturnValue<TJobTypes[T]>> | undefined>;
+    close<T extends keyof TJobTypes>(name?: T): Promise<void>;
+    dispose(): Promise<void>;
+    process<T extends keyof TJobTypes>(name: T, callback: WorkerCallback<JobData<TJobTypes[T]>, JobReturnValue<TJobTypes[T]>>): IWorker<JobData<TJobTypes[T]>, JobReturnValue<TJobTypes[T]>> | undefined;
+}
+
 /** A helper class responsible for managing multiple queues. The manager will maintain a single instance of each queue as they are referenced. */
-export class QueueManager<TJobTypes extends JobTypes> {
+export class QueueManager<TJobTypes extends JobTypes> implements IQueueManager<TJobTypes> {
     private readonly queues = new Map<keyof TJobTypes, IQueue>();
     private isDisposed = false;
 
