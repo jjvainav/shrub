@@ -1,7 +1,7 @@
 {
     "name": "@shrub/queue-local",
     "description": "Provides a job/worker queue that runs locally.",
-    "version": "0.5.71",
+    "version": "0.5.72",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -24,9 +24,9 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.71",
-        "@shrub/logging": "0.5.71",
-        "@shrub/queue": "0.5.71",
+        "@shrub/core": "0.5.72",
+        "@shrub/logging": "0.5.72",
+        "@shrub/queue": "0.5.72",
         "@sprig/async-queue": "0.2.2",
         "@sprig/event-emitter": "^0.2.2",
         "@sprig/unique-id": "^0.2.2",
