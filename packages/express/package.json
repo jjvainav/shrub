@@ -1,7 +1,7 @@
 {
     "name": "@shrub/express",
     "description": "A module that adds support for Express based apps.",
-    "version": "0.5.72",
+    "version": "0.5.73",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -25,8 +25,8 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/core": "0.5.72",
-        "@shrub/http": "0.5.72",
+        "@shrub/core": "0.5.73",
+        "@shrub/http": "0.5.73",
         "express": "^4.17.1",
         "http-terminator": "^3.2.0"
     },
