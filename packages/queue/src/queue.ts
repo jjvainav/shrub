@@ -1,7 +1,7 @@
 import { IEvent } from "@sprig/event-emitter";
 import { QueueAdapterWhitelist } from "./whitelist";
 
-export type WorkerCallback<TData = any, TReturnValue = any> = (job: IJob<TData, TReturnValue>) => Promise<void | TReturnValue>;
+export type WorkerCallback<TData = any, TReturnValue = void> = (job: IJob<TData, TReturnValue>) => Promise<TReturnValue>;
 
 /** Defines the API for a queue. */
 export interface IQueue<TData = any, TReturnValue = any> {
