@@ -19,6 +19,8 @@ export interface IQueue<TData = any, TReturnValue = any> {
 
 /** Responsible for providing access to a queue. */
 export interface IQueueAdapter {
+    /** Optional callback to dispose the adapter. */
+    readonly dispose?: () => Promise<void>;
     /** Gets a queue with the specified name or undefined if the adapter does not support/recognize the given queue name. */
     getQueue(name: string): IQueue | undefined;
 }
@@ -145,5 +147,17 @@ export class QueueAdapterCollection {
                 return undefined;
             }
         };
+    }
+
+    async dispose(): Promise<void> {
+        const promises: Promise<void>[] = [];
+        
+        for (const adapter of this.adapters.splice(0)) {
+            if (adapter.dispose) {
+                promises.push(adapter.dispose());
+            }
+        }
+
+        await Promise.all(promises);
     }
 }

@@ -19,9 +19,11 @@ export interface IQueueBullMQConfiguration {
 export interface IQueueBullMQOptions {
     /** BullMQ connection options for connecting to Redis. */
     readonly connection: ConnectionOptions;
+    /** True to enable queue events that are required when waiting for jobs to finish; this is false by default. */
+    readonly enableEvents?: boolean;
     /** A set of queue name patterns defining the queues the BullMQ adapter will handle; if not defined, BullMQ job queue will be used for all queues. */
     readonly queueNamePatterns?: string[];
-    /** A set of queue names that are expected to process delayed or preating jobs. By default, BullMQ will not process these jobs unless explicitely defined. See https://docs.bullmq.io/guide/queuescheduler  */
+    /** A set of queue names that are expected to process delayed or repeating jobs. By default, BullMQ will not process these jobs unless explicitely defined. See https://docs.bullmq.io/guide/queuescheduler  */
     readonly queueSchedulers?: string[];
 }
 
@@ -41,6 +43,7 @@ export class QueueBullMQModule implements IModule {
             useQueue: options => this.adapters.addQueueAdapter(new QueueBullMQAdapter(
                 services.get(ILoggingService).createLogger(),
                 options.connection,
+                !!options.enableEvents,
                 options.queueNamePatterns,
                 options.queueSchedulers))
         }));
@@ -49,43 +52,56 @@ export class QueueBullMQModule implements IModule {
     configure({ config }: IModuleConfigurator): void {
         config.get(IQueueConfiguration).useQueue(this.adapters.asQueueAdapter());
     }
+
+    dispose(): Promise<void> {
+        return this.adapters.dispose();
+    }
 }
 
 export class QueueBullMQAdapter extends QueueAdapter {
+    private readonly schedulers: QueueScheduler[] = [];
+
     constructor(
         private readonly logger: ILogger,
         private readonly connection: ConnectionOptions,
+        private readonly enableEvents: boolean,
         queueNamePatterns?: string[],
         queueSchedulers?: string[]) {
             super(queueNamePatterns || ["*"]);
             this.initializeSchedulers(queueSchedulers || []);
     }
 
+    async dispose(): Promise<void> {
+        await Promise.all(this.schedulers.splice(0).map(scheduler => scheduler.close()));
+    }
+
     protected getQueueInstance(name: string): IQueue {
-        return new BullMQWrapper(this.logger, this.connection, name);
+        return new BullMQWrapper(this.logger, this.connection, this.enableEvents, name);
     }
 
     private initializeSchedulers(queueSchedulers: string[]): void {
-        // TODO: is support needed to close the schedulers?
-        queueSchedulers.forEach(name => new QueueScheduler(name, { connection: this.connection }));
+        queueSchedulers.forEach(name => this.schedulers.push(new QueueScheduler(name, { connection: this.connection })));
     }
 }
 
 class BullMQWrapper implements IQueue {
     private readonly workers = new Map<number, Worker>();
 
-    private readonly events: QueueEventsReference;
+    private events?: QueueEvents;
     private instance?: Queue;
     private workerId = 1;
 
     constructor(
         private readonly logger: ILogger,
         private readonly connection: ConnectionOptions,
+        enableEvents: boolean,
         readonly name: string) {
-            this.events = new QueueEventsReference(name, connection);
+            if (enableEvents) {
+                this.events = new QueueEvents(name, { connection });
+            }
     }
 
-    add(options: IJobOptions): Promise<IJob> {
+    async add(options: IJobOptions): Promise<IJob> {
         const jobOptions: JobsOptions = {
             jobId: options.id,
             delay: options.delay,
@@ -94,6 +110,10 @@ class BullMQWrapper implements IQueue {
                 immediately: options.repeat.immediate
             }
         };
+
+        if (this.events) {
+            await this.events.waitUntilReady();
+        }
 
         return this.getInstance().add(options.name || "", options.data || {}, jobOptions).then(job => this.convertJob(job));
     }
@@ -105,6 +125,11 @@ class BullMQWrapper implements IQueue {
         if (this.instance) {
             promises.push(this.instance.close());
             this.instance = undefined;
+        }
+
+        if (this.events) {
+            promises.push(this.events.close());
+            this.events = undefined;
         }
 
         await Promise.all(promises);
@@ -178,7 +203,13 @@ class BullMQWrapper implements IQueue {
                 return job.progress;
             },
             updateProgress: progress => job.updateProgress(progress),
-            waitUntilFinished: () => job.waitUntilFinished(this.events.getInstance()).finally(() => this.events.releaseInstance())
+            waitUntilFinished: async () => {
+                if (!this.events) {
+                    throw new Error("enableEvents must be true in order to wait for a job to finish.");
+                }
+
+                return job.waitUntilFinished(this.events);
+            }
         };
     }
 
@@ -214,34 +245,6 @@ class WorkerEventEmitter<TArgs, T extends keyof WorkerListener> extends EventEmi
     protected callbackUnregistered(): void {
         if (this.count === 0) {
             this.worker.off(this.name, this.listener);
-        }
-    }
-}
-
-/** 
- * Manages a reference to a QueueEvents object and will close the connection when all references have been released. 
- * BullMQ uses Redis Streams so only open a connection when necessary. 
- */
-class QueueEventsReference {
-    private events?: QueueEvents;
-    private count = 0;
-
-    constructor(
-        private readonly queueName: string,
-        private readonly connection?: ConnectionOptions) {
-    }
-
-    getInstance(): QueueEvents {
-        this.events = this.events || new QueueEvents(this.queueName, { connection: this.connection });
-        this.count++;
-        return this.events;
-    }
-
-    releaseInstance(): void {
-        this.count--;
-        if (!this.count && this.events) {
-            this.events.close();
-            this.events = undefined;
         }
     }
 }

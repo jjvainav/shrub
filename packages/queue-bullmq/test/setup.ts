@@ -2,7 +2,8 @@ import { ModuleLoader } from "@shrub/core";
 import { IQueueService } from "@shrub/queue";
 import { IQueueBullMQConfiguration, IQueueBullMQOptions, QueueBullMQModule } from "../src/module";
 
-interface ITestContext {
+export interface ITestContext {
+    readonly done: () => Promise<void>;
     readonly queueService: IQueueService;
 }
 
@@ -16,10 +17,14 @@ export function setup(options?: Partial<IQueueBullMQOptions>): Promise<ITestCont
                     host: "localhost",
                     port: 6379
                 },
+                enableEvents: true,
                 queueNamePatterns: options && options.queueNamePatterns,
                 queueSchedulers: options && options.queueSchedulers
             });
         }
     }])
-    .then(collection => ({ queueService: collection.services.get(IQueueService) }));
+    .then(collection => ({ 
+        done: () => collection.dispose(),
+        queueService: collection.services.get(IQueueService) 
+    }));
 }
