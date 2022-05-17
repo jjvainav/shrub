@@ -36,6 +36,25 @@ describe("module", () => {
         expect(message.data).toBe("Hello");
     });
 
+    test("verify await message send", async () => {
+        const context = await setupTest();
+        const messaging = context.services.get(IMessageService);
+
+        let message: IMessage | undefined;
+        await messaging.getConsumer().subscribe("*", { 
+            subscriptionId: "1",
+            handler: m => new Promise(resolve => setTimeout(() => {
+                message = m;
+                resolve();
+            }, 
+            0))
+        });
+
+        await messaging.getProducer().send("foo", { data: "Hello" });
+
+        expect(message!.data).toBe("Hello");
+    });
+
     test("verify producer doesn't send message to subscriber of a different channel", async () => {
         const context = await setupTest();
         const messaging = context.services.get(IMessageService);

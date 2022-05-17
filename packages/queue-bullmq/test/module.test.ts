@@ -104,6 +104,51 @@ describe("module", () => {
         expect(result[2]).toBe(1);
     });
 
+    test("queue multiple jobs that return a value with custom concurrency and wait for close", async () => {
+        const worker = queue.createWorker({
+            callback: job => new Promise(resolve => setTimeout(() => resolve(job.data.value), 10)),
+            concurrency: 5
+        });
+
+        let count = 0;
+        worker.onJobCompleted(() => count++);
+
+        await worker.waitUntilReady();
+
+        for (let i = 0; i < 10; i++) {
+            await queue.add({ name: "test-job", data: { value: 1 } });
+        }
+
+        await worker.close();
+
+        // the worker will queue up 5 jobs that will process before closing the worker
+        expect(count).toBe(5);
+    });
+
+    test("queue multiple jobs that return void with custom concurrency and wait for close", async () => {
+        const worker = queue.createWorker({
+            callback: () => {
+                const promise = new Promise<void>(resolve => setTimeout(() => resolve(), 10));
+                return promise.then(() => {});
+            },
+            concurrency: 5
+        });
+
+        let count = 0;
+        worker.onJobCompleted(() => count++);
+
+        await worker.waitUntilReady();
+
+        for (let i = 0; i < 10; i++) {
+            await queue.add({ name: "test-job", data: {} });
+        }
+
+        await worker.close();
+
+        // the worker will queue up 5 jobs that will process before closing the worker
+        expect(count).toBe(5);
+    });
+
     test("queue multiple simple jobs with the same job name before starting worker", async () => {
         const job1 = await queue.add({ name: "test-job" });
         const job2 = await queue.add({ name: "test-job" });

@@ -5,7 +5,7 @@ import { EventMessage } from "./event";
 /** Handles publishing events against a message producer. */
 export interface IEventPublisher {
     /** Publishes an event against the specified channel. */
-    publish(channel: string, event: IEventDetails): void;
+    publish(channel: string, event: IEventDetails): Promise<void>;
 }
 
 /** Defines the details for an event to be published. */
@@ -25,8 +25,8 @@ export class EventPublisher implements IEventPublisher {
     constructor(@IMessageProducer private readonly producer: IMessageProducer) {
     }
 
-    publish(channel: string, event: IEventDetails): void {
-        this.producer.send(channel, {
+    publish(channel: string, event: IEventDetails): Promise<void> {
+        return this.producer.send(channel, {
             metadata: {
                 ...event.metadata,
                 [`${EventMessage.Metadata.eventType}`]: event.eventType

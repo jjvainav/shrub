@@ -124,7 +124,9 @@ class TestBroker implements IMessageBrokerAdapter {
                     if (isChannelNameMatch(item[0], channelName)) {
                         item[1].send(message, channelName);
                     }
-                }      
+                }
+                
+                return Promise.resolve();
             }
         };
     }

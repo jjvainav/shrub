@@ -63,7 +63,7 @@ export interface IMessageConsumer {
 /** Handles sending messages. */
 export interface IMessageProducer {
     /** Sends a message to consumers subscribed to the specified channel. */
-    send(channelName: string, message: IMessageDetails): void;
+    send(channelName: string, message: IMessageDetails): Promise<void>;
 }
 
 /** Defines a consumer for a specific channel. */
@@ -75,7 +75,7 @@ export interface IMessageChannelConsumer {
 /** Defines a producer for sending messages over a specific channel. */
 export interface IMessageChannelProducer {
     /** Sends a message on the channel. */
-    send(message: IMessageDetails): void;
+    send(message: IMessageDetails): Promise<void>;
 }
 
 export const IMessageService = createService<IMessageService>("message-service");
@@ -133,7 +133,7 @@ export class MessageService implements IMessageService {
 
     getProducer(): IMessageProducer {
         return {
-            send: (channelName, message) => {
+            send: async (channelName, message) => {
                 const producers: IMessageChannelProducer[] = [];
 
                 for (const adapter of this.adapters) {
@@ -149,7 +149,7 @@ export class MessageService implements IMessageService {
                     throw new Error(`No registered message brokers to handle channel producer (${channelName}).`);
                 }
 
-                producers.forEach(producer => producer.send(message));
+                await Promise.all(producers.map(producer => producer.send(message)));
             }
         };
     }
