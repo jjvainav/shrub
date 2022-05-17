@@ -56,7 +56,7 @@ export class EventStreamProducerService implements IEventStreamProducerService {
 
     getMessageChannelProducer(channelName: string): IMessageChannelProducer | undefined {
         return this.whitelist.isChannelSupported(channelName) 
-            ? { send: message => this.sendMessage(channelName, message) }
+            ? { send: async message => this.sendMessage(channelName, message) }
             : undefined;
     }
 
