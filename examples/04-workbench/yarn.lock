@@ -944,14 +944,19 @@
     vue "^2.6.10"
     vue-class-component "^7.1.0"
 
-"@sprig/event-emitter-dom@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.2.0.tgz#413d432e7a77ac483aaa3dbbc6fd027badca31f7"
-  integrity sha512-Rtx9N9ojfFGDmQLHfhc+maUSA8SCx/YvQXXXM+1uTtCdSFJVVf5p/hQyJeB6PB30g9ay7HzJBTS7YFDmgBL7TA==
+"@sprig/event-emitter-dom@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.2.3.tgz#63ffaa459bae9ca516da474b34b1032e340a9c17"
+  integrity sha512-8E5lwcH+hxszzDigqISd4xkpqH0QgwAxTh6O0QmkYhWj2hjlZ7i1Y5I56ELu1ch1UHnMttWhLtYbKw2Rt4s9/w==
   dependencies:
-    "@sprig/event-emitter" "0.2.0"
+    "@sprig/event-emitter" "0.2.3"
 
-"@sprig/event-emitter@0.2.0", "@sprig/event-emitter@^0.2.0":
+"@sprig/event-emitter@0.2.3", "@sprig/event-emitter@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.2.3.tgz#04274f56f8e00dcada7670151f53bc8bc01b0bb8"
+  integrity sha512-/9tsjKQkGgshwVZGF0BbO444sb2V9ITW/kvM0bG/QJXb9va+6clMPp7EmhmGcGB4dMWXXjjDC/7mn/TJf2biAA==
+
+"@sprig/event-emitter@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.2.0.tgz#1cc2b4a464c96066c370127d71e12160124cafbf"
   integrity sha512-IbgMo7/cHPe4ZjcvHzBmsBO58lqz1woA4kQCdF8kLR5DxsnnA5ALA8BGNdRi08V6jch6yTKNktn02M4+U88h9A==
@@ -1514,11 +1519,11 @@ aws4@^1.8.0:
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
 
 axios@^0.21.1:
-  version "0.21.1"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.1.tgz#22563481962f4d6bde9a76d516ef0e5d3c09b2b8"
-  integrity sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==
+  version "0.21.2"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.2.tgz#21297d5084b2aeeb422f5d38e7be4fbb82239017"
+  integrity sha512-87otirqUw3e8CzHTMO+/9kh/FSgXt/eVDvipijwDtEuwbkySWZ9SBm6VEubmJ/kLKEoLQV/POhxXFb66bfekfg==
   dependencies:
-    follow-redirects "^1.10.0"
+    follow-redirects "^1.14.0"
 
 backo2@~1.0.2:
   version "1.0.2"
@@ -2808,10 +2813,10 @@ find-up@^4.0.0, find-up@^4.1.0:
     locate-path "^5.0.0"
     path-exists "^4.0.0"
 
-follow-redirects@^1.10.0:
-  version "1.14.1"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.1.tgz#d9114ded0a1cfdd334e164e6662ad02bfd91ff43"
-  integrity sha512-HWqDgT7ZEkqRzBvc2s64vSZ/hfOceEol3ac/7tKwzuvEyWx3/4UegXh5oBOIotkGsObyk3xznnSRVADBgWSQVg==
+follow-redirects@^1.14.0:
+  version "1.15.1"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.1.tgz#0ca6a452306c9b276e4d3127483e29575e207ad5"
+  integrity sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==
 
 forever-agent@~0.6.1:
   version "0.6.1"
