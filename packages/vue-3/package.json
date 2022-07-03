@@ -1,7 +1,7 @@
 {
     "name": "@shrub/vue-3",
     "description": "A module that adds support for Vue 3 based apps.",
-    "version": "0.5.75",
+    "version": "0.5.76",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -22,7 +22,7 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.75",
+        "@shrub/core": "0.5.76",
         "vue": "^3.2.20"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
