@@ -944,14 +944,19 @@
     vue "^2.6.10"
     vue-class-component "^7.1.0"
 
-"@sprig/event-emitter-dom@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.2.0.tgz#413d432e7a77ac483aaa3dbbc6fd027badca31f7"
-  integrity sha512-Rtx9N9ojfFGDmQLHfhc+maUSA8SCx/YvQXXXM+1uTtCdSFJVVf5p/hQyJeB6PB30g9ay7HzJBTS7YFDmgBL7TA==
+"@sprig/event-emitter-dom@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.2.3.tgz#63ffaa459bae9ca516da474b34b1032e340a9c17"
+  integrity sha512-8E5lwcH+hxszzDigqISd4xkpqH0QgwAxTh6O0QmkYhWj2hjlZ7i1Y5I56ELu1ch1UHnMttWhLtYbKw2Rt4s9/w==
   dependencies:
-    "@sprig/event-emitter" "0.2.0"
+    "@sprig/event-emitter" "0.2.3"
 
-"@sprig/event-emitter@0.2.0", "@sprig/event-emitter@^0.2.0":
+"@sprig/event-emitter@0.2.3", "@sprig/event-emitter@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.2.3.tgz#04274f56f8e00dcada7670151f53bc8bc01b0bb8"
+  integrity sha512-/9tsjKQkGgshwVZGF0BbO444sb2V9ITW/kvM0bG/QJXb9va+6clMPp7EmhmGcGB4dMWXXjjDC/7mn/TJf2biAA==
+
+"@sprig/event-emitter@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.2.0.tgz#1cc2b4a464c96066c370127d71e12160124cafbf"
   integrity sha512-IbgMo7/cHPe4ZjcvHzBmsBO58lqz1woA4kQCdF8kLR5DxsnnA5ALA8BGNdRi08V6jch6yTKNktn02M4+U88h9A==
@@ -1925,7 +1930,7 @@ component-emitter@~1.3.0:
 concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
-  integrity sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=
+  integrity sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==
 
 concat-stream@^2.0.0:
   version "2.0.0"
@@ -4076,9 +4081,9 @@ min-indent@^1.0.0:
   integrity sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==
 
 minimatch@^3.0.3, minimatch@^3.0.4, minimatch@~3.0.2:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
-  integrity sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.8.tgz#5e6a59bd11e2ab0de1cfb843eb2d82e546c321c1"
+  integrity sha512-6FsRAQsxQ61mw+qP1ZzbL9Bc78x2p5OqNgNpnoAFLTrX8n5Kxph0CsnhmKKNXTWjXqU5L0pGPR7hYk+XWZr60Q==
   dependencies:
     brace-expansion "^1.1.7"
 
