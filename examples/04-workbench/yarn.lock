@@ -944,14 +944,19 @@
     vue "^2.6.10"
     vue-class-component "^7.1.0"
 
-"@sprig/event-emitter-dom@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.2.0.tgz#413d432e7a77ac483aaa3dbbc6fd027badca31f7"
-  integrity sha512-Rtx9N9ojfFGDmQLHfhc+maUSA8SCx/YvQXXXM+1uTtCdSFJVVf5p/hQyJeB6PB30g9ay7HzJBTS7YFDmgBL7TA==
+"@sprig/event-emitter-dom@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter-dom/-/event-emitter-dom-0.2.3.tgz#63ffaa459bae9ca516da474b34b1032e340a9c17"
+  integrity sha512-8E5lwcH+hxszzDigqISd4xkpqH0QgwAxTh6O0QmkYhWj2hjlZ7i1Y5I56ELu1ch1UHnMttWhLtYbKw2Rt4s9/w==
   dependencies:
-    "@sprig/event-emitter" "0.2.0"
+    "@sprig/event-emitter" "0.2.3"
 
-"@sprig/event-emitter@0.2.0", "@sprig/event-emitter@^0.2.0":
+"@sprig/event-emitter@0.2.3", "@sprig/event-emitter@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.2.3.tgz#04274f56f8e00dcada7670151f53bc8bc01b0bb8"
+  integrity sha512-/9tsjKQkGgshwVZGF0BbO444sb2V9ITW/kvM0bG/QJXb9va+6clMPp7EmhmGcGB4dMWXXjjDC/7mn/TJf2biAA==
+
+"@sprig/event-emitter@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.2.0.tgz#1cc2b4a464c96066c370127d71e12160124cafbf"
   integrity sha512-IbgMo7/cHPe4ZjcvHzBmsBO58lqz1woA4kQCdF8kLR5DxsnnA5ALA8BGNdRi08V6jch6yTKNktn02M4+U88h9A==
@@ -2256,9 +2261,9 @@ decamelize@^1.1.0, decamelize@^1.1.2, decamelize@^1.2.0:
   integrity sha1-9lNNFRSCabIDUue+4m9QH5oZEpA=
 
 decode-uri-component@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.0.tgz#eb3913333458775cb84cd1a1fae062106bb87545"
-  integrity sha1-6zkTMzRYd1y4TNGh+uBiEGu4dUU=
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.2.tgz#e69dbe25d37941171dd540e024c444cd5188e1e9"
+  integrity sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==
 
 dedent@^0.7.0:
   version "0.7.0"
