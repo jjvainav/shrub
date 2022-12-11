@@ -12,7 +12,7 @@
     "dependencies": {
         "@shrub/core": "^0.5.49",
         "@shrub/express": "^0.5.49",
-        "express": "^4.17.1"
+        "express": "^4.17.3"
     },
     "devDependencies": {
         "@types/express": "4.17.9",
