@@ -13,7 +13,7 @@
     "dependencies": {
         "@shrub/express": "^0.5.49",
         "@shrub/vue-server": "^0.5.49",
-        "express": "^4.17.1",
+        "express": "^4.17.3",
         "vue": "^2.6.10",
         "vue-server-renderer": "^2.6.10"
     },
