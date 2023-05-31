@@ -96,8 +96,11 @@ export interface IServiceRegistration {
 }
 
 export interface IServiceCollection {
-    /** Creates a scoped collection. */
-    createScope(): IScopedServiceCollection;
+    /** 
+     * Creates a scoped collection and optionally allows registering services into the scoped service collection. 
+     * Note: overwriting existing services are not allowed with scoped service collections.
+     */
+    createScope(register?: (registration: IServiceRegistration) => void): IScopedServiceCollection;
     /** Gets an instance of the registered service. */
     get<T>(serviceOrKey: IService<T> | string): T;
     /** True if a service has been registered. */
@@ -197,7 +200,7 @@ export function createOptions<T>(key: string, defaultOptions?: T): IOptions<T> {
         (<IOptions<T>>options).register((obj, invalid) => {
             for (const prop of props) {
                 if (obj[prop] === undefined) {
-                    invalid(new OptionsValidationError(`Options (${key}) property (${prop}) is required.`));
+                    invalid(new OptionsValidationError(`Options (${key}) property (${String(prop)}) is required.`));
                     break;
                 }
             }
@@ -291,10 +294,9 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
     private readonly instances = new Map<string, any>();
     private isFrozen?: boolean;
 
-    /** Creates a new ServiceMap instance; note: the services parameter is for internal purposes and should not be used. */
-    constructor(private readonly services = new Map<string, IServiceEntry>()) {
-        // assume this is a scoped service if the provided map already has entries
-        if (!services.size) {
+    /** Creates a new ServiceMap instance; note: the parameters are for internal purposes and should not be used. */
+    constructor(private readonly services = new Map<string, IServiceEntry>(), readonly isScoped = false) {
+        if (!isScoped) {
             // the thisFactory is used to return the appropriate ServiceMap instance since the IInstantiationService and IServiceCollection services need to be scoped
             const thisFactory: IServiceFactory<IServiceCollection> = { create: service => service };
             this.registerService(IInstantiationService, ServiceScope.scoped, thisFactory, { sealed: true });
@@ -317,12 +319,18 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
             : this.createObjectInstance(ctorOrInjectable);
     }
 
-    createScope(): IScopedServiceCollection {
+    createScope(register?: (registration: IServiceRegistration) => void): IScopedServiceCollection {
         const parent = this;
         const getOrCreateServiceInstanceFromParent = this.getOrCreateServiceInstance.bind(this);
         return new class extends ServiceMap implements IDisposable {
             constructor() {
-                super(parent.services);
+                // if registering new services we need to copy the current entries into a new map; otherwise, pass a reference to the parent's set of services
+                super(register ? new Map(parent.services) : parent.services, /* isScoped */ true);
+
+                if (register) {
+                    register(this);
+                }
+
                 this.freeze();
             }
 
@@ -339,10 +347,13 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
             }
 
             protected getOrCreateServiceInstance(key: string, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): any {
-                const entry = this.services.get(key);
-                if (entry !== undefined && (entry.scope === ServiceScope.singleton || entry.scope === ServiceScope.instance)) {
-                    // if the service is an instance or singleton call up the parent chain and get the instance from the root
-                    return getOrCreateServiceInstanceFromParent(key, rootScope, ancestors);
+                // if the service is registered direclty with the scoped service collection the parent collection will not be aware so check that first
+                if (parent.has(key)) {
+                    const entry = this.services.get(key);
+                    if (entry !== undefined && entry.scope !== ServiceScope.scoped) {
+                        // if the service is non-scoped call up the parent chain and get the instance from the root
+                        return getOrCreateServiceInstanceFromParent(key, rootScope, ancestors);
+                    }
                 }
 
                 return super.getOrCreateServiceInstance(key, rootScope, ancestors);
@@ -361,6 +372,10 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
     registerInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance, options?: IServiceRegistrationOptions): void {
         if (instance === undefined) {
             throw new Error("instance undefined");
+        }
+
+        if (this.isScoped && this.services.has(service.key)) {
+            throw new Error(`Service with key (${service.key}) cannot be overridden.`);
         }
 
         // TODO: check if the instance constructor has a required scope - if so, verify its a singleton
@@ -469,7 +484,7 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         }
 
         const current = this.services.get(service.key);
-        if (current && current.sealed) {
+        if (current && (current.sealed || this.isScoped)) {
             return "sealed";
         }
 

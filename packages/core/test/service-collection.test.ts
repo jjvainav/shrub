@@ -500,7 +500,7 @@ describe("service options", () => {
             services.getOptions(ITestOptionsWithValidation);
             fail();
         }
-        catch (err) {
+        catch (err: any) {
             expect(err.message).toBe("Options (test-with-validation) property (foo) is required.");
         }
     });    
@@ -585,7 +585,7 @@ describe("service dependency injection", () => {
             services.get(ICircular1Service);
             fail();
         }
-        catch (err) {
+        catch (err: any) {
             expect((<string>err.message).indexOf("Circular dependency detected")).toBeGreaterThan(-1);
         }        
     });
@@ -600,7 +600,7 @@ describe("service dependency injection", () => {
             services.get(IParentSingletonService);
             fail();
         }
-        catch (err) {
+        catch (err: any) {
             expect((<string>err.message).indexOf("Scoped services should only be referenced by Transient or other Scoped services.")).toBeGreaterThan(-1);
         }        
     });
@@ -727,6 +727,109 @@ describe("service scope", () => {
         const scope = parent.createScope();
         const instantiation = scope.get(IInstantiationService);
         expect(instantiation).toBe(scope);
+    });
+
+    test("register new transient services with scoped service collection", () => {
+        const parent = new ServiceMap();
+        const scope1 = parent.createScope(registration => registration.registerTransient(IFooService, FooBarService));
+        const scope2 = scope1.createScope(registration => registration.registerTransient(IBarService, FooBarService));
+
+        const scope1Services = scope1.tryGet(IServiceCollection);
+        const scope2Services = scope2.tryGet(IServiceCollection);
+
+        const foo0 = parent.tryGet(IFooService);
+        const bar0 = parent.tryGet(IBarService);
+
+        const foo1 = scope1.tryGet(IFooService);
+        const bar1 = scope1.tryGet(IBarService);
+
+        const foo2 = scope2.tryGet(IFooService);
+        const bar2 = scope2.tryGet(IBarService);
+
+        expect(scope1Services).toBe(scope1);
+        expect(scope2Services).toBe(scope2);
+        
+        expect(foo0).toBeUndefined();
+        expect(bar0).toBeUndefined();
+        
+        expect(foo1).toBeDefined();
+        expect(bar1).toBeUndefined();
+
+        expect(foo2).toBeDefined();
+        expect(bar2).toBeDefined();
+    });
+
+    test("register new singleton services with scoped service collection", () => {
+        const parent = new ServiceMap();
+        const scope1 = parent.createScope(registration => registration.registerSingleton(IFooService, FooBarService));
+        const scope2 = scope1.createScope(registration => registration.registerSingleton(IBarService, FooBarService));
+        
+        const scope1Services = scope1.tryGet(IServiceCollection);
+        const scope2Services = scope2.tryGet(IServiceCollection);
+
+        const foo0 = parent.tryGet(IFooService);
+        const bar0 = parent.tryGet(IBarService);
+
+        const foo1 = scope1.tryGet(IFooService);
+        const bar1 = scope1.tryGet(IBarService);
+
+        const foo2 = scope2.tryGet(IFooService);
+        const bar2 = scope2.tryGet(IBarService);
+        
+        expect(scope1Services).toBe(scope1);
+        expect(scope2Services).toBe(scope2);
+
+        expect(foo0).toBeUndefined();
+        expect(bar0).toBeUndefined();
+        
+        expect(foo1).toBeDefined();
+        expect(bar1).toBeUndefined();
+
+        expect(foo2).toBeDefined();
+        expect(foo2).toBe(foo1);
+        expect(bar2).toBeDefined();
+    });
+
+    test("register new scoped service with scoped service collection", () => {
+        const parent = new ServiceMap();
+        const scope1 = parent.createScope(registration => registration.registerScoped(IFooService, FooBarService));
+        const scope2 = scope1.createScope();
+
+        const scope1Services = scope1.tryGet(IServiceCollection);
+        const scope2Services = scope2.tryGet(IServiceCollection);
+
+        const foo0 = parent.tryGet(IFooService);
+        const foo1 = scope1.tryGet(IFooService);
+        const foo2 = scope2.tryGet(IFooService);
+
+        expect(scope1Services).toBe(scope1);
+        expect(scope2Services).toBe(scope2);
+        
+        expect(foo0).toBeUndefined();
+        expect(foo1).toBeDefined();
+        expect(foo2).toBeDefined();
+        expect(foo2).not.toBe(foo1);
+    });
+
+    test("try registering a new service with scoped service collection that attempts to overwrite an existing service", () => {
+        let success: boolean | undefined;
+        const parent = new ServiceMap();
+        const scope1 = parent.createScope(registration => registration.registerScoped(IFooService, FooBarService));
+        const scope2 = scope1.createScope(registration => {
+            success = registration.tryRegisterInstance(IFooService, { foo: "test" });
+        });
+
+        const foo0 = parent.tryGet(IFooService);
+        const foo1 = scope1.tryGet(IFooService);
+        const foo2 = scope2.tryGet(IFooService);
+
+        expect(success).toBe(false);
+
+        expect(foo0).toBeUndefined();
+        expect(foo1).toBeDefined();
+        expect(foo2).toBeDefined();
+        expect(foo2).not.toBe(foo1);
+        expect(foo2!.foo).toBe("foo");
     });
 });
 
