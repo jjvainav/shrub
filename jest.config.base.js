@@ -8,22 +8,19 @@
  */
 
 module.exports = {
-    globals: {
-        "ts-jest": {
-            tsconfig: "<rootDir>/test/tsconfig.json"
-        }
-    },
     preset: "ts-jest",
     roots: [
         "<rootDir>/test"
     ],
     transform: {
-        "^.+\\.ts$": "ts-jest"
+        "^.+\\.ts$": ["ts-jest", { 
+            tsconfig: "<rootDir>/test/tsconfig.json",
+            verbose: true
+        }]
     },
     transformIgnorePatterns: [
         "node_modules/?!(@shrub)"
     ],
     testRegex: "((\\.|/)(test))\\.ts$",
-    moduleFileExtensions: ["js", "ts"],
-    verbose: true
+    moduleFileExtensions: ["js", "ts"]
 }

@@ -100,7 +100,7 @@ export class VueModule implements IModule {
 
     async configure({ settings, services, next }: IModuleConfigurator): Promise<void> {
         this.app = (<IVueModuleSettings>settings).ssr ? createSSRApp(this.root) : createApp(this.root);
-        this.app.config.globalProperties.$services = services;
+        (<any>this.app.config.globalProperties).$services = services;
         this.app.provide(servicesKey, services);
 
         // mount the element after all dependents have had a chance to configure
