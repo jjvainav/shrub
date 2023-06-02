@@ -1,7 +1,7 @@
-import { IModule, IModuleCollection, ModuleLoader } from "@shrub/core";
+import { IModule, IModuleCollection, IServiceCollection, ModuleLoader } from "@shrub/core";
 import { IVueAppService, IVueConfiguration } from "@shrub/vue-3";
-import { defineComponent, h } from "vue";
-import { Composer, useI18n } from "vue-i18n";
+import { ComponentPublicInstance, defineComponent, h } from "vue";
+import { Composer, ExportedGlobalComposer, TranslateResult, useI18n, VueI18n } from "vue-i18n";
 import { IVueI18nConfiguration, IVueI18nService, VueI18nModule } from "../src";
 
 interface ISetupCompositionResult {
@@ -9,8 +9,17 @@ interface ISetupCompositionResult {
     readonly i18n: Composer;
 }
 
+interface IVueI18nInjection {
+    $i18n: VueI18n | ExportedGlobalComposer;
+    $t(key: string): TranslateResult;
+}
+
 // the vue module is expecting an element with id app to mount to
 document.body.innerHTML = '<!doctype html><html><body><div id="app"></div></body></html>';
+
+function getInstance(services: IServiceCollection): ComponentPublicInstance & IVueI18nInjection {
+    return <ComponentPublicInstance & IVueI18nInjection>services.get(IVueAppService).instance;
+}
 
 function setupLegacy(...modules: IModule[]): Promise<IModuleCollection> {
     return ModuleLoader
@@ -55,7 +64,7 @@ async function setupComposition(...modules: IModule[]): Promise<ISetupCompositio
 describe("module - legacy mode", () => {
     test("verify vue-i18n installation", async () => {
         const collection = await setupLegacy();
-        const instance = collection.services.get(IVueAppService).instance!;
+        const instance = getInstance(collection.services);
 
         expect(instance.$i18n).toBeDefined();
     });
@@ -70,14 +79,14 @@ describe("module - legacy mode", () => {
             })
         });
 
-        const instance = collection.services.get(IVueAppService).instance!;
+        const instance = getInstance(collection.services);
         expect(instance.$t("hi")).toBe("hi!");
     });
 
     test("manually load locale messages", async () => {
         const collection = await setupLegacy();
         const service = collection.services.get(IVueI18nService);
-        const instance = collection.services.get(IVueAppService).instance!;
+        const instance = getInstance(collection.services);
 
         await service.load(() => Promise.resolve({ hi: "hi!" }));
 
@@ -102,7 +111,7 @@ describe("module - legacy mode", () => {
             }
         );
 
-        const instance = collection.services.get(IVueAppService).instance!;
+        const instance = getInstance(collection.services);
         expect(instance.$t("foo")).toBe("foo!");
         expect(instance.$t("bar")).toBe("bar!");
     });
@@ -117,7 +126,7 @@ describe("module - legacy mode", () => {
             }))
         });
 
-        const instance = collection.services.get(IVueAppService).instance!;
+        const instance = getInstance(collection.services);
         const service = collection.services.get(IVueI18nService);
 
         service.onLocaleChanged(() => changed = true);
@@ -146,7 +155,7 @@ describe("module - legacy mode", () => {
             })
         });
 
-        const instance = collection.services.get(IVueAppService).instance!;
+        const instance = getInstance(collection.services);
         const service = collection.services.get(IVueI18nService);
 
         service.onLocaleChanged(() => changed = true);

@@ -1,3 +1,6 @@
+// NOTE: this package is being built using an older version of typescript because of an issue with vue-i18n not working with typescript version 5
+// https://github.com/intlify/vue-i18n-next/issues/1415
+
 import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IServiceRegistration } from "@shrub/core";
 import { IVueConfiguration, VueModule } from "@shrub/vue-3";
 import { EventEmitter, IEvent } from "@sprig/event-emitter";

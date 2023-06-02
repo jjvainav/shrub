@@ -23,7 +23,7 @@
     },
     "dependencies": {
         "@shrub/core": "0.5.76",
-        "vue": "^3.2.20"
+        "vue": "3.3.4"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
 }

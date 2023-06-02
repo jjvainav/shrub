@@ -26,7 +26,7 @@
     "dependencies": {
         "@shrub/core": "0.5.76",
         "@shrub/http": "0.5.76",
-        "socket.io": "^4.1.2"
+        "socket.io": "4.6.2"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
 }

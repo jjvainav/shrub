@@ -54,7 +54,7 @@ export class QueueManager<TJobTypes extends JobTypes> implements IQueueManager<T
     }
 
     private getQueue(jobName: keyof TJobTypes): IQueue {
-        const queueName = this.queuePrefix + jobName;
+        const queueName = this.queuePrefix + String(jobName);
         let queue = this.queues.get(queueName);
 
         if (!queue) {

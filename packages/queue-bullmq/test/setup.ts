@@ -18,8 +18,7 @@ export function setup(options?: Partial<IQueueBullMQOptions>): Promise<ITestCont
                     port: 6379
                 },
                 enableEvents: true,
-                queueNamePatterns: options && options.queueNamePatterns,
-                queueSchedulers: options && options.queueSchedulers
+                queueNamePatterns: options && options.queueNamePatterns
             });
         }
     }])

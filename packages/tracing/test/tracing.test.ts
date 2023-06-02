@@ -62,7 +62,7 @@ class MockTraceWriter implements ITraceWriter {
     }
 }
 
-describe("tracing", async () => {
+describe("tracing", () => {
     test("create root span", async () => {
         const now = 1562602719878;
         const unmock = mockDateNow(now);

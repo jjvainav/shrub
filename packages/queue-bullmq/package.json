@@ -28,12 +28,11 @@
         "@shrub/core": "0.5.76",
         "@shrub/logging": "0.5.76",
         "@shrub/queue": "0.5.76",
-        "@sprig/event-emitter": "^0.2.3",
-        "@types/ioredis": "^4.28.2",
-        "bullmq": "^1.80.6"
+        "@sprig/event-emitter": "0.2.3",
+        "bullmq": "3.15.0"
     },
     "devDependencies": {
-        "@sprig/unique-id": "^0.2.3"
+        "@sprig/unique-id": "0.2.3"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
 }

@@ -14,8 +14,8 @@
         "@shrub/core": "^0.5.49",
         "@shrub/vue": "^0.5.49",
         "@shrub/vue-i18n": "^0.5.49",
-        "vue": "^2.6.10",
-        "vue-class-component": "^7.1.0"
+        "vue": "2.7.14",
+        "vue-class-component": "7.2.6"
     },
     "devDependencies": {
         "copyfiles": "^2.1.1"

@@ -22,9 +22,13 @@ export interface IVueRouterService {
 export const IVueRouterService = createService<IVueRouterService>("vue-router-service");
 export const IVueRouterConfiguration = createConfig<IVueRouterConfiguration>();
 
+interface IVueRouterModuleOptions extends Partial<RouterOptions> {
+    readonly routes: RouteRecordRaw[];
+}
+
 export class VueRouterModule implements IModule {
     private router?: Router;
-    private options?: Partial<RouterOptions> = {
+    private options?: IVueRouterModuleOptions = {
         routes: []
     };
 
@@ -35,7 +39,7 @@ export class VueRouterModule implements IModule {
         config(IVueRouterConfiguration).register(({ config }) => ({
             addRoute: route => {
                 if (this.options) {
-                    this.options.routes!.push(route);
+                    this.options.routes.push(route);
                 }
                 else if (this.router) {
                     this.router.addRoute(route);
@@ -83,7 +87,7 @@ export class VueRouterModule implements IModule {
         if (this.options) {
             this.router = createRouter({
                 history: this.options.history || vue.isServer ? createMemoryHistory() : createWebHistory(),
-                routes: this.options.routes!
+                routes: this.options.routes
             });
 
             this.options = undefined;

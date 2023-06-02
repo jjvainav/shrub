@@ -5,7 +5,7 @@ export async function removeAllQueueData(queueName: string): Promise<void> {
     const pattern = `bull:${queueName}:*`;
     return new Promise<void>((resolve, reject) => {
         const stream = client.scanStream({ match: pattern });
-        stream.on("data", (keys: string[]) => {
+        stream.on("data", async (keys: string[]) => {
             if (keys.length) {
                 const pipeline = client.pipeline();
                 keys.forEach(key => pipeline.del(key));
@@ -15,5 +15,9 @@ export async function removeAllQueueData(queueName: string): Promise<void> {
         stream.on("end", () => resolve());
         stream.on("error", error => reject(error));
     })
-    .finally(() => client.disconnect());
+    .then(async () => { await client.quit() })
+    .catch(async err => {
+        await client.quit();
+        throw err;
+    });
 }

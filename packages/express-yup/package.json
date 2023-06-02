@@ -31,7 +31,7 @@
     "dependencies": {
         "@shrub/core": "0.5.76",
         "@shrub/express": "0.5.76",
-        "express": "^4.17.1",
+        "express": "4.18.2",
         "yup": "^1.2.0"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"

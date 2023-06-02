@@ -94,7 +94,7 @@ export interface IJobCompletedEventArgs<TData = any, TReturnValue = any> {
 }
 
 export interface IJobFailedEventArgs<TData = any, TReturnValue = any> {
-    readonly job: IJob<TData, TReturnValue>;
+    readonly job?: IJob<TData, TReturnValue>;
     readonly error: Error;
 }
 
