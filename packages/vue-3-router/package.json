@@ -1,7 +1,7 @@
 {
     "name": "@shrub/vue-3-router",
     "description": "A module that adds support for Vue 3 router.",
-    "version": "0.5.78",
+    "version": "0.5.79",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -22,8 +22,8 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.78",
-        "@shrub/vue-3": "0.5.78",
+        "@shrub/core": "0.5.79",
+        "@shrub/vue-3": "0.5.79",
         "vue": "3.3.4",
         "vue-router": "4.2.2"
     }

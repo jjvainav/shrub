@@ -1,7 +1,7 @@
 {
     "name": "@shrub/express-identity",
     "description": "Express module that provides middleware for managing authenticated users.",
-    "version": "0.5.78",
+    "version": "0.5.79",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -26,9 +26,9 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/core": "0.5.78",
-        "@shrub/express": "0.5.78",
-        "@shrub/express-session": "0.5.78",
+        "@shrub/core": "0.5.79",
+        "@shrub/express": "0.5.79",
+        "@shrub/express-session": "0.5.79",
         "express": "4.18.2",
         "http-errors": "2.0.0"
     },

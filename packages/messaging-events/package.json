@@ -1,7 +1,7 @@
 {
     "name": "@shrub/messaging-events",
     "description": "A simple layer on top of messaging to support basic event pub/sub.",
-    "version": "0.5.78",
+    "version": "0.5.79",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -24,8 +24,8 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.78",
-        "@shrub/messaging": "0.5.78"
+        "@shrub/core": "0.5.79",
+        "@shrub/messaging": "0.5.79"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
 }
