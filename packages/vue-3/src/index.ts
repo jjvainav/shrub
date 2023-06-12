@@ -1,5 +1,5 @@
 ﻿import { createConfig, createService, IModule, IModuleConfigurator, IModuleInitializer, IService, IServiceCollection, IServiceRegistration } from "@shrub/core";
-import { App, Component, ComponentPublicInstance, DefineComponent, createApp, createSSRApp, h, inject, VNode } from "vue";
+import { App, Component, ComponentPublicInstance, DefineComponent, createApp, createSSRApp, h, inject, provide, VNode } from "vue";
 
 declare module "@vue/runtime-core" {
     interface ComponentCustomProperties {
@@ -48,6 +48,14 @@ export const IVueAppService = createService<IVueAppService>("vue-app-service");
 export const IVueConfiguration = createConfig<IVueConfiguration>();
 
 const servicesKey = Symbol("services");
+
+/** 
+ * Provides access to the specified service collection at the component level and is intended to be used to override the global application level service collection. 
+ * This is useful for creating and providing scoped service collections to different components within the same application and should be invoked inside the setup function for the root component.
+ */
+export function provideServices(services: IServiceCollection): void {
+    provide(servicesKey, services);
+}
 
 /** Provides access to the service collection for the current Vue app and is intended to be used with the new composition Api. */
 export function useServices(): IServiceCollection {
