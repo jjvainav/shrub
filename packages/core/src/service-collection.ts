@@ -322,7 +322,7 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
     createScope(register?: (registration: IServiceRegistration) => void): IScopedServiceCollection {
         const parent = this;
         const getOrCreateServiceInstanceFromParent = this.getOrCreateServiceInstance.bind(this);
-        return new class extends ServiceMap implements IDisposable {
+        return new class ScopedServiceMap extends ServiceMap implements IDisposable {
             constructor() {
                 // if registering new services we need to copy the current entries into a new map; otherwise, pass a reference to the parent's set of services
                 super(register ? new Map(parent.services) : parent.services, /* isScoped */ true);
@@ -350,8 +350,8 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
                 // if the service is registered direclty with the scoped service collection the parent collection will not be aware so check that first
                 if (parent.has(key)) {
                     const entry = this.services.get(key);
-                    if (entry !== undefined && entry.scope !== ServiceScope.scoped) {
-                        // if the service is non-scoped call up the parent chain and get the instance from the root
+                    if (entry !== undefined && (entry.scope === ServiceScope.singleton || entry.scope === ServiceScope.instance)) {
+                        // if the service is a singleton or instance call up the parent chain to get the instance
                         return getOrCreateServiceInstanceFromParent(key, rootScope, ancestors);
                     }
                 }
@@ -435,7 +435,11 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
 
     tryGet<T>(serviceOrKey: IService<T> | string): T | undefined {
         if (this.has(serviceOrKey)) {
-            return this.get(serviceOrKey);
+            // still need a try/catch incase one of the services dependencies fails to load
+            try {
+                return this.get(serviceOrKey);
+            }
+            catch {}
         }
 
         return undefined;

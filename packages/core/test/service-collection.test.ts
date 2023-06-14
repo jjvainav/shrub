@@ -1,6 +1,6 @@
 import { 
     createInjectable, createOptions, createService, IDisposable, IInstantiationService, IServiceCollection,
-    OptionsValidationError, Scoped, ServiceMap, Singleton, SingletonServiceFactory 
+    OptionsValidationError, Scoped, ServiceMap, Singleton, SingletonServiceFactory, Transient
 } from "../src/service-collection";
 
 const IConfigurableInjectable = createInjectable<IConfigurableInjectable>({ 
@@ -19,9 +19,14 @@ const ICircular3Service = createService<ICircular3Service>("circular3-service");
 const ICompositeService = createService<ICompositeService>("composite-service");
 const ICompositeService2 = createService<ICompositeService>("composite-service2");
 const ISingletonService = createService<ISingletonService>("singleton-service");
+const INestedSingletonService = createService<INestedSingletonService>("nested-singleton-service");
 const ITestService = createService<ITestService>("test-service");
 
+const IScopedWithSingletonService = createService<IScopedWithSingletonService>("scoped-with-singleton-service");
+const ITransientWithSingletonService = createService<ITransientWithSingletonService>("transient-with-singleton-service");
+
 const IChildScopedService = createService<IChildScopedService>("child-scoped-service");
+const IParentScopedService = createService<IParentScopedService>("parent-scoped-service");
 const IParentSingletonService = createService<IParentSingletonService>("parent-singleton-service");
 
 const ITestOptions = createOptions<ITestOptions>("test", { 
@@ -73,8 +78,20 @@ interface ICompositeService2 {
     getBar(): string;
 }
 
+interface INestedSingletonService {
+    readonly singletonService: ISingletonService;
+}
+
+interface IScopedWithSingletonService {
+    readonly singletonService: ISingletonService;
+}
+
 interface ISingletonService {
     readonly value: string;
+}
+
+interface ITransientWithSingletonService {
+    readonly singletonService: ISingletonService;
 }
 
 interface ITestService extends IDisposable {
@@ -99,6 +116,10 @@ interface ITestServiceWithOptions {
 }
 
 interface IChildScopedService {
+}
+
+interface IParentScopedService {
+    readonly scopedService: IChildScopedService;
 }
 
 interface IParentSingletonService {
@@ -170,8 +191,26 @@ class SubCompositeService extends CompositeService {
 }
 
 @Singleton
+class NestedSingletonService implements INestedSingletonService {
+    constructor(@ISingletonService readonly singletonService: ISingletonService) {
+    }
+}
+
+@Scoped
+class ScopedWithSingletonService implements IScopedWithSingletonService {
+    constructor(@ISingletonService readonly singletonService: ISingletonService) {
+    }
+}
+
+@Singleton
 class SingletonService implements ISingletonService {
     value = "singleton";
+}
+
+@Transient
+class TransientWithSingletonService implements ITransientWithSingletonService {
+    constructor(@ISingletonService readonly singletonService: ISingletonService) {
+    }
 }
 
 class TestService implements ITestService {
@@ -207,6 +246,12 @@ class TestServiceWithOptions implements ITestServiceWithOptions {
 
 @Scoped
 class ChildScopedService implements IChildScopedService {
+}
+
+@Scoped
+class ParentScopedService implements IParentScopedService {
+    constructor(@IChildScopedService readonly scopedService: IChildScopedService) {
+    }
 }
 
 @Singleton
@@ -590,6 +635,26 @@ describe("service dependency injection", () => {
         }        
     });
 
+    test("inject scoped service into another scoped service", () => {
+        const services = new ServiceMap();
+
+        services.register(IChildScopedService, ChildScopedService);
+        services.register(IParentScopedService, ParentScopedService);
+
+        const scopedServices1 = services.createScope();
+        const scopedServices2 = services.createScope();
+
+        const parent1 = scopedServices1.get(IParentScopedService);
+        const parent2 = scopedServices1.get(IParentScopedService);
+        const parent3 = scopedServices2.get(IParentScopedService);
+
+        expect(parent1).toBe(parent2);
+        expect(parent1.scopedService).toBe(parent2.scopedService);
+
+        expect(parent1).not.toBe(parent3);
+        expect(parent1.scopedService).not.toBe(parent3.scopedService);   
+    });
+
     test("inject scoped service into a singleton service", () => {
         const services = new ServiceMap();
 
@@ -603,6 +668,117 @@ describe("service dependency injection", () => {
         catch (err: any) {
             expect((<string>err.message).indexOf("Scoped services should only be referenced by Transient or other Scoped services.")).toBeGreaterThan(-1);
         }        
+    });
+
+    test("inject singleton service into a scoped service", () => {
+        const services = new ServiceMap();
+
+        // the same singleton should be shared/referenced by all scoped services.
+        services.register(IScopedWithSingletonService, ScopedWithSingletonService);
+        services.register(ISingletonService, SingletonService);
+
+        const scopedServices1 = services.createScope();
+        const scopedServices2 = services.createScope();
+
+        const service1 = scopedServices1.get(IScopedWithSingletonService);
+        const service2 = scopedServices1.get(IScopedWithSingletonService);
+        const service3 = scopedServices2.get(IScopedWithSingletonService);
+
+        expect(service1).toBe(service2);
+        expect(service1.singletonService).toBe(service2.singletonService);
+
+        expect(service1).not.toBe(service3);
+        expect(service1.singletonService).toBe(service3.singletonService);   
+    });
+    
+    test("inject singleton service into another singleton service", () => {
+        const services = new ServiceMap();
+
+        services.register(INestedSingletonService, NestedSingletonService);
+        services.register(ISingletonService, SingletonService);
+
+        const scopedServices1 = services.createScope();
+        const scopedServices2 = services.createScope();
+
+        const service1 = scopedServices1.get(INestedSingletonService);
+        const service2 = scopedServices1.get(INestedSingletonService);
+        const service3 = scopedServices2.get(INestedSingletonService);
+
+        expect(service1).toBe(service2);
+        expect(service1).toBe(service3);
+        expect(service1.singletonService).toBe(service2.singletonService);
+        expect(service1.singletonService).toBe(service3.singletonService); 
+    });
+    
+
+    test("inject singleton service into a scoped service where the singleton is registered with a scoped service collection", () => {
+        const services = new ServiceMap();
+
+        // the singleton service is expected to have a single service instance in the service collection it was registered at and below
+        services.register(IScopedWithSingletonService, ScopedWithSingletonService);
+
+        const scopedServices1 = services.createScope(registration => registration.register(ISingletonService, SingletonService));
+        const scopedServices2 = services.createScope(registration => registration.register(ISingletonService, SingletonService));
+
+        const scopedServices12 = scopedServices1.createScope();
+
+        const service1 = services.tryGet(IScopedWithSingletonService);
+        const service2 = scopedServices1.get(IScopedWithSingletonService);
+        const service3 = scopedServices1.get(IScopedWithSingletonService);
+        const service4 = scopedServices2.get(IScopedWithSingletonService);
+        const service5 = scopedServices12.get(IScopedWithSingletonService);
+
+        expect(service1).toBeUndefined();
+
+        expect(service2).toBe(service3);
+        expect(service2.singletonService).toBe(service3.singletonService);
+
+        expect(service4).not.toBe(service2);
+        expect(service4).not.toBe(service3);
+        expect(service4).not.toBe(service5);
+        expect(service4.singletonService).not.toBe(service2.singletonService);
+        expect(service4.singletonService).not.toBe(service3.singletonService);
+        expect(service4.singletonService).not.toBe(service5.singletonService);
+
+        expect(service5).not.toBe(service2);
+        expect(service5).not.toBe(service3);
+        expect(service5.singletonService).toBe(service2.singletonService);
+        expect(service5.singletonService).toBe(service3.singletonService);  
+    });
+
+    test("inject singleton service into a transient service where the singleton is registered with a scoped service collection", () => {
+        const services = new ServiceMap();
+
+        // the singleton service is expected to have a single service instance in the service collection it was registered at and below
+        services.register(ITransientWithSingletonService, TransientWithSingletonService);
+
+        const scopedServices1 = services.createScope(registration => registration.register(ISingletonService, SingletonService));
+        const scopedServices2 = services.createScope(registration => registration.register(ISingletonService, SingletonService));
+
+        const scopedServices12 = scopedServices1.createScope();
+
+        const service1 = services.tryGet(ITransientWithSingletonService);
+        const service2 = scopedServices1.get(ITransientWithSingletonService);
+        const service3 = scopedServices1.get(ITransientWithSingletonService);
+        const service4 = scopedServices2.get(ITransientWithSingletonService);
+        const service5 = scopedServices12.get(ITransientWithSingletonService);
+
+        expect(service1).toBeUndefined();
+
+        expect(service2).not.toBe(service3);
+        expect(service2.singletonService).toBe(service3.singletonService);
+
+        expect(service4).not.toBe(service2);
+        expect(service4).not.toBe(service3);
+        expect(service4).not.toBe(service5);
+        expect(service4.singletonService).not.toBe(service2.singletonService);
+        expect(service4.singletonService).not.toBe(service3.singletonService);
+        expect(service4.singletonService).not.toBe(service5.singletonService);
+
+        expect(service5).not.toBe(service2);
+        expect(service5).not.toBe(service3);
+        expect(service5.singletonService).toBe(service2.singletonService);
+        expect(service5.singletonService).toBe(service3.singletonService);  
     });
 
     test("inject service options", () => {
