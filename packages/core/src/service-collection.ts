@@ -521,10 +521,10 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         }
     }
 
-    private checkParentChildScopes(parentScope: ServiceScope | undefined, childScope: ServiceScope | undefined): void {
+    private checkParentChildScopes(parentScope: ServiceScope | undefined, childScope: ServiceScope | undefined, childKey: string): void {
         if (!parentScope || parentScope === ServiceScope.instance || parentScope === ServiceScope.singleton) {
             if (childScope === ServiceScope.scoped) {
-                throw new Error("Scoped services should only be referenced by Transient or other Scoped services.");
+                throw new Error(`Scoped service (${childKey}) should only be referenced by a Transient or Scoped service.`);
             }
         }
     }
@@ -587,7 +587,7 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
             const args = keys.map(key => {
                 const injectable = dependencies[<any>key];
                 const entry = this.services.get(injectable.key);
-                this.checkParentChildScopes(rootScope, entry && entry.scope);
+                this.checkParentChildScopes(rootScope, entry && entry.scope, injectable.key);
                 return this.getOrCreateInjectable(injectable, rootScope, ancestors);
             });
 
