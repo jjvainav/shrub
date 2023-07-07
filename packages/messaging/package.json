@@ -27,7 +27,7 @@
     "dependencies": {
         "@shrub/core": "0.5.80",
         "@shrub/logging": "0.5.80",
-        "@sprig/unique-id": "0.2.5"
+        "@sprig/unique-id": "0.2.8"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
 }
