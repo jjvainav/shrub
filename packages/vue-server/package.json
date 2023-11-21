@@ -29,7 +29,7 @@
         "@shrub/core": "0.5.81",
         "@shrub/model": "0.5.81",
         "@shrub/vue": "0.5.81",
-        "@sprig/serialization": "0.2.8",
+        "@sprig/serialization": "0.2.9",
         "vue": "2.7.14",
         "vue-router": "3.6.5",
         "vue-server-renderer": "2.7.14"

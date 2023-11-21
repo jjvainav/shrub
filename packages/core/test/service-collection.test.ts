@@ -710,7 +710,6 @@ describe("service dependency injection", () => {
         expect(service1.singletonService).toBe(service3.singletonService); 
     });
     
-
     test("inject singleton service into a scoped service where the singleton is registered with a scoped service collection", () => {
         const services = new ServiceMap();
 

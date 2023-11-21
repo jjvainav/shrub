@@ -1175,60 +1175,60 @@
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.1.0.tgz#96116f2a912e0c02817345b3c10751069920d553"
   integrity sha512-+9jVqKhRSpsc591z5vX+X5Yyw+he/HCB4iQ/RYxw35CEPaY1gnsNE43nf9n9AaYjAQrTiI/mOwKUKdUs9vf7Xg==
 
-"@sprig/async-queue@0.2.8":
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/@sprig/async-queue/-/async-queue-0.2.8.tgz#b2b041f93bfa47c35ee7c0b785e892fcd2709741"
-  integrity sha512-QYyUC+97TqhwbugzWA2s765uDFTiwLBB3MJGjmVa71S4USDNlprUyRWAC2Zq3zPqtfbVsA9r4NNbv8o+72Gu/A==
+"@sprig/async-queue@0.2.9":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@sprig/async-queue/-/async-queue-0.2.9.tgz#1553fc66c4918a57bce138530a5373af06c620b3"
+  integrity sha512-fN5siSNGq0kVZYQ7aZZy4H4Kf6ikI6z2b7rEshy/OeY3XrgKI7waUnXxGT1YVoxmx6ThhOD7Vkb5EK9fvAyaYg==
   dependencies:
-    "@sprig/event-emitter" "0.2.8"
+    "@sprig/event-emitter" "0.2.9"
 
-"@sprig/event-emitter@0.2.8":
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.2.8.tgz#b95b3143b8eeee3abd22135acb2963ca14b3eeb5"
-  integrity sha512-JfNnLKw2Vh1TYtkD/+/CCFtW4yBXglXVxOh4LHNGDuAu3hDR9MQBnPMw7o4LIk50prSBgqp6c+Y//SYX/rlfDA==
+"@sprig/event-emitter@0.2.9":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@sprig/event-emitter/-/event-emitter-0.2.9.tgz#03ee2ba385de855a87100cf604523d40d9188033"
+  integrity sha512-YOX34ZNHpQuxeiTtGn/lATaXKJXLHpXk5tQ8wwK6/l/Mq0Tfk+N/PXCkX0zuC5MsBvnYu8xa4OCxx2yTcksWlg==
 
-"@sprig/request-client-class@0.2.8":
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client-class/-/request-client-class-0.2.8.tgz#4bc63f4e9f24a4c594d02fb9ad7a609d416b1ad7"
-  integrity sha512-RMtPlzAt2Nxv3oCRHIoYfi1sbz2WCVGhdxqi38YNsdfzadRo78phTQxL+cwOCxgiCf6lf4wpRhRc2DMnX+TdsQ==
+"@sprig/request-client-class@0.2.9":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client-class/-/request-client-class-0.2.9.tgz#e7e3875c0b129764e71d3ff0ea9a25b22024e5b4"
+  integrity sha512-/gAOlf2rte+r6dsz3oNbkjcmfJgPi3M9YURyQd2IqkWxrl2opcPwNVhMAN1/L5Nb4D2kz/fzS7lbjLEgXTqcLA==
   dependencies:
-    "@sprig/request-client" "0.2.8"
+    "@sprig/request-client" "0.2.9"
 
-"@sprig/request-client-events@0.2.8":
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client-events/-/request-client-events-0.2.8.tgz#0778488d7bbcb4bad3079cb080dff043c4419796"
-  integrity sha512-E9kzsCt+fb7bQUS3YeS4KFg8kM0J7d0QBUT2f+U4bfxwx6jbBS/CFxorT1xxWREPwOvOeq7NgSbP/cdlbkCa7Q==
+"@sprig/request-client-events@0.2.9":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client-events/-/request-client-events-0.2.9.tgz#b2764fa0182a36e0e2eb9e63a1fe671a36c0db10"
+  integrity sha512-22iCmBP9u5Lqor4SpF33TGfC66Id0p4fd7FHmMZmIklMyWn2sGsu4k4OrpGOjCQIJoCKwbeeBVHfLdxT1HbwTQ==
   dependencies:
-    "@sprig/event-emitter" "0.2.8"
-    "@sprig/request-client" "0.2.8"
+    "@sprig/event-emitter" "0.2.9"
+    "@sprig/request-client" "0.2.9"
 
-"@sprig/request-client-mock@0.2.8":
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client-mock/-/request-client-mock-0.2.8.tgz#e0c82fe3c84ea62c03a1dec925cb3ee6f1364441"
-  integrity sha512-g27Ocl0/K1gK++8W2ZHFptQK77SaA8lzoRy9ccWqbfdEPC/X0FDzEwq2nrv/Y0X1q2Ypue2bxTh/cU2NRx13Bw==
+"@sprig/request-client-mock@0.2.9":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client-mock/-/request-client-mock-0.2.9.tgz#3e84c870adcd6a3498bac662cf8a9d585b66480a"
+  integrity sha512-7AIkH+GTHySjmDci6RCNbeCz5gcQrMhJ3ccws4TQT5Fnjoi77D86/rCrQPQKsQLKIliipbZ6Vrz2/jnjqZGqXg==
   dependencies:
-    "@sprig/request-client" "0.2.8"
+    "@sprig/request-client" "0.2.9"
     axios "1.4.0"
     eventsource "2.0.2"
     http-status-codes "2.2.0"
 
-"@sprig/request-client@0.2.8":
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.2.8.tgz#a6927f0785605dda45757078c7bc74318d5626c9"
-  integrity sha512-K4G0X6t9rIlhhQO289/AHmmfMbonFpHPluHyCWH6AVV+JTiC2uSCu0UIaPajxKzlXntDC1Kjh1JgVv+xBRAHlg==
+"@sprig/request-client@0.2.9":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@sprig/request-client/-/request-client-0.2.9.tgz#16e59bff1fe8f3070141f9806e15d52b8d54f3a2"
+  integrity sha512-E//nszcWpOG8cKVBYLXloOdHKJgIvBoayqTKmCwQOlSCC1pLkeRKCSlsqKZAdfnMqFOg76G2+o2ZqkMj5Ymmnw==
   dependencies:
     axios "1.4.0"
     eventsource "2.0.2"
 
-"@sprig/serialization@0.2.8":
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.2.8.tgz#ea5b610933299f9abbd53f1594f827208a640f32"
-  integrity sha512-/mZPs1ccG27+QcYy6Ta99qjl1NfZUJP4YHZIy9FoBJWnX9nctjAAG9XgduypfyqwEvuky3emniZ0P3Qc/iHUoA==
+"@sprig/serialization@0.2.9":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@sprig/serialization/-/serialization-0.2.9.tgz#7df5451c4cc24ce70ba83d704ca118cce4e94663"
+  integrity sha512-4CezwCFJHY+Ef5GpvRbNp1noOwhLYKZ9JhTLOreLUQi3yu/sazWUkMCCK/Z/Q/ZqNnarddZTn+JMH/hGh9l4WQ==
 
-"@sprig/unique-id@0.2.8":
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/@sprig/unique-id/-/unique-id-0.2.8.tgz#dab72dac1090169328497e8e33db73c870fc06e8"
-  integrity sha512-ArYsDLKu+X+CHbJmDkgITeXXB8AFuTlFDy7C69DkkFKDIvb06AWy4F3ahkBfiuHV/cXyZwZZKl8Ru3WPj4pHcA==
+"@sprig/unique-id@0.2.9":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@sprig/unique-id/-/unique-id-0.2.9.tgz#e3a2ae8fe4a00c8a49feb1543a9e5d5bbe87d853"
+  integrity sha512-m03okCgToc3fjLQiwNnfRD+vU+pJ8knHfuZJEphGxyEuYZlxIrLA1DBmzSQ0aetMNLHuWt0+3Z1woJJadQWLhg==
   dependencies:
     base-x "4.0.0"
     uuid "9.0.0"

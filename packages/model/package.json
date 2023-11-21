@@ -23,7 +23,7 @@
     },
     "dependencies": {
         "@shrub/core": "0.5.81",
-        "@sprig/serialization": "0.2.8"
+        "@sprig/serialization": "0.2.9"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
 }
