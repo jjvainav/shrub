@@ -27,7 +27,7 @@
         "@shrub/core": "0.5.83",
         "@shrub/logging": "0.5.83",
         "@shrub/tracing": "0.5.83",
-        "@sprig/request-client": "0.2.10"
+        "@sprig/request-client": "0.2.11"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
 }
