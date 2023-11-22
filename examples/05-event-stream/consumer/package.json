@@ -16,9 +16,9 @@
         "@shrub/express-tracing": "^0.5.49",
         "@shrub/messaging": "^0.5.49",
         "@shrub/tracing-console": "^0.5.49",
-        "@sprig/request-client": "0.2.9",
-        "@sprig/request-client-events": "0.2.9",
-        "@sprig/unique-id": "0.2.9",
+        "@sprig/request-client": "0.2.10",
+        "@sprig/request-client-events": "0.2.10",
+        "@sprig/unique-id": "0.2.10",
         "express": "4.18.2"
     },
     "devDependencies": {
