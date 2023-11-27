@@ -52,6 +52,7 @@ interface ITestInjectable {
 }
 
 interface IFooService {
+    readonly disposed?: boolean;
     readonly foo: string;
 }
 
@@ -136,6 +137,11 @@ class BarServiceThatThrows implements IBarService {
 class FooBarService implements IFooService, IBarService {
     readonly foo = "foo";
     readonly bar = "bar";
+    disposed = false;
+
+    dispose(): void {
+        this.disposed = true;
+    }
 }
 
 class Circular1Service implements ICircular1Service {
@@ -666,7 +672,7 @@ describe("service dependency injection", () => {
             fail();
         }
         catch (err: any) {
-            expect((<string>err.message).indexOf("Scoped services should only be referenced by Transient or other Scoped services.")).toBeGreaterThan(-1);
+            expect((<string>err.message).indexOf("Scoped service (child-scoped-service) should only be referenced by a Transient or Scoped service.")).toBeGreaterThan(-1);
         }        
     });
 
@@ -984,6 +990,43 @@ describe("service scope", () => {
         expect(foo1).toBeDefined();
         expect(foo2).toBeDefined();
         expect(foo2).not.toBe(foo1);
+    });
+
+    test("register service instance with scoped service collection", () => {
+        const parent = new ServiceMap();
+        const instance = new FooBarService();
+        const scope1 = parent.createScope(registration => registration.registerInstance(IFooService, instance));
+        const scope2 = scope1.createScope();
+
+        const foo0 = parent.tryGet(IFooService);
+        const foo1 = scope1.tryGet(IFooService);
+        const foo2 = scope2.tryGet(IFooService);
+
+        expect(foo0).toBeUndefined();
+        expect(foo1).toBe(instance);
+        expect(foo2).toBe(instance);
+    });
+
+    test("register service instance with scoped service collection and ensure it is disposed with its parent", () => {
+        const parent = new ServiceMap();
+        const instance = new FooBarService();
+        const scope1 = parent.createScope(registration => registration.registerInstance(IFooService, instance));
+        scope1.createScope();
+
+        scope1.dispose();
+
+        expect(instance.disposed).toBe(true);
+    });
+
+    test("register service instance with scoped service collection and ensure it is not disposed when disposing a child collection", () => {
+        const parent = new ServiceMap();
+        const instance = new FooBarService();
+        const scope1 = parent.createScope(registration => registration.registerInstance(IFooService, instance));
+        const scope2 = scope1.createScope();
+
+        scope2.dispose();
+
+        expect(instance.disposed).toBe(false);
     });
 
     test("try registering a new service with scoped service collection that attempts to overwrite an existing service", () => {
