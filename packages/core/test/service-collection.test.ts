@@ -294,6 +294,20 @@ describe("service lifetime", () => {
         expect(instance).toBe(instance3);
     });
 
+    test("register service instance using constructor", () => {
+        const services = new ServiceMap();
+
+        const instance = services.registerInstance(ITestService, TestService);
+
+        const instance1 = services.get(ITestService);
+        const instance2 = services.get(ITestService);
+        const instance3 = services.createScope().get(ITestService);
+
+        expect(instance).toBe(instance1);
+        expect(instance).toBe(instance2);
+        expect(instance).toBe(instance3);
+    });
+
     test("register singleton", () => {
         const services = new ServiceMap();
 

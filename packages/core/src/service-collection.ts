@@ -75,8 +75,11 @@ export interface IServiceRegistrationOptions {
 export interface IServiceRegistration {
     /** Registers a service using its required scope. Note: a service class must define a required scope decorator. */
     register<T, TInstance extends T>(service: IService<T>, ctor: Constructor<TInstance>, options?: IServiceRegistrationOptions): void;
-    /** Registers a singleton instance that lives within the collection and is available to all child scopes. Note: if the instance implements IDisposable it will not be disposed automatically. */
-    registerInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance, options?: IServiceRegistrationOptions): void;
+    /** 
+     * Registers a singleton instance that lives within the collection and is available to all child scopes. A constructor can be provided to create a new instance and return a reference to it.
+     * Note: if the instance implements IDisposable it will not be disposed automatically. 
+     */
+    registerInstance<T, TInstance extends T>(service: IService<T>, instanceOrConstructor: TInstance | Constructor<TInstance>, options?: IServiceRegistrationOptions): TInstance;
     /** Registers a service that gets created once per service collection scope. */
     registerScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): void;
     /** Registers a service that gets created once and is available to all child scopes. */
@@ -350,8 +353,8 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         this.registerService(service, getServiceScope(ctor), ctor, options);
     }
 
-    registerInstance<T, TInstance extends T>(service: IService<T>, instance: TInstance, options?: IServiceRegistrationOptions): void {
-        if (instance === undefined) {
+    registerInstance<T, TInstance extends T>(service: IService<T>, instanceOrConstructor: TInstance | Constructor<TInstance>, options?: IServiceRegistrationOptions): TInstance {
+        if (instanceOrConstructor === undefined) {
             throw new Error("instance undefined");
         }
 
@@ -361,8 +364,14 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
 
         // TODO: check if the instance constructor has a required scope - if so, verify its a singleton
 
+        const instance = isConstructor(instanceOrConstructor) 
+            ? this.createInstance(instanceOrConstructor) 
+            : instanceOrConstructor;
+
         this.instances.set(service.key, instance);
         this.services.set(service.key, { service, scope: ServiceScope.instance, sealed: options && options.sealed });
+
+        return instance;
     }
 
     registerScoped<T, TInstance extends T>(service: IService<T>, ctorOrFactory: Constructor<TInstance> | IServiceFactory<TInstance>, options?: IServiceRegistrationOptions): void {
