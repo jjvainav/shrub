@@ -97,10 +97,12 @@ export interface IServiceRegistration {
 
 export interface IServiceCollection {
     /** 
-     * Creates a scoped collection and optionally allows registering services into the scoped service collection. 
+     * Creates a scoped collection and optionally allows registering services into the scoped service collection.
      * Note: overwriting existing services are not allowed with scoped service collections.
      */
     createScope(register?: (registration: IServiceRegistration) => void): IScopedServiceCollection;
+    /** Creates a scoped service map that can be used for registering and providing scoped services to the current service collection. */
+    createScopeMap(): ScopedServiceMap;
     /** Gets an instance of the registered service. */
     get<T>(serviceOrKey: IService<T> | string): T;
     /** True if a service has been registered. */
@@ -291,12 +293,18 @@ export class SingletonServiceFactory<T> implements IServiceFactory<T> {
 }
 
 export class ServiceMap implements IServiceRegistration, IServiceCollection, IOptionsService, IInstantiationService {
-    private readonly instances = new Map<string, any>();
-    private isFrozen?: boolean;
+    protected readonly services: Map<string, IServiceEntry>;
+    protected readonly instances = new Map<string, any>();
+    
+    protected isFrozen = false;
+    protected isScoped = false;
 
-    /** Creates a new ServiceMap instance; note: the parameters are for internal purposes and should not be used. */
-    constructor(private readonly services = new Map<string, IServiceEntry>(), readonly isScoped = false) {
-        if (!isScoped) {
+    /** Creates a new ServiceMap instance with an optional parent if the ServiceMap should be scoped; note: this is used for internal purposes and should not be used directly. */
+    constructor(parent?: ServiceMap) { 
+        this.isScoped = !!parent;
+        this.services = new Map<string, IServiceEntry>(parent?.services);
+
+        if (!parent) {
             // the thisFactory is used to return the appropriate ServiceMap instance since the IInstantiationService and IServiceCollection services need to be scoped
             const thisFactory: IServiceFactory<IServiceCollection> = { create: service => service };
             this.registerService(IInstantiationService, ServiceScope.scoped, thisFactory, { sealed: true });
@@ -320,45 +328,18 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
     }
 
     createScope(register?: (registration: IServiceRegistration) => void): IScopedServiceCollection {
-        const parent = this;
-        const getOrCreateServiceInstanceFromParent = this.getOrCreateServiceInstance.bind(this);
-        return new class ScopedServiceMap extends ServiceMap implements IDisposable {
-            constructor() {
-                // if registering new services we need to copy the current entries into a new map; otherwise, pass a reference to the parent's set of services
-                super(register ? new Map(parent.services) : parent.services, /* isScoped */ true);
+        const scopedServices = this.createScopeMap();
 
-                if (register) {
-                    register(this);
-                }
-
-                this.freeze();
-            }
-
-            dispose(): void {
-                for (const instance of this.instances.values()) {
-                    // dispose instances created and referenced by the scope; this will be scoped and transient instances
-                    // also make sure we don't dispose the current instance as that will cause a stack overflow
-                    if (instance !== this && isDisposable(instance)) {
-                        instance.dispose();
-                    }
-                }
-
-                this.instances.clear();
-            }
-
-            protected getOrCreateServiceInstance(key: string, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): any {
-                // if the service is registered direclty with the scoped service collection the parent collection will not be aware so check that first
-                if (parent.has(key)) {
-                    const entry = this.services.get(key);
-                    if (entry !== undefined && (entry.scope === ServiceScope.singleton || entry.scope === ServiceScope.instance)) {
-                        // if the service is a singleton or instance call up the parent chain to get the instance
-                        return getOrCreateServiceInstanceFromParent(key, rootScope, ancestors);
-                    }
-                }
-
-                return super.getOrCreateServiceInstance(key, rootScope, ancestors);
-            }
+        if (register) {
+            register(scopedServices);
         }
+
+        scopedServices.freeze();
+        return scopedServices;
+    }
+
+    createScopeMap(): ScopedServiceMap {
+        return new ScopedServiceMap(this);
     }
 
     getOptions<T>(options: IOptions<T>): T {
@@ -450,7 +431,8 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
         this.isFrozen = true;
     }
 
-    protected getOrCreateServiceInstance(key: string, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): any {
+    /** @internal */
+    getOrCreateServiceInstance(key: string, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): any {
         const entry = this.services.get(key);
 
         if (!entry) {
@@ -602,6 +584,37 @@ export class ServiceMap implements IServiceRegistration, IServiceCollection, IOp
 
             throw new ObjectCreateError(`Failed to get dependencies for Constructor (${ctor.name}): ${err}`);
         }
+    }
+}
+
+export class ScopedServiceMap extends ServiceMap implements IScopedServiceCollection {
+    constructor(private readonly parent: ServiceMap) {
+        super(parent);
+    }
+
+    dispose(): void {
+        for (const instance of this.instances.values()) {
+            // dispose instances created and referenced by the scope; this will be scoped and transient instances
+            // also make sure we don't dispose the current instance as that will cause a stack overflow
+            if (instance !== this && isDisposable(instance)) {
+                instance.dispose();
+            }
+        }
+
+        this.instances.clear();
+    }
+
+    getOrCreateServiceInstance(key: string, rootScope?: ServiceScope, ancestors?: Constructor<any>[]): any {
+        // if the service is registered direclty with the scoped service collection the parent collection will not be aware so check that first
+        if (this.parent.has(key)) {
+            const entry = this.services.get(key);
+            if (entry !== undefined && (entry.scope === ServiceScope.singleton || entry.scope === ServiceScope.instance)) {
+                // if the service is a singleton or instance call up the parent chain to get the instance
+                return this.parent.getOrCreateServiceInstance(key, rootScope, ancestors);
+            }
+        }
+
+        return super.getOrCreateServiceInstance(key, rootScope, ancestors);
     }
 }
 

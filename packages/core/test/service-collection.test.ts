@@ -940,6 +940,17 @@ describe("service scope", () => {
         expect(bar2).toBeDefined();
     });
 
+    test("register new transient services with scoped service map", () => {
+        const parent = new ServiceMap();
+        const scope = parent.createScopeMap();
+
+        const result = scope.tryRegisterTransient(IFooService, FooBarService);
+        const foo = scope.tryGet(IFooService);
+
+        expect(result).toBe(true);
+        expect(foo).toBeDefined();
+    });
+
     test("register new singleton services with scoped service collection", () => {
         const parent = new ServiceMap();
         const scope1 = parent.createScope(registration => registration.registerSingleton(IFooService, FooBarService));
