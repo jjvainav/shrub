@@ -23,7 +23,7 @@
     "dependencies": {
         "@shrub/core": "0.5.87",
         "@shrub/logging": "0.5.87",
-        "@sprig/request-client": "0.2.12"
+        "@sprig/request-client": "0.2.13"
     },
     "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
 }
