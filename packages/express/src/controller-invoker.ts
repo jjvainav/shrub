@@ -1,6 +1,7 @@
 import { createService, Transient } from "@shrub/core";
 import { ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from "express";
 import { PathParams } from "express-serve-static-core";
+import { PassThrough } from "stream";
 import { IExpressApplication } from "./app";
 import { controller, Constructor } from "./controller";
 
@@ -91,7 +92,7 @@ export abstract class ControllerInvoker {
             const invokeAction = () => {
                 // create the express Request object to pass down the request chain
                 const req = this.createExpressRequest(options);
-                // create the express Response object that will resovle the Promise when the response has ended (i.e. when res.end is inovked)
+                // create the express Response object that will resolve the Promise when the response has ended (i.e. when res.end is inovked)
                 const res = this.createExpressResponse(resolve);
 
                 // first invoke prepare
@@ -122,20 +123,28 @@ export abstract class ControllerInvoker {
     }
 
     private createExpressResponse(callback: (response: IControllerResponse) => void): Response {
+        let stream: PassThrough;
         let headers: any = {};
         let status = 200;
+
         return <Response>{
             get statusCode() {
                 return status;
             },
             set statusCode(s) {
-                this.status(status);
+                this.status(s);
             },
-            end: function (data: any, _: BufferEncoding, cb?: (() => void)): void {
-                callback({ status, data });
+            end: function (data: any, encoding: BufferEncoding, cb?: (() => void)): void {
+                if (stream) {
+                    // do not invoke the callback if there is a stream, it is invoked the first time write is called so instead end the stream
+                    stream.end(data, encoding, cb);
+                }
+                else {
+                    callback({ status, data });
                 
-                if (cb) {
-                    cb();
+                    if (cb) {
+                        cb();
+                    }
                 }
             },
             getHeader: name => headers[name],
@@ -158,11 +167,13 @@ export abstract class ControllerInvoker {
                 return this;
             },
             write: function (data: any, _: BufferEncoding, cb?: ((error: Error | null | undefined) => void)): void {
-                this.end(data);
-                
-                if (cb) {
-                    cb(undefined);
+                if (!stream) {
+                    stream = new PassThrough();
+                    // the caller is expecting to receive a Readable stream
+                    callback({ status, data: stream });
                 }
+
+                stream.write(data, cb);
             },
         };
     }

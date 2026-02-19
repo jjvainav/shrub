@@ -1,6 +1,9 @@
 import { ModuleLoader } from "@shrub/core";
 import { NextFunction, Request, RequestHandler, Response } from "express";
+import * as fs from "fs";
 import createError, { HttpError } from "http-errors";
+import { Readable } from "stream";
+import { buffer } from "stream/consumers";
 import { ControllerInvoker, ExpressModule, Get, IControllerInvokerService, IExpressConfiguration, Route } from "../src";
 
 interface IInvokerTestContext extends IControllerInvokerService {
@@ -162,6 +165,15 @@ describe("invoker", () => {
         expect(result).toBe("foo");
         expect(totalRetryCount).toBe(2);
     });
+
+    test("for GET action where data is written to the response as a stream", async () => {
+        const invoker = context.createControllerInvoker(FooControllerInvoker);
+        
+        const result = await buffer(await invoker.getFile());
+        
+        // this will be the length of the files/test.png file
+        expect(result.byteLength).toBe(166214);
+    });
 });
 
 @Route("/foo")
@@ -177,6 +189,14 @@ class FooController {
         res.json({ foo });
     }
 
+    @Get("/file")
+    getFile(req: Request, res: Response, next: NextFunction): void {
+        // invoking pipe against the Response will pass a Readable stream as the response data
+        const stream = fs.createReadStream("./test/files/test.png");
+        stream.pipe(res);
+        stream.on("error", err => next(err));
+    }
+
     // this needs to come before getFooById so it's route gets registered first
     @Get("/secure", authorize())
     getSecureFoo(req: Request, res: Response, next: NextFunction): void {
@@ -190,6 +210,16 @@ class FooController {
 }
 
 class FooControllerInvoker extends ControllerInvoker {
+    getFile(): Promise<Readable> {
+        return this.invokeAction({
+            controller: FooController,
+            method: "GET",
+            path: "/foo/file"
+        })
+        // data will be a Readable stream
+        .then(response => response.data);
+    }
+
     getFoo(concat?: string): Promise<string> {
         let path = "/foo";
 
