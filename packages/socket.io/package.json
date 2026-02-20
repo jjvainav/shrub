@@ -1,7 +1,7 @@
 {
     "name": "@shrub/socket.io",
     "description": "A module providing socket.io server support.",
-    "version": "0.5.89",
+    "version": "0.5.90",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -24,9 +24,9 @@
         "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo"
     },
     "dependencies": {
-        "@shrub/core": "0.5.89",
-        "@shrub/http": "0.5.89",
+        "@shrub/core": "0.5.90",
+        "@shrub/http": "0.5.90",
         "socket.io": "4.6.2"
     },
-    "gitHead": "96f1a2a97069e48bbf9cea127e6768c566066032"
+    "gitHead": "7930508995db8f294b385f8b507e36d7de513f05"
 }
