@@ -1,7 +1,7 @@
 {
     "name": "@shrub/queue-bullmq",
     "description": "Provides a job/worker queue using BullMQ.",
-    "version": "0.5.88",
+    "version": "0.5.89",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -25,9 +25,9 @@
         "test": "jest"
     },
     "dependencies": {
-        "@shrub/core": "0.5.88",
-        "@shrub/logging": "0.5.88",
-        "@shrub/queue": "0.5.88",
+        "@shrub/core": "0.5.89",
+        "@shrub/logging": "0.5.89",
+        "@shrub/queue": "0.5.89",
         "@sprig/event-emitter": "0.2.20",
         "bullmq": "3.15.0"
     },
