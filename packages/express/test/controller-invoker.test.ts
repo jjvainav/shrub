@@ -9,6 +9,11 @@ import { ControllerInvoker, ExpressModule, Get, IControllerInvokerService, IExpr
 interface IInvokerTestContext extends IControllerInvokerService {
 }
 
+interface IFileResult {
+    readonly contentType: string;
+    readonly stream: Readable;
+}
+
 const expectedToken = "valid_token";
 const tokenMiddleware = (token: string) => (req: Request, res: Response, next: NextFunction) => {
     // this middleware is used to test injecting a token into the request before the applicatin's request pipeline is invoked
@@ -169,10 +174,12 @@ describe("invoker", () => {
     test("for GET action where data is written to the response as a stream", async () => {
         const invoker = context.createControllerInvoker(FooControllerInvoker);
         
-        const result = await buffer(await invoker.getFile());
-        
+        const result = await invoker.getFile();
+        const data = await buffer(result.stream);
+
+        expect(result.contentType).toBe("image/png");
         // this will be the length of the files/test.png file
-        expect(result.byteLength).toBe(166214);
+        expect(data.byteLength).toBe(166214);
     });
 });
 
@@ -193,6 +200,9 @@ class FooController {
     getFile(req: Request, res: Response, next: NextFunction): void {
         // invoking pipe against the Response will pass a Readable stream as the response data
         const stream = fs.createReadStream("./test/files/test.png");
+
+        res.setHeader("Content-Type", "image/png");
+
         stream.pipe(res);
         stream.on("error", err => next(err));
     }
@@ -210,14 +220,17 @@ class FooController {
 }
 
 class FooControllerInvoker extends ControllerInvoker {
-    getFile(): Promise<Readable> {
+    getFile(): Promise<IFileResult> {
         return this.invokeAction({
             controller: FooController,
             method: "GET",
             path: "/foo/file"
         })
-        // data will be a Readable stream
-        .then(response => response.data);
+        .then(response => ({
+            contentType: response.getHeader("Content-Type") as string,
+            // data will be a Readable stream
+            stream: response.data
+        }));
     }
 
     getFoo(concat?: string): Promise<string> {

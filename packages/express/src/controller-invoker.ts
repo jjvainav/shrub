@@ -46,6 +46,7 @@ export interface IControllerRequestOptions<TController> {
 export interface IControllerResponse {
     readonly status: number;
     readonly data: any;
+    getHeader(name: string): number | string | string[] | undefined;
 }
 
 export const IControllerInvokerService = createService<IControllerInvokerService>("controller-invoker-service");
@@ -140,7 +141,11 @@ export abstract class ControllerInvoker {
                     stream.end(data, encoding, cb);
                 }
                 else {
-                    callback({ status, data });
+                    callback({ 
+                        status, 
+                        data,
+                        getHeader: name => this.getHeader(name)
+                    });
                 
                     if (cb) {
                         cb();
@@ -170,7 +175,11 @@ export abstract class ControllerInvoker {
                 if (!stream) {
                     stream = new PassThrough();
                     // the caller is expecting to receive a Readable stream
-                    callback({ status, data: stream });
+                    callback({ 
+                        status, 
+                        data: stream,
+                        getHeader: name => this.getHeader(name)
+                    });
                 }
 
                 stream.write(data, cb);
