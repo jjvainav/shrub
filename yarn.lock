@@ -7467,6 +7467,11 @@ type-is@~1.6.18:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
+typebox@1.1.28:
+  version "1.1.28"
+  resolved "https://registry.yarnpkg.com/typebox/-/typebox-1.1.28.tgz#ff31583db52f4c59ce9e2e4b2d8a77bc02f64741"
+  integrity sha512-OqHTHRfBpQHWPipoeFVkNgxKjjXhGY49UgekFrOuaC9O59/Hws8KHjGa1AUfNYnxWSfuNRkTB81FAL/QbTWFrg==
+
 typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"

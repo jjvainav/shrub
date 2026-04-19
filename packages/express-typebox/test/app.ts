@@ -1,25 +1,24 @@
 import { Request, Response, NextFunction } from "express";
-import * as zod from "zod";
+import Type from "typebox";
+import Schema from "typebox/schema";
 import { ExpressFactory, IExpressApplication, IExpressConfiguration } from "@shrub/express";
-import { ExpressZodModule } from "../src";
+import { ExpressTypeboxModule } from "../src";
 
 export interface ITestContextOptions {
     readonly shouldFail?: boolean;
 }
 
-interface ITestObject {
-    readonly foo: string;
-}
-
-const schema: zod.Schema<ITestObject> = zod.object({
-    foo: zod.string()
+type TestObject = Type.Static<typeof TestObject>
+const TestObject = Type.Object({
+  foo: Type.Readonly(Type.String())
 });
+const TestObjectValidator = Schema.Compile(TestObject);
 
 export function createApp(options?: ITestContextOptions): Promise<IExpressApplication> {
     return ExpressFactory
         .useModules([{
             name: "Test",
-            dependencies: [ExpressZodModule],
+            dependencies: [ExpressTypeboxModule],
             configure: ({ config }) => {
                 config.get(IExpressConfiguration).get(
                     "/test",
@@ -27,7 +26,7 @@ export function createApp(options?: ITestContextOptions): Promise<IExpressApplic
                         const obj = options && options.shouldFail ? { } : { foo: "test" };
                         
                         try {
-                            const result = schema.parse(obj);
+                            const result = TestObjectValidator.Parse(obj);
                             res.status(200).json(result);
                         }
                         catch (err) {

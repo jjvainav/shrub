@@ -1,0 +1,17 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+      "composite": false,
+      "declaration": false,
+      "declarationMap": false,
+      "outDir": "dist",
+      "strictNullChecks": true,
+      "strictPropertyInitialization": true,
+      "types": ["jest"]
+    },
+    "ts-node": {
+      "esm": true,
+      "experimentalSpecifierResolution": "node"
+    },
+    "include": [".", "../src"]
+  }

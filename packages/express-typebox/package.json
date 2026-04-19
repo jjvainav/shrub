@@ -1,0 +1,38 @@
+{
+    "name": "@shrub/express-typebox",
+    "description": "Express module that provides error middleware for typebox validation errors.",
+    "version": "0.5.91",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jjvainav/shrub.git"
+    },
+    "main": "dist/index.js",
+    "module": "dist/esm/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=10.18.0"
+    },
+    "scripts": {
+        "build": "tsc -b .",
+        "build:esm": "tsc -p tsconfig.esm.json",
+        "clean": "rimraf ./dist && rimraf tsconfig.tsbuildinfo",
+        "test": "node --experimental-vm-modules ../../node_modules/.bin/jest"
+    },
+    "devDependencies": {
+        "@types/express": "4.17.9"
+    },
+    "dependencies": {
+        "@shrub/core": "0.5.91",
+        "@shrub/express": "0.5.91",
+        "express": "4.18.2",
+        "typebox": "1.1.28"
+    },
+    "gitHead": "7930508995db8f294b385f8b507e36d7de513f05"
+}

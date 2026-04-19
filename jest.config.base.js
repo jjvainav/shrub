@@ -8,13 +8,15 @@
  */
 
 module.exports = {
-    preset: "ts-jest",
+    preset: "ts-jest/presets/default-esm",
     roots: [
         "<rootDir>/test"
     ],
+    extensionsToTreatAsEsm: [".ts"],
     transform: {
         "^.+\\.ts$": ["ts-jest", { 
             tsconfig: "<rootDir>/test/tsconfig.json",
+            useESM: true,
             verbose: true
         }]
     },
